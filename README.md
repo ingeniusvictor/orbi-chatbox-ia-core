@@ -46,6 +46,31 @@ Ejecutar en local:
 npm run dev
 ```
 
+## Backend Receiver Sandbox
+
+El receiver es un scaffold local controlado. No representa un backend productivo ni expone un endpoint público.
+
+Comandos:
+
+```bash
+npm run server:check
+npm run server:dev
+```
+
+Health check:
+
+```txt
+GET http://localhost:8787/api/health
+```
+
+Widget sandbox endpoint:
+
+```txt
+POST http://localhost:8787/api/public/widget/orbi_demo_widget_key/message
+```
+
+Este endpoint es local/sandbox y no crea leads reales, no llama IA externa, no usa base de datos y no conecta WhatsApp.
+
 ## Arquitectura actual
 
 La aplicación fue modularizada para evitar un monolito exportado desde Google AI Studio.
@@ -75,8 +100,8 @@ Bloqueado por diseño:
 - Base de datos real
 - Deploy público sin revisión de seguridad
 
-## Próximo módulo
+## Módulo actual
 
 0K-13A.1 — Minimal Backend Receiver Controlled Scaffold
 
-Objetivo: preparar un scaffold backend mínimo, local y controlado, sin deploy productivo y sin datos reales.
+Objetivo: mantener un scaffold backend mínimo, local y controlado, sin deploy productivo y sin datos reales.
