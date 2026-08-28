@@ -1,20 +1,66 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+﻿# ORBI ChatBox IA Core
 
-# Run and deploy your AI Studio app
+ORBI ChatBox IA Core es una aplicación frontend modular para atención conversacional empresarial, captura de leads, simulación de Web Widget, preparación futura para WhatsApp Business, base de conocimiento local y paneles de diagnóstico comercial.
 
-This contains everything you need to run your app locally.
+## Estado actual
 
-View your app in AI Studio: https://ai.studio/apps/9422ac4f-cb19-46d8-9f15-b7773fff2f08
+- Versión: 0.12.1-premium-ux-refresh
+- Estado: Sandbox / Demo avanzada
+- Producción externa: Bloqueada
+- WhatsApp real: No conectado
+- Backend real: No creado todavía
+- Persistencia actual: LocalStorage
+- Rama de trabajo actual: feature/0k-13-minimal-backend-controlled-build
 
-## Run Locally
+## Stack
 
-**Prerequisites:**  Node.js
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- lucide-react
 
+## Comandos locales
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+Instalar dependencias:
+npm install
+
+Validar TypeScript:
+npm run lint
+
+Compilar:
+npm run build
+
+Ejecutar en local:
+npm run dev
+
+## Arquitectura actual
+
+La aplicación fue modularizada para evitar un monolito exportado desde Google AI Studio.
+
+Estructura principal:
+- src/App.tsx
+- src/AppPremium.tsx
+- src/main.tsx
+- src/components/common/
+- src/components/workspaces/
+- src/data/
+- src/types/
+
+## Guardrails
+
+Este proyecto todavía no debe usarse en producción.
+
+Bloqueado por diseño:
+- Endpoint público productivo
+- WhatsApp Business real
+- Datos reales de clientes
+- Backend productivo
+- Base de datos real
+- Deploy público sin revisión de seguridad
+
+## Próximo módulo
+
+0K-13A.1 — Minimal Backend Receiver Controlled Scaffold
+
+Objetivo: preparar un scaffold backend mínimo, local y controlado, sin deploy productivo y sin datos reales.
