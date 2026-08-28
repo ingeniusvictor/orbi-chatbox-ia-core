@@ -71,6 +71,19 @@ POST http://localhost:8787/api/public/widget/orbi_demo_widget_key/message
 
 Este endpoint es local/sandbox y no crea leads reales, no llama IA externa, no usa base de datos y no conecta WhatsApp.
 
+## Manual Test Console
+
+La app incluye una consola local para probar el backend receiver sandbox desde el frontend.
+
+1. Ejecutar backend: `npm run server:dev`
+2. Ejecutar frontend: `npm run dev`
+3. Abrir: `http://localhost:3000`
+4. Ir a **Backend Roadmap**, abrir **Plan 0K-12B Receiver** y probar:
+   - `GET /api/health`
+   - `POST /api/public/widget/orbi_demo_widget_key/message`
+
+La consola solo permite URLs locales `localhost`/`127.0.0.1` y no debe usarse con datos reales.
+
 ## Arquitectura actual
 
 La aplicación fue modularizada para evitar un monolito exportado desde Google AI Studio.

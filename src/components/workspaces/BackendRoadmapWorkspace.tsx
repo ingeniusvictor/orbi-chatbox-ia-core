@@ -12,6 +12,7 @@ import {
   FileCode,
   AlertCircle,
 } from "lucide-react";
+import { BackendReceiverTestConsole } from "../common";
 import {
   CompanyProfile,
   BACKEND_ARCHITECTURE_COMPONENTS,
@@ -343,6 +344,17 @@ export const BackendRoadmapWorkspace: React.FC<BackendRoadmapWorkspaceProps> = (
                 <p className="text-[11px] text-slate-400">{file.purpose}</p>
               </div>
             ))}
+          </div>
+
+          <div className="space-y-3 border-t border-amber-500/30 pt-6">
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-amber-500/30" />
+              <h3 className="text-sm font-bold uppercase tracking-wide text-amber-200">
+                Backend Receiver Manual Test Console
+              </h3>
+              <div className="h-px flex-1 bg-amber-500/30" />
+            </div>
+            <BackendReceiverTestConsole />
           </div>
         </div>
       )}
