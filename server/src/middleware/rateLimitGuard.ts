@@ -1,4 +1,5 @@
 import type { RequestHandler } from "express";
+import { createSandboxError } from "../security/errorResponses.js";
 
 type RateLimitEntry = {
   requestCount: number;
@@ -27,11 +28,12 @@ export const createRateLimitGuard = (
         "Retry-After",
         Math.ceil((windowMs - (now - currentEntry.windowStartedAt)) / 1_000),
       );
-      response.status(429).json({
-        ok: false,
-        mode: "sandbox",
-        message: "Too many local sandbox requests. Try again later.",
-      });
+      const error = createSandboxError(
+        429,
+        "RATE_LIMITED",
+        "Too many local sandbox requests. Try again later.",
+      );
+      response.status(error.statusCode).json(error.body);
       return;
     }
 

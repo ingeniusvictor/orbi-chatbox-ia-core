@@ -84,6 +84,10 @@ La app incluye una consola local para probar el backend receiver sandbox desde e
 
 La consola solo permite URLs locales `localhost`/`127.0.0.1` y no debe usarse con datos reales.
 
+## Receiver Validation Hardening
+
+El receiver sandbox valida la public key, el consentimiento, el mensaje, su máximo de 2000 caracteres y el `channel`. Los errores usan un `errorCode` seguro y consistente. No almacena mensajes, no llama IA externa, no crea leads reales, no conecta WhatsApp ni usa una base de datos.
+
 ## Arquitectura actual
 
 La aplicación fue modularizada para evitar un monolito exportado desde Google AI Studio.

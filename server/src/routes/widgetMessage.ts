@@ -1,5 +1,7 @@
 import { Router } from "express";
-import type { WidgetMessageRequest, WidgetMessageResponse } from "../types/widget.js";
+import { createSandboxError } from "../security/errorResponses.js";
+import type { WidgetMessageResponse } from "../types/widget.js";
+import { validateWidgetMessagePayload } from "../validation/widgetPayload.js";
 
 const SANDBOX_GUARDRAILS = [
   "Sandbox local",
@@ -14,36 +16,19 @@ export const createWidgetMessageRouter = (demoWidgetPublicKey: string): Router =
 
   router.post("/api/public/widget/:publicKey/message", (request, response) => {
     if (request.params.publicKey !== demoWidgetPublicKey) {
-      response.status(403).json({
-        ok: false,
-        mode: "sandbox",
-        message: "Invalid demo widget public key.",
-      });
+      const error = createSandboxError(403, "INVALID_PUBLIC_KEY", "Invalid demo widget public key.");
+      response.status(error.statusCode).json(error.body);
       return;
     }
 
-    const body = request.body as WidgetMessageRequest | undefined;
-
-    if (
-      !body ||
-      typeof body.message !== "string" ||
-      body.message.trim().length === 0 ||
-      body.message.length > 2_000
-    ) {
-      response.status(400).json({
-        ok: false,
-        mode: "sandbox",
-        message: "Message must be a non-empty string with at most 2000 characters.",
-      });
-      return;
-    }
-
-    if (body.consentAccepted !== true) {
-      response.status(400).json({
-        ok: false,
-        mode: "sandbox",
-        message: "Consent must be accepted in sandbox mode.",
-      });
+    const validation = validateWidgetMessagePayload(request.body);
+    if (validation.ok === false) {
+      const error = createSandboxError(
+        validation.statusCode,
+        validation.errorCode,
+        validation.message,
+      );
+      response.status(error.statusCode).json(error.body);
       return;
     }
 
@@ -56,6 +41,8 @@ export const createWidgetMessageRouter = (demoWidgetPublicKey: string): Router =
       message:
         "Mensaje recibido en modo sandbox. No se creó lead real ni se ejecutó automatización productiva.",
       guardrails: SANDBOX_GUARDRAILS,
+      processedAt: new Date().toISOString(),
+      normalizedChannel: validation.payload.channel,
     };
 
     response.json(payload);

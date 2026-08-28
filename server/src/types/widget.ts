@@ -1,8 +1,7 @@
 export type WidgetChannel = "web_demo" | "manual_test" | "whatsapp_future";
 
 export type WidgetMessageRequest = {
-  publicKey?: string;
-  channel?: WidgetChannel;
+  channel?: WidgetChannel | string;
   visitorId?: string;
   message?: string;
   pageUrl?: string;
@@ -10,12 +9,23 @@ export type WidgetMessageRequest = {
   timestamp?: string;
 };
 
+export type NormalizedWidgetMessageRequest = {
+  channel: WidgetChannel;
+  visitorId: string;
+  message: string;
+  pageUrl: string;
+  consentAccepted: true;
+  timestamp: string;
+};
+
 export type WidgetMessageResponse = {
-  ok: boolean;
+  ok: true;
   mode: "sandbox";
   received: boolean;
   leadCreated: boolean;
   handoffRecommended: boolean;
   message: string;
   guardrails: string[];
+  processedAt: string;
+  normalizedChannel: WidgetChannel;
 };

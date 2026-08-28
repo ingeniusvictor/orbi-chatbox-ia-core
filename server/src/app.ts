@@ -5,6 +5,7 @@ import { createCorsGuard } from "./middleware/corsGuard.js";
 import { createRateLimitGuard } from "./middleware/rateLimitGuard.js";
 import { healthRouter } from "./routes/health.js";
 import { createWidgetMessageRouter } from "./routes/widgetMessage.js";
+import { createSandboxError } from "./security/errorResponses.js";
 
 export const createApp = (runtimeEnv: ServerRuntimeEnv): express.Express => {
   const app = express();
@@ -20,19 +21,23 @@ export const createApp = (runtimeEnv: ServerRuntimeEnv): express.Express => {
   app.use(createWidgetMessageRouter(runtimeEnv.demoWidgetPublicKey));
 
   const notFoundHandler: RequestHandler = (_request, response) => {
-    response.status(404).json({
-      ok: false,
-      mode: "sandbox",
-      message: "Route not found.",
-    });
+    const error = createSandboxError(404, "ROUTE_NOT_FOUND", "Route not found.");
+    response.status(error.statusCode).json(error.body);
   };
 
-  const errorHandler: ErrorRequestHandler = (_error, _request, response, _next) => {
-    response.status(500).json({
-      ok: false,
-      mode: "sandbox",
-      message: "Unexpected sandbox server error.",
-    });
+  const errorHandler: ErrorRequestHandler = (error, _request, response, _next) => {
+    if (error instanceof SyntaxError && "status" in error && error.status === 400) {
+      const invalidJson = createSandboxError(400, "INVALID_JSON_BODY", "Request body must contain valid JSON.");
+      response.status(invalidJson.statusCode).json(invalidJson.body);
+      return;
+    }
+
+    const sandboxError = createSandboxError(
+      500,
+      "INTERNAL_SANDBOX_ERROR",
+      "Unexpected sandbox server error.",
+    );
+    response.status(sandboxError.statusCode).json(sandboxError.body);
   };
 
   app.use(notFoundHandler);

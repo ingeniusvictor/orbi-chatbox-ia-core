@@ -1,4 +1,5 @@
 import type { RequestHandler } from "express";
+import { createSandboxError } from "../security/errorResponses.js";
 
 export const createCorsGuard = (allowedOrigins: string[]): RequestHandler => {
   const originAllowlist = new Set(allowedOrigins);
@@ -7,11 +8,8 @@ export const createCorsGuard = (allowedOrigins: string[]): RequestHandler => {
     const origin = request.get("origin");
 
     if (origin && !originAllowlist.has(origin)) {
-      response.status(403).json({
-        ok: false,
-        mode: "sandbox",
-        message: "Origin not allowed.",
-      });
+      const error = createSandboxError(403, "ORIGIN_NOT_ALLOWED", "Origin not allowed.");
+      response.status(error.statusCode).json(error.body);
       return;
     }
 
