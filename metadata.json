@@ -1,0 +1,8 @@
+{
+  "name": "ORBI ChatBox IA Core",
+  "description": "Motor inteligente de atención empresarial multicanal, calificación comercial, base de conocimiento y arquitectura de integración con WhatsApp y Web Widget en interfaz SaaS Premium.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
