@@ -1,4 +1,4 @@
-﻿# ORBI ChatBox IA Core
+# ORBI ChatBox IA Core
 
 ORBI ChatBox IA Core es una aplicación frontend modular para atención conversacional empresarial, captura de leads, simulación de Web Widget, preparación futura para WhatsApp Business, base de conocimiento local y paneles de diagnóstico comercial.
 
@@ -23,35 +23,51 @@ ORBI ChatBox IA Core es una aplicación frontend modular para atención conversa
 ## Comandos locales
 
 Instalar dependencias:
+
+```bash
 npm install
+```
 
 Validar TypeScript:
+
+```bash
 npm run lint
+```
 
 Compilar:
+
+```bash
 npm run build
+```
 
 Ejecutar en local:
+
+```bash
 npm run dev
+```
 
 ## Arquitectura actual
 
 La aplicación fue modularizada para evitar un monolito exportado desde Google AI Studio.
 
 Estructura principal:
-- src/App.tsx
-- src/AppPremium.tsx
-- src/main.tsx
-- src/components/common/
-- src/components/workspaces/
-- src/data/
-- src/types/
+
+```txt
+src/App.tsx
+src/AppPremium.tsx
+src/main.tsx
+src/components/common/
+src/components/workspaces/
+src/data/
+src/types/
+```
 
 ## Guardrails
 
 Este proyecto todavía no debe usarse en producción.
 
 Bloqueado por diseño:
+
 - Endpoint público productivo
 - WhatsApp Business real
 - Datos reales de clientes
