@@ -180,6 +180,10 @@ El hub interno que une Chat IA y WhatsApp manual está documentado en [docs/UNIF
 
 Los tipos y configuraciones template están documentados en [docs/INSTALLABLE_CLIENT_CONFIG_TEMPLATE.md](docs/INSTALLABLE_CLIENT_CONFIG_TEMPLATE.md). Incluyen una config demo ORBI sandbox y un template preview seguro que alimenta el Unified Floating Launcher; no contienen secretos, datos reales ni habilitan producción.
 
+## ORBI Website Preview Package
+
+El paquete para preparar una futura prueba en web ORBI está en [docs/ORBI_WEBSITE_PREVIEW_PACKAGE.md](docs/ORBI_WEBSITE_PREVIEW_PACKAGE.md). Estado: **PREVIEW PACKAGE / NO INSTALL / NO DEPLOY / PRODUCTION BLOCKED**; no instala ni modifica la web ORBI todavía.
+
 ## Validaciones obligatorias
 
 ```bash

@@ -83,6 +83,8 @@ Responsabilidad futura:
 
 **Estado actual:** PLANNED / NOT IMPLEMENTED.
 
+El [ORBI Website Preview Package](./ORBI_WEBSITE_PREVIEW_PACKAGE.md) está **PREPARATION READY**; no implementa el loader ni autoriza instalación.
+
 ### 6. Backend Receiver
 
 Responsabilidad:

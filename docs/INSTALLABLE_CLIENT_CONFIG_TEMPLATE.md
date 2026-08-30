@@ -40,6 +40,8 @@ No incluye snippet real, instalación en Web ORBI, producción, WhatsApp Busines
 - `databasePersistenceAllowed` debe ser `false` hasta un módulo futuro de persistencia real.
 - No hardcodear teléfonos reales, exponer secretos ni usar wildcard CORS.
 
+La configuración ORBI preview debe derivarse de `orbiDemoInstallableWidgetConfig` y mantener `realDataAllowed: false` y `productionAllowed: false`. Ver [ORBI Website Preview Package](./ORBI_WEBSITE_PREVIEW_PACKAGE.md).
+
 ## Próxima fase
 
 `0K-14D.5 — ORBI Website Preview Package`

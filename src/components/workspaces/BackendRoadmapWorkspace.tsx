@@ -127,12 +127,12 @@ export const BackendRoadmapWorkspace: React.FC<BackendRoadmapWorkspaceProps> = (
       <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="text-sm font-bold text-amber-200">Installable Client Config Template</h3>
-            <p className="mt-1 text-xs text-slate-300">Plantilla tipada de cliente para sandbox, sin secretos ni datos reales.</p>
+            <h3 className="text-sm font-bold text-amber-200">ORBI Website Preview Package</h3>
+            <p className="mt-1 text-xs text-slate-300">Paquete documental para una futura prueba preview controlada en web ORBI.</p>
           </div>
           <div className="text-left sm:text-right">
-            <p className="text-xs font-bold text-amber-300">CLIENT CONFIG TEMPLATE READY / SNIPPET PENDING / PRODUCTION NO-GO</p>
-            <p className="font-mono text-[10px] text-slate-400">Next: ORBI Website Preview Package</p>
+            <p className="text-xs font-bold text-amber-300">PREVIEW PACKAGE READY / EXECUTION PENDING / PRODUCTION NO-GO</p>
+            <p className="font-mono text-[10px] text-slate-400">Next: Controlled Web Preview Execution</p>
           </div>
         </div>
       </div>

@@ -176,3 +176,5 @@ Debe existir un procedimiento claro para:
 `0K-14C.3 — Preview Configuration Template`
 
 La arquitectura de la suite que estos requisitos preparan está en [Installable Widget Suite Architecture](./INSTALLABLE_WIDGET_SUITE_ARCHITECTURE.md).
+
+Para la futura prueba específica de ORBI, consultar [ORBI Website Preview Package](./ORBI_WEBSITE_PREVIEW_PACKAGE.md).
