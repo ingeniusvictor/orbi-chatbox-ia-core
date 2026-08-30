@@ -55,4 +55,8 @@ Este plan es informativo: no pegar todavía en producción. Cuando se autorice u
 
 ## Próxima fase recomendada
 
-`0K-14B.2 — Controlled Embed Instruction Pack`.
+El procedimiento de preparación, preflight, snippet conceptual y rollback está documentado en [Controlled Embed Instruction Pack](./CONTROLLED_EMBED_INSTRUCTION_PACK.md).
+
+El paquete es **DOCUMENTATION ONLY / PRODUCTION BLOCKED**. No habilita una integración, endpoint ni despliegue productivo.
+
+Una prueba de preview únicamente podrá evaluarse con autorización explícita, dominio permitido, CORS controlado y datos sintéticos.

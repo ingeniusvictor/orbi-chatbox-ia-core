@@ -131,8 +131,8 @@ export const BackendRoadmapWorkspace: React.FC<BackendRoadmapWorkspaceProps> = (
             <p className="mt-1 text-xs text-slate-300">Plan documentado para una futura prueba controlada en web ORBI.</p>
           </div>
           <div className="text-left sm:text-right">
-            <p className="text-xs font-bold text-amber-300">DOCUMENTED / PRODUCTION BLOCKED</p>
-            <p className="font-mono text-[10px] text-slate-400">Next: Controlled Embed Instruction Pack</p>
+            <p className="text-xs font-bold text-amber-300">INSTRUCTION PACK READY / PRODUCTION BLOCKED</p>
+            <p className="font-mono text-[10px] text-slate-400">Next: authorized controlled preview only</p>
           </div>
         </div>
       </div>

@@ -152,6 +152,10 @@ El widget llama al receiver local, muestra la respuesta controlada y, tras HTTP 
 
 El plan de preparación está en [docs/WEB_ORBI_EMBED_CONTROLLED_PLAN.md](docs/WEB_ORBI_EMBED_CONTROLLED_PLAN.md). El Web Widget funciona sólo en sandbox local; no es un embed productivo. Antes de probarlo en una web real controlada se deben definir dominio, CORS, backend controlado, política de datos demo y ejecutar QA local.
 
+## Controlled Embed Instruction Pack
+
+Las instrucciones para una futura prueba de preview controlada están en [docs/CONTROLLED_EMBED_INSTRUCTION_PACK.md](docs/CONTROLLED_EMBED_INSTRUCTION_PACK.md). El paquete es solo documental y mantiene la integración productiva bloqueada.
+
 ## Validaciones obligatorias
 
 ```bash
