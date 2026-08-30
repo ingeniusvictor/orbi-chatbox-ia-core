@@ -49,8 +49,8 @@ const hasKnowledgeMetadata = (body: unknown, expectedEntryId?: string): boolean 
     ? baseMetadataIsValid && typeof matchCount === "number" && matchCount >= 1 && entryIds.includes(expectedEntryId)
     : baseMetadataIsValid && matchCount === 0 && entryIds.length === 0;
 };
-const hasKnowledgeResponse = (body: unknown, expectedEntryId?: string): boolean => {
-  if (!isRecord(body) || body.responseMode !== "knowledge-deterministic" || typeof body.grounded !== "boolean" || !Array.isArray(body.sourceEntryIds) || typeof body.message !== "string") return false;
+const hasProviderResponse = (body: unknown, expectedEntryId?: string): boolean => {
+  if (!isRecord(body) || body.responseMode !== "provider-mock" || body.provider !== "mock" || typeof body.grounded !== "boolean" || !Array.isArray(body.sourceEntryIds) || typeof body.message !== "string") return false;
 
   return expectedEntryId
     ? body.grounded === true
@@ -62,7 +62,7 @@ const hasKnowledgeResponse = (body: unknown, expectedEntryId?: string): boolean 
 };
 let knownResponseSnapshot: { message: string; sourceEntryIds: readonly string[] } | undefined;
 const hasDeterministicKnownResponse = (body: unknown): boolean => {
-  if (!hasKnowledgeResponse(body, "orbi-sandbox-assistant") || !isRecord(body)) return false;
+  if (!hasProviderResponse(body, "orbi-sandbox-assistant") || !isRecord(body)) return false;
 
   const current = {
     message: body.message as string,
@@ -110,7 +110,7 @@ const main = async (): Promise<void> => {
     { name: "valid widget message", path: "/api/public/widget/orbi_demo_widget_key/message", init: { method: "POST", headers: jsonHeaders, body: validMessage }, expected: { status: 200, assertions: (body) => hasFields({ ok: true, received: true, leadCreated: false })(body) && hasValidProcessingResult(body) } },
     { name: "known knowledge response", path: "/api/public/widget/orbi_demo_widget_key/message", init: { method: "POST", headers: jsonHeaders, body: knownKnowledgeMessage }, expected: { status: 200, assertions: (body) => hasPipelineMetadata(body) && hasKnowledgeMetadata(body, "orbi-sandbox-assistant") && hasDeterministicKnownResponse(body) } },
     { name: "known knowledge response repeat", path: "/api/public/widget/orbi_demo_widget_key/message", init: { method: "POST", headers: jsonHeaders, body: knownKnowledgeMessage }, expected: { status: 200, assertions: hasDeterministicKnownResponse } },
-    { name: "unknown knowledge response", path: "/api/public/widget/orbi_demo_widget_key/message", init: { method: "POST", headers: jsonHeaders, body: unknownKnowledgeMessage }, expected: { status: 200, assertions: (body) => hasPipelineMetadata(body) && hasKnowledgeMetadata(body) && hasKnowledgeResponse(body) } },
+    { name: "unknown knowledge response", path: "/api/public/widget/orbi_demo_widget_key/message", init: { method: "POST", headers: jsonHeaders, body: unknownKnowledgeMessage }, expected: { status: 200, assertions: (body) => hasPipelineMetadata(body) && hasKnowledgeMetadata(body) && hasProviderResponse(body) } },
     { name: "invalid public key", path: "/api/public/widget/invalid_key/message", init: { method: "POST", headers: jsonHeaders, body: validMessage }, expected: { status: 403, assertions: hasFields({ errorCode: "INVALID_PUBLIC_KEY" }) } },
     { name: "empty message", path: "/api/public/widget/orbi_demo_widget_key/message", init: { method: "POST", headers: jsonHeaders, body: emptyMessage }, expected: { status: 400, assertions: hasFields({ errorCode: "INVALID_MESSAGE" }) } },
     { name: "long message", path: "/api/public/widget/orbi_demo_widget_key/message", init: { method: "POST", headers: jsonHeaders, body: longMessage }, expected: { status: 400, assertions: hasFields({ errorCode: "MESSAGE_TOO_LONG" }) } },

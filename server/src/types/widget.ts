@@ -43,7 +43,8 @@ export type WidgetMessageResponse = {
   leadCreated: boolean;
   handoffRecommended: boolean;
   message: string;
-  responseMode: "knowledge-deterministic";
+  responseMode: "provider-mock";
+  provider: "mock";
   grounded: boolean;
   sourceEntryIds: readonly string[];
   guardrails: string[];

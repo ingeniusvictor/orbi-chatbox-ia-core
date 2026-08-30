@@ -110,7 +110,7 @@ npm run server:knowledge:qa
 
 ## AI Provider Abstraction
 
-0K-14 y 0K-15A.1 están cerrados. El módulo actual 0K-15A.2 añade un provider `mock` local, determinista y aislado para probar el contrato con el `KnowledgeContext` local acotado. No hay IA real, SDK, API keys ni llamadas externas; la respuesta determinista basada en conocimiento local sigue siendo el comportamiento de runtime actual.
+0K-14, 0K-15A.1 y 0K-15A.2 están cerrados. El módulo actual 0K-15A.3 integra el provider `mock` local y determinista al flujo sandbox: `Widget → Receiver → Validation → Knowledge Context → AiProvider contract → Mock provider → Sandbox Response`. Sólo `mock` está activo; no hay IA real, SDK, API keys, llamadas externas ni runtime productivo.
 
 Validar el contrato estructural local:
 
