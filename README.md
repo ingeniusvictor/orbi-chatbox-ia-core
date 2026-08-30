@@ -188,6 +188,10 @@ El paquete para preparar una futura prueba en web ORBI está en [docs/ORBI_WEBSI
 
 La decisión de ejecución está documentada en [docs/CONTROLLED_WEB_PREVIEW_EXECUTION_GATE.md](docs/CONTROLLED_WEB_PREVIEW_EXECUTION_GATE.md). Estado: **EXECUTION GATE / NO DEPLOY / PRODUCTION BLOCKED**; hay CONDITIONAL GO para preparación y NO-GO para ejecución real hasta contar con URL preview, backend controlado, CORS, public key y autorización final.
 
+## Controlled Preview Execution Inputs
+
+La plantilla para completar los inputs de ejecución está en [docs/CONTROLLED_PREVIEW_EXECUTION_INPUTS.md](docs/CONTROLLED_PREVIEW_EXECUTION_INPUTS.md). Estado: **INPUT TEMPLATE / NO EXECUTION / NO DEPLOY / PRODUCTION BLOCKED**; hay CONDITIONAL GO para completar inputs y NO-GO para ejecutar preview real.
+
 ## Validaciones obligatorias
 
 ```bash

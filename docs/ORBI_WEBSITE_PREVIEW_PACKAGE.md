@@ -144,6 +144,8 @@ NO-GO si se intenta usar producción, falta rollback/CORS/backend controlado, se
 
 La decisión final de ejecución debe pasar por [Controlled Web Preview Execution Gate](./CONTROLLED_WEB_PREVIEW_EXECUTION_GATE.md).
 
+La plantilla de valores requerida antes de cualquier ejecución está en [Controlled Preview Execution Inputs](./CONTROLLED_PREVIEW_EXECUTION_INPUTS.md).
+
 ## Próxima fase
 
 `0K-15 — Controlled Web Preview Execution`

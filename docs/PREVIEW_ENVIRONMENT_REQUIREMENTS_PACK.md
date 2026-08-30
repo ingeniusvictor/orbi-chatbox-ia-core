@@ -180,3 +180,5 @@ La arquitectura de la suite que estos requisitos preparan está en [Installable 
 Para la futura prueba específica de ORBI, consultar [ORBI Website Preview Package](./ORBI_WEBSITE_PREVIEW_PACKAGE.md).
 
 La decisión de avanzar hacia ejecución preview debe pasar por [Controlled Web Preview Execution Gate](./CONTROLLED_WEB_PREVIEW_EXECUTION_GATE.md).
+
+Los inputs específicos de ORBI para esa decisión se registran en [Controlled Preview Execution Inputs](./CONTROLLED_PREVIEW_EXECUTION_INPUTS.md).
