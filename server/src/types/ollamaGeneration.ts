@@ -12,4 +12,8 @@ export type OllamaGenerationResponse = {
 
 export type OllamaGenerationResult =
   | { readonly ok: true; readonly text: string }
-  | { readonly ok: false; readonly reason: string };
+  | {
+    readonly ok: false;
+    readonly code: "runtime-unavailable" | "model-unavailable" | "timeout" | "invalid-response" | "generation-failed";
+    readonly reason: string;
+  };

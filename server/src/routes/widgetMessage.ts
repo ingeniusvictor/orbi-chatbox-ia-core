@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { resolveAiProvider } from "../providers/aiProviderRegistry.js";
+import { QwenLocalProviderError } from "../providers/qwenLocalProvider.js";
 import { createSandboxError } from "../security/errorResponses.js";
 import { buildConversationEnvelope } from "../services/conversationEnvelope.js";
 import { buildKnowledgeContext } from "../services/knowledgeContextBuilder.js";
@@ -83,10 +84,10 @@ export const createWidgetMessageRouter = (
 
       response.json(payload);
     } catch (error) {
-      if (error instanceof Error && error.message.startsWith("qwen-local-unavailable:")) {
+      if (error instanceof QwenLocalProviderError) {
         const providerError = createSandboxError(
-          503,
-          "LOCAL_AI_PROVIDER_UNAVAILABLE",
+          error.code === "LOCAL_AI_INVALID_RESPONSE" ? 502 : 503,
+          error.code,
           "Configured local AI provider is unavailable.",
         );
         response.status(providerError.statusCode).json(providerError.body);

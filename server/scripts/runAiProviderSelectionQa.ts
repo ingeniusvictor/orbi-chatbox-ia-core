@@ -19,6 +19,7 @@ const start = async (router: express.Router): Promise<{ base: string; close: () 
 
 const main = async (): Promise<void> => {
   const syntheticOllama = createServer((request, response) => {
+    if (request.url === "/api/version" && request.method === "GET") { response.writeHead(200, { "Content-Type": "application/json" }); response.end('{"version":"synthetic"}'); return; }
     if (request.url !== "/api/generate" || request.method !== "POST") { response.writeHead(404); response.end(); return; }
     response.writeHead(200, { "Content-Type": "application/json" }); response.end('{"response":"synthetic selected qwen"}');
   });
@@ -45,7 +46,7 @@ const main = async (): Promise<void> => {
       && resolveAiProvider(resolveConfiguredAiProvider("qwen-local")).mode === "qwen-local"
       && mockResponse.status === 200 && mockBody.provider === "mock" && mockBody.responseMode === "provider-mock"
       && qwenResponse.status === 200 && qwenBody.provider === "qwen-local" && qwenBody.responseMode === "provider-qwen-local" && qwenBody.message === "synthetic selected qwen"
-      && unavailableResponse.status === 503 && unavailableBody.errorCode === "LOCAL_AI_PROVIDER_UNAVAILABLE" && unavailableBody.provider !== "mock";
+      && unavailableResponse.status === 503 && unavailableBody.errorCode === "LOCAL_AI_RUNTIME_UNAVAILABLE" && unavailableBody.provider !== "mock";
     if (!passed) throw new Error("AI provider selection assertions failed.");
     console.info("AI Provider Selection QA: PASS (server-controlled mock/qwen-local selection only)");
   } finally {

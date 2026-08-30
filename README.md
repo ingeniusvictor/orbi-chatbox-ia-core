@@ -126,6 +126,8 @@ npm run server:knowledge:qa
 
 0K-16B.3-R2 valida la ruta real local con `qwen3:1.7b`, `think: false` y `stream: false` en Ryzen 7 serie 4000 / 16 GB RAM: la prueba ORBI end-to-end de contexto conocido respondió en aproximadamente 12 s. Qwen sigue siendo opcional, `mock` permanece como valor por defecto y la ruta local no requiere dependencias cloud. `qwen3:4b` no fue viable dentro del timeout seguro en esta máquina.
 
+0K-16C.1 endurece la operación local: `qwen3:1.7b` comprueba salud de Ollama antes de generar y mapea fallos de runtime, modelo, timeout, respuesta inválida y generación a errores HTTP controlados. No existe fallback silencioso; `mock` permanece activo por defecto y Qwen es seleccionable sólo por configuración local.
+
 Validar el contrato estructural local:
 
 ```bash

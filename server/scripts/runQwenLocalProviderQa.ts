@@ -23,6 +23,7 @@ const main = async (): Promise<void> => {
   let sawAuthorization = false;
   const server = createServer((incoming, outgoing) => {
     sawAuthorization ||= typeof incoming.headers.authorization === "string";
+    if (incoming.url === "/api/version" && incoming.method === "GET") { outgoing.writeHead(200, { "Content-Type": "application/json" }); outgoing.end('{"version":"synthetic"}'); return; }
     if (incoming.url !== "/api/generate" || incoming.method !== "POST") { outgoing.writeHead(404); outgoing.end(); return; }
     let raw = ""; incoming.on("data", (chunk: Buffer) => { raw += chunk; }); incoming.on("end", () => {
       const body = JSON.parse(raw) as Record<string, unknown>;
