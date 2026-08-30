@@ -85,6 +85,8 @@ La suite sandbox está lista, pero faltan URL preview, backend controlado públi
 
 Los valores concretos deben completarse en [Controlled Preview Execution Inputs](./CONTROLLED_PREVIEW_EXECUTION_INPUTS.md).
 
+El [Controlled Preview Dry Run Plan](./CONTROLLED_PREVIEW_DRY_RUN_PLAN.md) es evidencia previa requerida antes de considerar una ejecución real.
+
 ## Próxima fase recomendada
 
 `0K-15A.2 — Controlled Preview Execution Inputs`

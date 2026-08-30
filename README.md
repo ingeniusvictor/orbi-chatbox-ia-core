@@ -192,6 +192,10 @@ La decisión de ejecución está documentada en [docs/CONTROLLED_WEB_PREVIEW_EXE
 
 La plantilla para completar los inputs de ejecución está en [docs/CONTROLLED_PREVIEW_EXECUTION_INPUTS.md](docs/CONTROLLED_PREVIEW_EXECUTION_INPUTS.md). Estado: **INPUT TEMPLATE / NO EXECUTION / NO DEPLOY / PRODUCTION BLOCKED**; hay CONDITIONAL GO para completar inputs y NO-GO para ejecutar preview real.
 
+## Controlled Preview Dry Run Plan
+
+El ensayo local previo está en [docs/CONTROLLED_PREVIEW_DRY_RUN_PLAN.md](docs/CONTROLLED_PREVIEW_DRY_RUN_PLAN.md). Estado: **DRY RUN PLAN / NO EXECUTION / NO DEPLOY / PRODUCTION BLOCKED**; no toca Web ORBI ni ejecuta preview real.
+
 ## Validaciones obligatorias
 
 ```bash

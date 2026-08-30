@@ -127,12 +127,12 @@ export const BackendRoadmapWorkspace: React.FC<BackendRoadmapWorkspaceProps> = (
       <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="text-sm font-bold text-amber-200">Controlled Preview Execution Inputs</h3>
-            <p className="mt-1 text-xs text-slate-300">Plantilla documental de valores necesarios antes de una ejecución preview.</p>
+            <h3 className="text-sm font-bold text-amber-200">Controlled Preview Dry Run Plan</h3>
+            <p className="mt-1 text-xs text-slate-300">Plan documental de ensayo local antes de una futura ejecución preview.</p>
           </div>
           <div className="text-left sm:text-right">
-            <p className="text-xs font-bold text-amber-300">INPUT TEMPLATE READY / VALUES PENDING / PRODUCTION NO-GO</p>
-            <p className="font-mono text-[10px] text-slate-400">Next: Controlled Preview Dry Run Plan</p>
+            <p className="text-xs font-bold text-amber-300">DRY RUN PLAN READY / EVIDENCE PENDING / PRODUCTION NO-GO</p>
+            <p className="font-mono text-[10px] text-slate-400">Next: Controlled Preview Dry Run Evidence Template</p>
           </div>
         </div>
       </div>

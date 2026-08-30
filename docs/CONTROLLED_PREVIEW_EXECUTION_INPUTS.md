@@ -102,6 +102,8 @@ window.ORBI_WIDGET_CONFIG = {
 
 La suite sandbox y el gate están listos, pero faltan URL preview, backend controlado, CORS, public key, responsables, rollback y aprobación explícita.
 
+Antes de completar ejecución real, realizar el ensayo según [Controlled Preview Dry Run Plan](./CONTROLLED_PREVIEW_DRY_RUN_PLAN.md).
+
 ## Próxima fase recomendada
 
 `0K-15A.3 — Controlled Preview Dry Run Plan`

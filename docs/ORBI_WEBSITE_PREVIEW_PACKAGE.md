@@ -146,6 +146,8 @@ La decisión final de ejecución debe pasar por [Controlled Web Preview Executio
 
 La plantilla de valores requerida antes de cualquier ejecución está en [Controlled Preview Execution Inputs](./CONTROLLED_PREVIEW_EXECUTION_INPUTS.md).
 
+El ensayo local previo está definido en [Controlled Preview Dry Run Plan](./CONTROLLED_PREVIEW_DRY_RUN_PLAN.md).
+
 ## Próxima fase
 
 `0K-15 — Controlled Web Preview Execution`
