@@ -1,4 +1,8 @@
-import { mockAiProvider } from "../src/providers/mockAiProvider.js";
+import { ACTIVE_AI_PROVIDER } from "../src/config/aiProvider.js";
+import {
+  REGISTERED_AI_PROVIDER_MODES,
+  resolveAiProvider,
+} from "../src/providers/aiProviderRegistry.js";
 import { MAX_KNOWLEDGE_RESPONSE_CHARACTERS, NO_KNOWLEDGE_RESPONSE_TEXT } from "../src/services/knowledgeResponseComposer.js";
 import type { AiProviderRequest } from "../src/types/aiProvider.js";
 import type { KnowledgeContext } from "../src/types/knowledge.js";
@@ -48,18 +52,30 @@ const longContext: Readonly<KnowledgeContext> = Object.freeze({
 });
 
 const main = async (): Promise<void> => {
-  const knownResponse = await mockAiProvider.generate(request);
-  const repeatedResponse = await mockAiProvider.generate(request);
-  const noMatchResponse = await mockAiProvider.generate(Object.freeze({
+  const provider = resolveAiProvider(ACTIVE_AI_PROVIDER);
+  let invalidProviderRejected = false;
+  try {
+    resolveAiProvider("invalid-provider" as never);
+  } catch (error) {
+    invalidProviderRejected = error instanceof Error && error.message === "Unsupported AI provider mode.";
+  }
+  const knownResponse = await provider.generate(request);
+  const repeatedResponse = await provider.generate(request);
+  const noMatchResponse = await provider.generate(Object.freeze({
     ...request,
     knowledgeContext: noMatchContext,
   }));
-  const longResponse = await mockAiProvider.generate(Object.freeze({
+  const longResponse = await provider.generate(Object.freeze({
     ...request,
     knowledgeContext: longContext,
   }));
 
-  const passed = mockAiProvider.mode === "mock"
+  const passed = ACTIVE_AI_PROVIDER === "mock"
+    && REGISTERED_AI_PROVIDER_MODES.length === 1
+    && REGISTERED_AI_PROVIDER_MODES[0] === "mock"
+    && Object.isFrozen(REGISTERED_AI_PROVIDER_MODES)
+    && provider.mode === "mock"
+    && invalidProviderRejected
     && request.requestId.length > 0
     && request.conversationId.length > 0
     && Object.isFrozen(request.knowledgeContext)
@@ -83,7 +99,7 @@ const main = async (): Promise<void> => {
     process.exit(1);
   }
 
-  console.info("AI Provider Contract QA: PASS (local deterministic mock only)");
+  console.info("AI Provider Contract QA: PASS (controlled local mock registry only)");
 };
 
 void main();

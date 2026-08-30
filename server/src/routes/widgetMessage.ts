@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { mockAiProvider } from "../providers/mockAiProvider.js";
+import { ACTIVE_AI_PROVIDER } from "../config/aiProvider.js";
+import { resolveAiProvider } from "../providers/aiProviderRegistry.js";
 import { createSandboxError } from "../security/errorResponses.js";
 import { buildConversationEnvelope } from "../services/conversationEnvelope.js";
 import { buildKnowledgeContext } from "../services/knowledgeContextBuilder.js";
@@ -47,7 +48,8 @@ export const createWidgetMessageRouter = (demoWidgetPublicKey: string): Router =
         message: envelope.message.text,
         knowledgeContext: envelope.knowledgeContext,
       });
-      const providerResponse = await mockAiProvider.generate(providerRequest);
+      const provider = resolveAiProvider(ACTIVE_AI_PROVIDER);
+      const providerResponse = await provider.generate(providerRequest);
       const payload: WidgetMessageResponse = {
         ok: true,
         mode: "sandbox",
