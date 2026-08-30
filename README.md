@@ -114,6 +114,8 @@ npm run server:knowledge:qa
 
 0K-15C.1 añade un contrato de readiness para un futuro runtime local: su configuración sólo acepta endpoints loopback y se valida sin conexión. 0K-15C.2 añade el contrato de health probe sintético; no existe un sondeo de red real todavía y `reachable` se usa sólo en QA. Qwen Local y Gemma Local siguen siendo futuros y no ejecutables; Mock sigue siendo el único provider activo y ejecutable.
 
+0K-16A.1 añade un transporte genérico sólo para loopback (`localhost`, `127.0.0.1`, `::1`): rechaza LAN/exterior, no sigue redirects y limita timeout y respuesta. No activa proveedores ni contratos específicos de modelos.
+
 Validar el contrato estructural local:
 
 ```bash

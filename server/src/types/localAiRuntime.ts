@@ -47,3 +47,9 @@ export type LocalAiRuntimeProbeResultInput = LocalAiRuntimeProbeResult;
 export type LocalAiRuntimeProbeResultValidation =
   | { readonly ok: true; readonly result: Readonly<LocalAiRuntimeProbeResult> }
   | { readonly ok: false; readonly reason: string };
+
+export type LocalAiTransportMethod = "GET" | "POST";
+export type LocalAiTransportRequest = { readonly runtimeId: string; readonly url: string; readonly method: LocalAiTransportMethod; readonly timeoutMs: number; readonly body?: unknown };
+export type LocalAiTransportResponse = { readonly ok: true; readonly status: number; readonly body: unknown; readonly latencyMs: number };
+export type LocalAiTransportFailure = { readonly ok: false; readonly failure: "timeout" | "unreachable" | "invalid-url" | "invalid-response" | "transport-error"; readonly reason: string };
+export type LocalAiTransportResult = Readonly<LocalAiTransportResponse | LocalAiTransportFailure>;
