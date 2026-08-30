@@ -26,3 +26,24 @@ export type LocalAiRuntimeReadiness = {
   readonly model: string | null;
   readonly reason: string | null;
 };
+
+export type LocalAiRuntimeProbeStatus = "reachable" | "unreachable" | "timeout" | "invalid-response";
+
+export type LocalAiRuntimeProbeRequest = {
+  readonly runtimeId: string;
+  readonly endpoint: string;
+  readonly timeoutMs: number;
+};
+
+export type LocalAiRuntimeProbeResult = {
+  readonly runtimeId: string;
+  readonly status: LocalAiRuntimeProbeStatus;
+  readonly latencyMs: number | null;
+  readonly reason: string | null;
+};
+
+export type LocalAiRuntimeProbeResultInput = LocalAiRuntimeProbeResult;
+
+export type LocalAiRuntimeProbeResultValidation =
+  | { readonly ok: true; readonly result: Readonly<LocalAiRuntimeProbeResult> }
+  | { readonly ok: false; readonly reason: string };

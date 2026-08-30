@@ -4,6 +4,12 @@ import {
   validateLocalAiRuntimeConfig,
 } from "../src/services/localAiRuntimeConfig.js";
 import { evaluateLocalAiRuntimeReadiness } from "../src/services/localAiRuntimeReadiness.js";
+import {
+  createLocalAiRuntimeProbeRequest,
+  createLocalAiRuntimeProbeResult,
+  mapProbeResultToReadiness,
+  MAX_LOCAL_AI_PROBE_LATENCY_MS,
+} from "../src/services/localAiRuntimeProbe.js";
 import type { LocalAiRuntimeReadiness } from "../src/types/localAiRuntime.js";
 
 const validLocalhost = Object.freeze({
@@ -31,6 +37,14 @@ const main = (): void => {
     validReadiness,
     invalidReadiness,
   ];
+  const probeRequest = createLocalAiRuntimeProbeRequest(validLocalhost);
+  const reachable = createLocalAiRuntimeProbeResult({ runtimeId: "synthetic-local-runtime", status: "reachable", latencyMs: 12, reason: null });
+  const unreachable = createLocalAiRuntimeProbeResult({ runtimeId: "synthetic-local-runtime", status: "unreachable", latencyMs: null, reason: "runtime-unreachable" });
+  const timeout = createLocalAiRuntimeProbeResult({ runtimeId: "synthetic-local-runtime", status: "timeout", latencyMs: null, reason: "runtime-timeout" });
+  const invalidResponse = createLocalAiRuntimeProbeResult({ runtimeId: "synthetic-local-runtime", status: "invalid-response", latencyMs: 4, reason: "invalid-runtime-response" });
+  const invalidLatency = createLocalAiRuntimeProbeResult({ runtimeId: "synthetic-local-runtime", status: "reachable", latencyMs: -1, reason: null });
+  const infiniteLatency = createLocalAiRuntimeProbeResult({ runtimeId: "synthetic-local-runtime", status: "reachable", latencyMs: Infinity, reason: null });
+  const excessiveLatency = createLocalAiRuntimeProbeResult({ runtimeId: "synthetic-local-runtime", status: "reachable", latencyMs: MAX_LOCAL_AI_PROBE_LATENCY_MS + 1, reason: null });
 
   const passed = localhostValidation.ok
     && loopbackValidation.ok
@@ -51,12 +65,26 @@ const main = (): void => {
     && validReadiness.state === repeatedReadiness.state
     && validReadiness.reason === repeatedReadiness.reason;
 
-  if (!passed) {
+  const probePassed = reachable.ok
+    && unreachable.ok
+    && timeout.ok
+    && invalidResponse.ok
+    && mapProbeResultToReadiness(reachable.result).state === "ready"
+    && mapProbeResultToReadiness(unreachable.result).state === "unavailable"
+    && mapProbeResultToReadiness(timeout.result).state === "unavailable"
+    && mapProbeResultToReadiness(invalidResponse.result).state === "unavailable"
+    && !invalidLatency.ok
+    && !infiniteLatency.ok
+    && !excessiveLatency.ok
+    && Object.isFrozen(probeRequest)
+    && Object.isFrozen(reachable.result);
+
+  if (!passed || !probePassed) {
     console.error("Local AI Runtime Contract QA: FAIL");
     process.exit(1);
   }
 
-  console.info("Local AI Runtime Contract QA: PASS (configuration-only; no runtime connection)");
+  console.info("Local AI Runtime Contract QA: PASS (configuration and synthetic probe only; no runtime connection)");
 };
 
 main();
