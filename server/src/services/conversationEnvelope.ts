@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { ConversationEnvelope } from "../types/conversation.js";
+import type { KnowledgeContext } from "../types/knowledge.js";
 import type {
   NormalizedWidgetMessageRequest,
   WidgetMessageProcessingResult,
@@ -8,6 +9,7 @@ import type {
 export const buildConversationEnvelope = (
   input: NormalizedWidgetMessageRequest,
   processed: WidgetMessageProcessingResult,
+  knowledgeContext: Readonly<KnowledgeContext>,
 ): ConversationEnvelope => ({
   requestId: processed.requestId,
   conversationId: randomUUID(),
@@ -26,4 +28,5 @@ export const buildConversationEnvelope = (
     intent: processed.intent,
     receivedAt: processed.receivedAt,
   },
+  knowledgeContext,
 });

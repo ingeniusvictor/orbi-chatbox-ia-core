@@ -1,4 +1,5 @@
 import type { WidgetChannel } from "./widget.js";
+import type { KnowledgeContext } from "./knowledge.js";
 
 export type ConversationEnvelope = {
   requestId: string;
@@ -19,4 +20,5 @@ export type ConversationEnvelope = {
     intent: "unclassified";
     receivedAt: string;
   };
+  knowledgeContext: Readonly<KnowledgeContext>;
 };

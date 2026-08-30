@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { createSandboxError } from "../security/errorResponses.js";
 import { buildConversationEnvelope } from "../services/conversationEnvelope.js";
+import { buildKnowledgeContext } from "../services/knowledgeContextBuilder.js";
 import { processValidatedWidgetMessage } from "../services/widgetMessageProcessor.js";
 import type { WidgetMessageResponse } from "../types/widget.js";
 import { validateWidgetMessagePayload } from "../validation/widgetPayload.js";
@@ -35,7 +36,8 @@ export const createWidgetMessageRouter = (demoWidgetPublicKey: string): Router =
     }
 
     const processed = processValidatedWidgetMessage(validation.payload);
-    const envelope = buildConversationEnvelope(validation.payload, processed);
+    const knowledgeContext = buildKnowledgeContext(processed.normalizedMessage);
+    const envelope = buildConversationEnvelope(validation.payload, processed, knowledgeContext);
     const payload: WidgetMessageResponse = {
       ok: true,
       mode: "sandbox",
@@ -53,6 +55,12 @@ export const createWidgetMessageRouter = (demoWidgetPublicKey: string): Router =
       messageLength: envelope.message.length,
       processingMode: envelope.runtime.mode,
       intent: envelope.runtime.intent,
+      knowledge: {
+        source: envelope.knowledgeContext.source,
+        matchCount: envelope.knowledgeContext.matchCount,
+        entryIds: envelope.knowledgeContext.entries.map((entry) => entry.id),
+        truncated: envelope.knowledgeContext.truncated,
+      },
     };
 
     response.json(payload);

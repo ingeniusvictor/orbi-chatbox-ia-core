@@ -27,6 +27,28 @@ const hasValidProcessingResult = (body: unknown): boolean =>
   && body.normalizedChannel === "manual_test"
   && body.normalizedMessage === "Prueba local QA 0K-13A.4 del receiver sandbox."
   && body.messageLength === 46;
+const hasPipelineMetadata = (body: unknown): boolean =>
+  isRecord(body)
+  && typeof body.requestId === "string"
+  && body.requestId.length > 0
+  && typeof body.conversationId === "string"
+  && body.conversationId.length > 0
+  && body.processingMode === "sandbox"
+  && body.intent === "unclassified";
+const hasKnowledgeMetadata = (body: unknown, expectedEntryId?: string): boolean => {
+  if (!isRecord(body) || !isRecord(body.knowledge)) return false;
+
+  const entryIds = body.knowledge.entryIds;
+  const matchCount = body.knowledge.matchCount;
+  const baseMetadataIsValid = body.knowledge.source === "local-static"
+    && typeof matchCount === "number"
+    && typeof body.knowledge.truncated === "boolean"
+    && Array.isArray(entryIds);
+
+  return expectedEntryId
+    ? baseMetadataIsValid && typeof matchCount === "number" && matchCount >= 1 && entryIds.includes(expectedEntryId)
+    : baseMetadataIsValid && matchCount === 0 && entryIds.length === 0;
+};
 
 const resolveBaseUrl = (): string => {
   const configured = process.env.ORBI_RECEIVER_QA_URL?.trim() || "http://127.0.0.1:8787";
@@ -52,10 +74,14 @@ const main = async (): Promise<void> => {
     readFixture("valid-message.json"), readFixture("empty-message.json"), readFixture("missing-consent.json"), readFixture("invalid-channel.json"), readFixture("malformed-json.txt"),
   ]);
   const longMessage = JSON.stringify({ channel: "manual_test", message: "x".repeat(2_001), consentAccepted: true });
+  const knownKnowledgeMessage = JSON.stringify({ channel: "manual_test", message: "sandbox assistant", consentAccepted: true });
+  const unknownKnowledgeMessage = JSON.stringify({ channel: "manual_test", message: "zzqv-unmatched-knowledge", consentAccepted: true });
   const jsonHeaders = { "Content-Type": "application/json" };
   const cases: QaCase[] = [
     { name: "health ok", path: "/api/health", expected: { status: 200, assertions: hasFields({ ok: true, mode: "sandbox", production: false }) } },
     { name: "valid widget message", path: "/api/public/widget/orbi_demo_widget_key/message", init: { method: "POST", headers: jsonHeaders, body: validMessage }, expected: { status: 200, assertions: (body) => hasFields({ ok: true, received: true, leadCreated: false })(body) && hasValidProcessingResult(body) } },
+    { name: "known knowledge context", path: "/api/public/widget/orbi_demo_widget_key/message", init: { method: "POST", headers: jsonHeaders, body: knownKnowledgeMessage }, expected: { status: 200, assertions: (body) => hasPipelineMetadata(body) && hasKnowledgeMetadata(body, "orbi-sandbox-assistant") } },
+    { name: "unknown knowledge context", path: "/api/public/widget/orbi_demo_widget_key/message", init: { method: "POST", headers: jsonHeaders, body: unknownKnowledgeMessage }, expected: { status: 200, assertions: (body) => hasPipelineMetadata(body) && hasKnowledgeMetadata(body) } },
     { name: "invalid public key", path: "/api/public/widget/invalid_key/message", init: { method: "POST", headers: jsonHeaders, body: validMessage }, expected: { status: 403, assertions: hasFields({ errorCode: "INVALID_PUBLIC_KEY" }) } },
     { name: "empty message", path: "/api/public/widget/orbi_demo_widget_key/message", init: { method: "POST", headers: jsonHeaders, body: emptyMessage }, expected: { status: 400, assertions: hasFields({ errorCode: "INVALID_MESSAGE" }) } },
     { name: "long message", path: "/api/public/widget/orbi_demo_widget_key/message", init: { method: "POST", headers: jsonHeaders, body: longMessage }, expected: { status: 400, assertions: hasFields({ errorCode: "MESSAGE_TOO_LONG" }) } },

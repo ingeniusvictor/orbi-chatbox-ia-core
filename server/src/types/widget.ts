@@ -29,6 +29,13 @@ export type WidgetMessageProcessingResult = {
   intent: "unclassified";
 };
 
+export type SandboxKnowledgeMetadata = {
+  source: "local-static";
+  matchCount: number;
+  entryIds: readonly string[];
+  truncated: boolean;
+};
+
 export type WidgetMessageResponse = {
   ok: true;
   mode: "sandbox";
@@ -45,4 +52,5 @@ export type WidgetMessageResponse = {
   messageLength: number;
   processingMode: "sandbox";
   intent: "unclassified";
+  knowledge: SandboxKnowledgeMetadata;
 };

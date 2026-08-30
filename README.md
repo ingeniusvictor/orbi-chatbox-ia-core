@@ -100,7 +100,7 @@ El receiver sandbox valida la public key, el consentimiento, el mensaje, su máx
 
 ## Local Knowledge Foundation
 
-0K-14A.1 y 0K-14A.2 están cerrados: el registry server-side es estático, tipado y de solo lectura, y su lookup es léxico determinista. 0K-14A.3 agrega un contexto interno acotado, local/static y sandbox-only; no usa IA, RAG, embeddings, búsqueda semántica ni fuentes externas, y todavía no participa en el pipeline de mensajes.
+0K-14A.1, 0K-14A.2 y 0K-14A.3 están cerrados: el registry server-side es estático, tipado y de solo lectura; su lookup es léxico determinista; y el contexto es interno y acotado. 0K-14B.1 conecta ese contexto al flujo local `Widget → Receiver → Validation → Processing → Conversation Envelope → Local Knowledge Context → Sandbox Response`, con retrieval estático sandbox, sin IA generativa, embeddings, RAG externo ni fuentes productivas.
 
 Validar el registry local:
 
