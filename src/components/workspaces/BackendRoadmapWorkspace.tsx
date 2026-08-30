@@ -109,6 +109,21 @@ export const BackendRoadmapWorkspace: React.FC<BackendRoadmapWorkspaceProps> = (
         </div>
       </div>
 
+      <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 shadow-lg">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="text-sm font-bold text-emerald-200">Functional MVP Demo</h3>
+            <p className="mt-1 text-xs text-slate-300">
+              Chat Studio → Backend sandbox → Sandbox Lead → Lead Intelligence
+            </p>
+          </div>
+          <div className="text-left sm:text-right">
+            <p className="text-xs font-bold text-emerald-300">READY</p>
+            <p className="font-mono text-[10px] text-slate-400">v0.13.0-functional-mvp-demo</p>
+          </div>
+        </div>
+      </div>
+
       {/* Navigation Sub-Tabs */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-800/80">
         <button
