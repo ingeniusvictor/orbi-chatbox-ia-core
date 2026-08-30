@@ -112,10 +112,13 @@ npm run server:knowledge:qa
 
 0K-14, la familia 0K-15A, 0K-15B.1 y 0K-15B.2 están cerrados. El módulo actual 0K-15B.3 clasifica providers soportados: desarrollo (**Mock**), local/on-premise (**Qwen Local**, **Gemma Local**) y cloud (**OpenAI/ChatGPT**, **Gemini**). Sólo **Mock** está habilitado, activo y es ejecutable. Los providers locales y cloud son futuros arquitectónicos: no tienen credenciales, modelo runtime, API ni llamadas externas. ORBI podrá operar en futuros despliegues sin requerir obligatoriamente una API cloud de pago.
 
+0K-15C.1 añade un contrato de readiness para un futuro runtime local: su configuración sólo acepta endpoints loopback y se valida sin conexión. Qwen Local y Gemma Local siguen siendo futuros y no ejecutables; la evaluación nunca informa `ready` en este módulo. Mock sigue siendo el único provider activo y ejecutable.
+
 Validar el contrato estructural local:
 
 ```bash
 npm run server:ai-contract:qa
+npm run server:local-ai:qa
 ```
 
 ## Receiver Local QA Matrix

@@ -13,7 +13,8 @@
                     "server:check":  "tsc -p server/tsconfig.json --noEmit",
                     "server:qa":  "tsx server/scripts/runReceiverQa.ts",
                     "server:knowledge:qa":  "tsx server/scripts/runKnowledgeQa.ts",
-                    "server:ai-contract:qa":  "tsx server/scripts/runAiProviderContractQa.ts"
+                    "server:ai-contract:qa":  "tsx server/scripts/runAiProviderContractQa.ts",
+                    "server:local-ai:qa":  "tsx server/scripts/runLocalAiRuntimeContractQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",
