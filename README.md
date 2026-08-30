@@ -160,6 +160,10 @@ Las instrucciones para una futura prueba de preview controlada están en [docs/C
 
 La evidencia y criterios de decisión están en [docs/CONTROLLED_PREVIEW_READINESS_GATE.md](docs/CONTROLLED_PREVIEW_READINESS_GATE.md). El estado recomendado es **CONDITIONAL GO** para preparar preview y **NO-GO** para producción; producción sigue bloqueada.
 
+## Preview Environment Requirements Pack
+
+Los requisitos previos de dominio, backend, CORS, public key, evidencia y rollback están en [docs/PREVIEW_ENVIRONMENT_REQUIREMENTS_PACK.md](docs/PREVIEW_ENVIRONMENT_REQUIREMENTS_PACK.md). Estado: **REQUIREMENTS ONLY / NO DEPLOY / PRODUCTION BLOCKED**; CONDITIONAL GO para preparar requisitos y NO-GO hasta completar pendientes.
+
 ## Validaciones obligatorias
 
 ```bash

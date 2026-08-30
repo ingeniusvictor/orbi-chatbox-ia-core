@@ -62,3 +62,5 @@ El paquete es **DOCUMENTATION ONLY / PRODUCTION BLOCKED**. No habilita una integ
 Una prueba de preview únicamente podrá evaluarse con autorización explícita, dominio permitido, CORS controlado y datos sintéticos.
 
 La decisión formal debe pasar por el [Controlled Preview Readiness Gate](./CONTROLLED_PREVIEW_READINESS_GATE.md) antes de autorizar cualquier prueba controlada.
+
+Los requisitos concretos de dominio, backend, CORS, clave preview, evidencia y rollback están en [Preview Environment Requirements Pack](./PREVIEW_ENVIRONMENT_REQUIREMENTS_PACK.md).

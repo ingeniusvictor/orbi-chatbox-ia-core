@@ -127,12 +127,12 @@ export const BackendRoadmapWorkspace: React.FC<BackendRoadmapWorkspaceProps> = (
       <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="text-sm font-bold text-amber-200">Controlled Preview Readiness Gate</h3>
-            <p className="mt-1 text-xs text-slate-300">Compuerta documental para una futura prueba controlada en web ORBI.</p>
+            <h3 className="text-sm font-bold text-amber-200">Preview Environment Requirements Pack</h3>
+            <p className="mt-1 text-xs text-slate-300">Requisitos documentados para una futura prueba controlada en web ORBI.</p>
           </div>
           <div className="text-left sm:text-right">
-            <p className="text-xs font-bold text-amber-300">CONDITIONAL GO FOR PREVIEW PREP / PRODUCTION NO-GO</p>
-            <p className="font-mono text-[10px] text-slate-400">Next: Preview Environment Requirements Pack</p>
+            <p className="text-xs font-bold text-amber-300">REQUIREMENTS READY / PREVIEW PENDING / PRODUCTION NO-GO</p>
+            <p className="font-mono text-[10px] text-slate-400">Next: Preview Configuration Template</p>
           </div>
         </div>
       </div>

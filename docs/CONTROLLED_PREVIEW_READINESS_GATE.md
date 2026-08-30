@@ -134,4 +134,4 @@ El MVP local está funcional, pero aún faltan ambiente preview, backend control
 
 ## Próxima fase recomendada
 
-`0K-14C.2 — Preview Environment Requirements Pack`
+Los requisitos concretos y sus estados iniciales están en [Preview Environment Requirements Pack](./PREVIEW_ENVIRONMENT_REQUIREMENTS_PACK.md).

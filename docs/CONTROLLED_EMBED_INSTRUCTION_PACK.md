@@ -89,6 +89,7 @@ Antes de una prueba, dejar preparado un rollback simple y verificable:
 
 - [Web ORBI Embed Controlled Plan](./WEB_ORBI_EMBED_CONTROLLED_PLAN.md)
 - [Controlled Preview Readiness Gate](./CONTROLLED_PREVIEW_READINESS_GATE.md)
+- [Preview Environment Requirements Pack](./PREVIEW_ENVIRONMENT_REQUIREMENTS_PACK.md)
 - [Receiver QA Matrix](./RECEIVER_LOCAL_QA_MATRIX.md)
 
 La integración productiva permanece bloqueada hasta que exista una decisión explícita, un entorno autorizado y controles revisados para esa fase.
