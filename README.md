@@ -110,7 +110,7 @@ npm run server:knowledge:qa
 
 ## AI Provider Abstraction
 
-0K-14 está cerrado. El módulo actual 0K-15A.1 define únicamente un contrato mínimo e independiente de proveedor para una futura ejecución de IA. No hay runtime de IA, proveedor activo, API keys ni llamadas externas: la respuesta determinista basada en conocimiento local sigue siendo el comportamiento de runtime actual.
+0K-14 y 0K-15A.1 están cerrados. El módulo actual 0K-15A.2 añade un provider `mock` local, determinista y aislado para probar el contrato con el `KnowledgeContext` local acotado. No hay IA real, SDK, API keys ni llamadas externas; la respuesta determinista basada en conocimiento local sigue siendo el comportamiento de runtime actual.
 
 Validar el contrato estructural local:
 
