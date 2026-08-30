@@ -5,3 +5,4 @@ export * from "./backendReadiness";
 export * from "./diagnosticData";
 export * from "./moduleRegistry";
 export * from "./premiumWorkspaces";
+export * from "./installableWidgetConfig";

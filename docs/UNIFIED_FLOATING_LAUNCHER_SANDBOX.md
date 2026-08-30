@@ -26,6 +26,8 @@ No incluye instalación en Web ORBI, snippet real, producción, WhatsApp Busines
 - No activar producción, voz real ni WhatsApp bot.
 - No exponer secretos, usar wildcard CORS ni depender de localhost para preview público.
 
+El launcher puede alimentarse desde `orbiDemoInstallableWidgetConfig` para evitar hardcoding y preparar instalaciones futuras por cliente.
+
 ## Próxima fase
 
 `0K-14D.4 — Installable Client Config Template`

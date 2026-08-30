@@ -19,6 +19,7 @@ import {
   CONTROLLED_EMBED_SNIPPETS,
   buildControlledEmbedInstructionSummary,
   CONTROLLED_EMBED_INSTRUCTION_ITEMS,
+  orbiDemoInstallableWidgetConfig,
 } from "../../data";
 import {
   DEFAULT_PUBLIC_KEY,
@@ -61,6 +62,7 @@ export const WebWidgetWorkspace: React.FC<WebWidgetWorkspaceProps> = ({
   const [copiedSnippet, setCopiedSnippet] = useState(false);
   const [responseMode, setResponseMode] = useState<WidgetResponseMode>("demo");
   const [isSending, setIsSending] = useState(false);
+  const installableConfig = orbiDemoInstallableWidgetConfig;
 
   const embedSummary = React.useMemo(
     () => buildControlledEmbedInstructionSummary(CONTROLLED_EMBED_INSTRUCTION_ITEMS),
@@ -234,16 +236,31 @@ export const WebWidgetWorkspace: React.FC<WebWidgetWorkspaceProps> = ({
                 </p>
               </div>
               <UnifiedFloatingLauncher
-                brandName="ORBI Ecosystem"
-                mode="sandbox"
+                brandName={installableConfig.brand.brandName}
+                mode={installableConfig.mode}
                 enabled={true}
-                channels={{ webChat: true, whatsapp: true, voice: false }}
+                channels={installableConfig.channels}
                 whatsapp={{
-                  phoneNumber: "",
-                  defaultMessage: "Hola ORBI Ecosystem. Vengo desde la web y necesito información.",
+                  phoneNumber: installableConfig.whatsapp.phoneNumber,
+                  defaultMessage: installableConfig.whatsapp.defaultMessage,
                 }}
                 placement="inline-preview"
               />
+            </div>
+
+            <div className="space-y-2 border-t border-slate-800 pt-4">
+              <h4 className="text-xs font-mono font-bold uppercase text-violet-300">
+                Installable Client Config — Sandbox Template
+              </h4>
+              <div className="grid grid-cols-2 gap-2 rounded-xl border border-violet-400/20 bg-violet-400/5 p-3 text-[10px] font-mono text-slate-300">
+                <p>Client ID: <span className="text-white">{installableConfig.brand.clientId}</span></p>
+                <p>Mode: <span className="text-white">{installableConfig.mode}</span></p>
+                <p>Web chat: <span className="text-white">{String(installableConfig.channels.webChat)}</span></p>
+                <p>WhatsApp: <span className="text-white">{String(installableConfig.channels.whatsapp)}</span></p>
+                <p>Voice: <span className="text-white">{String(installableConfig.channels.voice)}</span></p>
+                <p>Real data: <span className="text-white">{String(installableConfig.chatbox.realDataAllowed)}</span></p>
+                <p className="col-span-2">Production allowed: <span className="text-white">{String(installableConfig.guardrails.productionAllowed)}</span></p>
+              </div>
             </div>
 
             <div className="space-y-2 border-t border-slate-800 pt-4">

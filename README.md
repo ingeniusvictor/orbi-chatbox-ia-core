@@ -176,6 +176,10 @@ El componente interno está documentado en [docs/WHATSAPP_FLOATING_WIDGET_INTERN
 
 El hub interno que une Chat IA y WhatsApp manual está documentado en [docs/UNIFIED_FLOATING_LAUNCHER_SANDBOX.md](docs/UNIFIED_FLOATING_LAUNCHER_SANDBOX.md). Voz permanece futura/desactivada; no hay instalación web real ni producción. El preview interno está disponible en Web Widget Workspace.
 
+## Installable Client Config Template
+
+Los tipos y configuraciones template están documentados en [docs/INSTALLABLE_CLIENT_CONFIG_TEMPLATE.md](docs/INSTALLABLE_CLIENT_CONFIG_TEMPLATE.md). Incluyen una config demo ORBI sandbox y un template preview seguro que alimenta el Unified Floating Launcher; no contienen secretos, datos reales ni habilitan producción.
+
 ## Validaciones obligatorias
 
 ```bash

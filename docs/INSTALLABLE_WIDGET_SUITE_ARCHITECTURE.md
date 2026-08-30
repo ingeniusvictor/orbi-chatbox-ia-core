@@ -70,7 +70,7 @@ Responsabilidad:
 - Definir modo: demo, sandbox, preview o production.
 - Definir si datos reales están permitidos.
 
-**Estado actual:** PLANNED.
+**Estado actual:** CLIENT CONFIG TEMPLATE READY. Ver [Installable Client Config Template](./INSTALLABLE_CLIENT_CONFIG_TEMPLATE.md).
 
 ### 5. Install Snippet / Loader
 
