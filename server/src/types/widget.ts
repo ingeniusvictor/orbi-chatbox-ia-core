@@ -36,6 +36,8 @@ export type SandboxKnowledgeMetadata = {
   truncated: boolean;
 };
 
+import type { AiProviderMode } from "./aiProvider.js";
+
 export type WidgetMessageResponse = {
   ok: true;
   mode: "sandbox";
@@ -43,8 +45,8 @@ export type WidgetMessageResponse = {
   leadCreated: boolean;
   handoffRecommended: boolean;
   message: string;
-  responseMode: "provider-mock";
-  provider: "mock";
+  responseMode: "provider-mock" | "provider-qwen-local";
+  provider: AiProviderMode;
   grounded: boolean;
   sourceEntryIds: readonly string[];
   guardrails: string[];

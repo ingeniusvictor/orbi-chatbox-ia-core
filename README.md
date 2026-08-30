@@ -120,6 +120,8 @@ npm run server:knowledge:qa
 
 0K-16A.3 añade el contrato y mappers de un futuro adapter de proveedor local. No hay generación local habilitada: `qwen-local` y `gemma-local` permanecen deshabilitados, Ollama conserva sólo su health check y Mock continúa como único provider ejecutable.
 
+0K-16B.1 cierra la familia 0K-16A y habilita arquitectónicamente `qwen-local`, aunque `mock` sigue activo por defecto. Qwen usa Ollama sólo por loopback mediante `POST /api/generate`, con QA sobre servidor sintético local; no instala ni descarga modelos. Gemma, OpenAI y Gemini continúan deshabilitados.
+
 Validar el contrato estructural local:
 
 ```bash

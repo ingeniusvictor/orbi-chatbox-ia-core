@@ -12,7 +12,7 @@ export const SUPPORTED_AI_PROVIDERS: readonly AiProviderId[] = Object.freeze([
   "openai",
   "gemini",
 ]);
-export const ENABLED_AI_PROVIDERS: readonly AiProviderMode[] = Object.freeze(["mock"]);
+export const ENABLED_AI_PROVIDERS: readonly AiProviderMode[] = Object.freeze(["mock", "qwen-local"]);
 export const ACTIVE_AI_PROVIDER: AiProviderMode = "mock";
 const PROVIDER_DEPLOYMENTS: Readonly<Record<AiProviderId, AiProviderDeployment>> = Object.freeze({
   mock: "development",

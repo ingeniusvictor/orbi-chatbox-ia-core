@@ -6,7 +6,7 @@ export type AiProviderId = "mock" | "qwen-local" | "gemma-local" | "openai" | "g
 export type AiProviderDeployment = "development" | "local" | "cloud";
 
 /** Executable modes are deliberately narrower than supported provider identifiers. */
-export type AiProviderMode = "mock";
+export type AiProviderMode = "mock" | "qwen-local";
 
 export type AiProviderRequest = {
   readonly requestId: string;

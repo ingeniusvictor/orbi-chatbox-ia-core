@@ -26,7 +26,7 @@ export type LocalAiProviderFutureResponse = {
   readonly sourceEntryIds: readonly string[];
 };
 
-/** No local provider is executable in 0K-16A.3. */
+/** Implementations may be executable only when explicitly registered. */
 export interface LocalAiProviderAdapter {
   generate(request: Readonly<LocalAiProviderRequest>): Promise<Readonly<LocalAiProviderResponse>>;
 }

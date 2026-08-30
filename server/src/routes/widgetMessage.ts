@@ -57,7 +57,7 @@ export const createWidgetMessageRouter = (demoWidgetPublicKey: string): Router =
         leadCreated: false,
         handoffRecommended: false,
         message: providerResponse.text,
-        responseMode: "provider-mock",
+        responseMode: providerResponse.provider === "mock" ? "provider-mock" : "provider-qwen-local",
         provider: providerResponse.provider,
         grounded: providerResponse.grounded,
         sourceEntryIds: providerResponse.sourceEntryIds,

@@ -60,15 +60,17 @@ const main = async (): Promise<void> => {
     && Object.isFrozen(projected.sourceEntryIds)
     && disabledError === LOCAL_AI_GENERATION_DISABLED
     && ACTIVE_AI_PROVIDER === "mock"
-    && ENABLED_AI_PROVIDERS.length === 1
+    && ENABLED_AI_PROVIDERS.length === 2
     && ENABLED_AI_PROVIDERS[0] === "mock"
-    && REGISTERED_AI_PROVIDER_MODES.length === 1
+    && ENABLED_AI_PROVIDERS[1] === "qwen-local"
+    && REGISTERED_AI_PROVIDER_MODES.length === 2
     && REGISTERED_AI_PROVIDER_MODES[0] === "mock"
-    && !isAiProviderEnabled("qwen-local")
+    && REGISTERED_AI_PROVIDER_MODES[1] === "qwen-local"
+    && isAiProviderEnabled("qwen-local")
     && !isAiProviderEnabled("gemma-local");
 
   if (!passed) { console.error("Local AI Provider Adapter QA: FAIL"); process.exit(1); }
-  console.info("Local AI Provider Adapter QA: PASS (mapping and disabled adapter only; no generation or network)");
+  console.info("Local AI Provider Adapter QA: PASS (mapping and disabled placeholder only; no generation or network)");
 };
 
 void main();
