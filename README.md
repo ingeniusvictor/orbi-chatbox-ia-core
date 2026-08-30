@@ -172,6 +172,10 @@ La arquitectura del producto instalable con ChatBox Web Widget y WhatsApp Floati
 
 El componente interno está documentado en [docs/WHATSAPP_FLOATING_WIDGET_INTERNAL_MODULE.md](docs/WHATSAPP_FLOATING_WIDGET_INTERNAL_MODULE.md). Opera solo como preview manual sandbox en Web Widget Workspace: no usa WhatsApp Business API, webhook, automatización ni producción.
 
+## Unified Floating Launcher Sandbox
+
+El hub interno que une Chat IA y WhatsApp manual está documentado en [docs/UNIFIED_FLOATING_LAUNCHER_SANDBOX.md](docs/UNIFIED_FLOATING_LAUNCHER_SANDBOX.md). Voz permanece futura/desactivada; no hay instalación web real ni producción. El preview interno está disponible en Web Widget Workspace.
+
 ## Validaciones obligatorias
 
 ```bash

@@ -30,6 +30,8 @@ No incluye WhatsApp Business API, webhook, bot real, automatización, envío des
 - No exponer secretos.
 - No usar wildcard ni configuraciones externas.
 
+El módulo puede integrarse desde [Unified Floating Launcher Sandbox](./UNIFIED_FLOATING_LAUNCHER_SANDBOX.md), manteniendo modo manual y sin automatización.
+
 ## Próxima fase
 
 `0K-14D.3 — Unified Floating Launcher Sandbox`

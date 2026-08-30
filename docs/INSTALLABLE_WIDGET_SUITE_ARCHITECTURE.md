@@ -33,7 +33,7 @@ Responsabilidad:
 - Ser responsive y accesible.
 - No bloquear navegación de la página.
 
-**Estado actual:** PLANNED.
+**Estado actual:** LAUNCHER SANDBOX READY. Ver [Unified Floating Launcher Sandbox](./UNIFIED_FLOATING_LAUNCHER_SANDBOX.md).
 
 ### 2. ChatBox Web Widget
 

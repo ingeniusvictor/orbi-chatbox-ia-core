@@ -127,12 +127,12 @@ export const BackendRoadmapWorkspace: React.FC<BackendRoadmapWorkspaceProps> = (
       <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="text-sm font-bold text-amber-200">WhatsApp Floating Widget Internal Module</h3>
-            <p className="mt-1 text-xs text-slate-300">Módulo interno de contacto manual para sandbox, sin automatización de WhatsApp.</p>
+            <h3 className="text-sm font-bold text-amber-200">Unified Floating Launcher Sandbox</h3>
+            <p className="mt-1 text-xs text-slate-300">Hub interno de Chat IA y WhatsApp manual, sin automatización productiva.</p>
           </div>
           <div className="text-left sm:text-right">
-            <p className="text-xs font-bold text-amber-300">INTERNAL MODULE READY / MANUAL SANDBOX ONLY / PRODUCTION NO-GO</p>
-            <p className="font-mono text-[10px] text-slate-400">Next: Unified Floating Launcher Sandbox</p>
+            <p className="text-xs font-bold text-amber-300">LAUNCHER SANDBOX READY / CLIENT CONFIG PENDING / PRODUCTION NO-GO</p>
+            <p className="font-mono text-[10px] text-slate-400">Next: Installable Client Config Template</p>
           </div>
         </div>
       </div>

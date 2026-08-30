@@ -25,7 +25,7 @@ import {
   DEFAULT_RECEIVER_URL,
   sendMessageToBackendReceiver,
 } from "../../services/backendReceiverClient";
-import { WhatsAppFloatingWidget } from "../common";
+import { UnifiedFloatingLauncher, WhatsAppFloatingWidget } from "../common";
 
 interface WebWidgetWorkspaceProps {
   companyProfile: CompanyProfile;
@@ -222,6 +222,28 @@ export const WebWidgetWorkspace: React.FC<WebWidgetWorkspaceProps> = ({
                   </button>
                 ))}
               </div>
+            </div>
+
+            <div className="space-y-2 border-t border-slate-800 pt-4">
+              <div>
+                <h4 className="text-xs font-mono font-bold uppercase text-cyan-300">
+                  Unified Floating Launcher — Sandbox Preview
+                </h4>
+                <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
+                  Chat IA está listo en sandbox; WhatsApp queda en configuración sin número y voz está desactivada.
+                </p>
+              </div>
+              <UnifiedFloatingLauncher
+                brandName="ORBI Ecosystem"
+                mode="sandbox"
+                enabled={true}
+                channels={{ webChat: true, whatsapp: true, voice: false }}
+                whatsapp={{
+                  phoneNumber: "",
+                  defaultMessage: "Hola ORBI Ecosystem. Vengo desde la web y necesito información.",
+                }}
+                placement="inline-preview"
+              />
             </div>
 
             <div className="space-y-2 border-t border-slate-800 pt-4">
