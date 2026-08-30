@@ -105,11 +105,38 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
       const detail = result.ok === true
         ? `HTTP ${result.status}${result.normalizedChannel ? ` · channel: ${result.normalizedChannel}` : ""}${result.processedAt ? ` · ${result.processedAt}` : ""}`
         : result.errorCode || result.message;
+      if (result.ok === true) {
+        const sandboxAnalysis: LeadAnalysis = {
+          ...EMPTY_ANALYSIS,
+          mainNeed: "Validación del backend sandbox local.",
+          aiSummary: "Lead sandbox generado tras validación del backend local.",
+          recommendedAction: "Solo demo local: no realizar seguimiento real.",
+        };
+        const sandboxLead = buildLeadRecord({
+          sourceMessage: text,
+          conversation: newMessages,
+          analysis: sandboxAnalysis,
+          channel: "web_demo",
+        });
+        onAddLead({
+          ...sandboxLead,
+          name: "Lead sandbox local",
+          detectedService: "Validación backend local",
+          rawMessage: text,
+          sandbox: {
+            source: "backend_sandbox",
+            status: "sandbox_validated",
+            realData: false,
+            backendStatus: 200,
+            note: "Lead sandbox generado tras validación del backend local. No corresponde a un cliente real.",
+          },
+        });
+      }
       const botMsg: Message = {
         id: `msg-backend-${Date.now()}`,
         sender: "bot",
         text: result.ok
-          ? `Mensaje validado por backend sandbox. No se creó lead real ni automatización productiva.\n${detail}`
+          ? `Mensaje validado por backend sandbox. No se creó lead real ni automatización productiva.\nLead sandbox registrado en Lead Intelligence.\n${detail}`
           : `El backend sandbox respondió con error controlado: ${detail}`,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
@@ -337,7 +364,7 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
             <p className="text-xs leading-relaxed text-slate-300">
               {responseMode === "demo"
                 ? "Responde con la lógica simulada actual."
-                : "Envía el mensaje al receiver local sandbox en localhost:8787."}
+                : "Envía el mensaje al receiver local sandbox en localhost:8787. Al validar HTTP 200 puede registrar un lead demo local."}
             </p>
             <div className="space-y-1 rounded-xl bg-slate-950/60 p-3 font-mono text-[10px] text-slate-400">
               <p>Mode: <span className="text-white">{responseMode === "demo" ? "Demo local" : "Backend sandbox"}</span></p>

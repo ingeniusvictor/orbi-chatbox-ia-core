@@ -187,9 +187,16 @@ export const LeadIntelligenceWorkspace: React.FC<LeadIntelligenceWorkspaceProps>
                         }`}
                       >
                         <td className="p-3">
-                          <p className="font-bold text-white">
-                            {lead.name || "Sin nombre"}
-                          </p>
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <p className="font-bold text-white">
+                              {lead.name || "Sin nombre"}
+                            </p>
+                            {lead.sandbox && (
+                              <span className="rounded border border-amber-400/40 bg-amber-500/10 px-1.5 py-0.5 text-[9px] font-mono font-bold uppercase text-amber-200">
+                                Sandbox lead
+                              </span>
+                            )}
+                          </div>
                           <p className="text-[11px] font-mono text-slate-400">
                             {lead.email || lead.phone || "Sin contacto directo"}
                           </p>
@@ -239,6 +246,13 @@ export const LeadIntelligenceWorkspace: React.FC<LeadIntelligenceWorkspaceProps>
 
             {selectedLead ? (
               <div className="space-y-3 text-xs">
+                {selectedLead.sandbox && (
+                  <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-amber-100">
+                    <p className="font-bold">Lead sandbox creado</p>
+                    <p className="mt-1 leading-relaxed">{selectedLead.sandbox.note}</p>
+                    <p className="mt-1 font-mono text-[10px]">Backend HTTP {selectedLead.sandbox.backendStatus} · datos reales: no</p>
+                  </div>
+                )}
                 <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-1">
                   <span className="text-[10px] font-mono uppercase text-slate-500">
                     Mensaje Original

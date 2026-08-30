@@ -170,6 +170,19 @@ export type LeadRecord = LeadAnalysis & {
   urgencyHint?: string;
   sourceMessage: string;
   conversation: ChatMessage[];
+  name?: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  detectedService?: string;
+  rawMessage?: string;
+  sandbox?: {
+    source: "backend_sandbox";
+    status: "sandbox_validated";
+    realData: false;
+    backendStatus: 200;
+    note: string;
+  };
 };
 
 export function createLeadId(): string {
@@ -1188,4 +1201,3 @@ export function parseKeywordsText(text: string): string[] {
 export function formatKeywordsText(keywords: string[]): string {
   return keywords.join(", ");
 }
-

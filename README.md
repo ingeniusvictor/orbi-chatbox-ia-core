@@ -109,6 +109,14 @@ Para probar el flujo frontend → backend local:
 
 El frontend llama solo al receiver local, el backend valida el mensaje y el chat muestra una respuesta controlada. No se crea lead en este modo, no se usa WhatsApp, IA externa ni base de datos. El modo **Demo local** conserva la lógica simulada existente. El bridge del Web Widget queda diferido para `0K-13B.1-R1`.
 
+## Functional MVP Sandbox Lead Capture
+
+1. Ejecutar `npm run server:dev`.
+2. Ejecutar `npm run dev`.
+3. Abrir Chat Studio, seleccionar **Backend sandbox** y enviar un mensaje sintético.
+
+Con una validación HTTP 200, el frontend registra un lead sandbox local visible en **Lead Intelligence**. El registro queda marcado como demo, no corresponde a un cliente real y usa únicamente el `localStorage` existente del prototipo. No usa datos reales, WhatsApp, IA externa ni una base de datos real.
+
 ## Arquitectura actual
 
 La aplicación fue modularizada para evitar un monolito exportado desde Google AI Studio.
