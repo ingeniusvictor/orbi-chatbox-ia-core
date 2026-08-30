@@ -98,6 +98,17 @@ La matriz local de QA valida el contrato del receiver con fixtures sintéticos: 
 
 Por defecto usa `http://127.0.0.1:8787`. Puede probarse el listener local alternativo con `ORBI_RECEIVER_QA_URL=http://localhost:8787 npm run server:qa`. La matriz solo admite `localhost`/`127.0.0.1`, no inicia el backend y no persiste resultados, mensajes ni datos. No usa datos reales, WhatsApp, IA externa ni base de datos.
 
+## Functional MVP Bridge
+
+Para probar el flujo frontend → backend local:
+
+1. En una terminal, ejecutar `npm run server:dev`.
+2. En otra terminal, ejecutar `npm run dev`.
+3. Abrir `http://localhost:3000`, ir a **Chat Studio** y seleccionar **Backend sandbox**.
+4. Enviar un mensaje sintético.
+
+El frontend llama solo al receiver local, el backend valida el mensaje y el chat muestra una respuesta controlada. No se crea lead en este modo, no se usa WhatsApp, IA externa ni base de datos. El modo **Demo local** conserva la lógica simulada existente. El bridge del Web Widget queda diferido para `0K-13B.1-R1`.
+
 ## Arquitectura actual
 
 La aplicación fue modularizada para evitar un monolito exportado desde Google AI Studio.
