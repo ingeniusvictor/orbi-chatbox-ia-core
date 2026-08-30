@@ -25,3 +25,21 @@ export type KnowledgeMatch = {
   readonly score: number;
   readonly matchedFields: readonly KnowledgeMatchField[];
 };
+
+export type KnowledgeContextEntry = {
+  readonly id: string;
+  readonly domain: KnowledgeDomain;
+  readonly title: string;
+  readonly content: string;
+  readonly score: number;
+};
+
+export type KnowledgeContext = {
+  readonly query: string;
+  readonly source: "local-static";
+  readonly mode: "sandbox";
+  readonly matchCount: number;
+  readonly entries: readonly Readonly<KnowledgeContextEntry>[];
+  readonly totalCharacters: number;
+  readonly truncated: boolean;
+};
