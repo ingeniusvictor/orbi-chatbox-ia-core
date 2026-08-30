@@ -174,3 +174,5 @@ Debe existir un procedimiento claro para:
 ## Próxima fase recomendada
 
 `0K-14C.3 — Preview Configuration Template`
+
+La arquitectura de la suite que estos requisitos preparan está en [Installable Widget Suite Architecture](./INSTALLABLE_WIDGET_SUITE_ARCHITECTURE.md).

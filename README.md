@@ -164,6 +164,10 @@ La evidencia y criterios de decisión están en [docs/CONTROLLED_PREVIEW_READINE
 
 Los requisitos previos de dominio, backend, CORS, public key, evidencia y rollback están en [docs/PREVIEW_ENVIRONMENT_REQUIREMENTS_PACK.md](docs/PREVIEW_ENVIRONMENT_REQUIREMENTS_PACK.md). Estado: **REQUIREMENTS ONLY / NO DEPLOY / PRODUCTION BLOCKED**; CONDITIONAL GO para preparar requisitos y NO-GO hasta completar pendientes.
 
+## Installable Widget Suite Architecture
+
+La arquitectura del producto instalable con ChatBox Web Widget y WhatsApp Floating Widget está en [docs/INSTALLABLE_WIDGET_SUITE_ARCHITECTURE.md](docs/INSTALLABLE_WIDGET_SUITE_ARCHITECTURE.md). La primera prueba futura será en Web ORBI y la arquitectura permitirá futuros clientes; estado: **ARCHITECTURE ONLY / NO DEPLOY / PRODUCTION BLOCKED**.
+
 ## Validaciones obligatorias
 
 ```bash

@@ -135,3 +135,5 @@ El MVP local está funcional, pero aún faltan ambiente preview, backend control
 ## Próxima fase recomendada
 
 Los requisitos concretos y sus estados iniciales están en [Preview Environment Requirements Pack](./PREVIEW_ENVIRONMENT_REQUIREMENTS_PACK.md).
+
+La arquitectura futura de los canales instalables está documentada en [Installable Widget Suite Architecture](./INSTALLABLE_WIDGET_SUITE_ARCHITECTURE.md); no cambia la decisión NO-GO para producción.

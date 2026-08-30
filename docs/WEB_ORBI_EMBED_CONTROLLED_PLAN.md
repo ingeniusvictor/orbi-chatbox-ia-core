@@ -64,3 +64,5 @@ Una prueba de preview únicamente podrá evaluarse con autorización explícita,
 La decisión formal debe pasar por el [Controlled Preview Readiness Gate](./CONTROLLED_PREVIEW_READINESS_GATE.md) antes de autorizar cualquier prueba controlada.
 
 Los requisitos concretos de dominio, backend, CORS, clave preview, evidencia y rollback están en [Preview Environment Requirements Pack](./PREVIEW_ENVIRONMENT_REQUIREMENTS_PACK.md).
+
+El embed futuro se enmarca en la [Installable Widget Suite Architecture](./INSTALLABLE_WIDGET_SUITE_ARCHITECTURE.md), que sigue siendo documental y no productiva.
