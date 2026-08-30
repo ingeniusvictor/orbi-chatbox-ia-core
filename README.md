@@ -116,6 +116,8 @@ npm run server:knowledge:qa
 
 0K-16A.1 añade un transporte genérico sólo para loopback (`localhost`, `127.0.0.1`, `::1`): rechaza LAN/exterior, no sigue redirects y limita timeout y respuesta. No activa proveedores ni contratos específicos de modelos.
 
+0K-16A.2 añade un adapter de salud Ollama para `GET /api/version` local mediante ese transporte. No llama generación, no carga ni descarga modelos; Mock continúa como único provider ejecutable.
+
 Validar el contrato estructural local:
 
 ```bash

@@ -15,7 +15,8 @@
                     "server:knowledge:qa":  "tsx server/scripts/runKnowledgeQa.ts",
                     "server:ai-contract:qa":  "tsx server/scripts/runAiProviderContractQa.ts",
                     "server:local-ai:qa":  "tsx server/scripts/runLocalAiRuntimeContractQa.ts",
-                    "server:local-ai:transport:qa":  "tsx server/scripts/runLocalAiRuntimeTransportQa.ts"
+                    "server:local-ai:transport:qa":  "tsx server/scripts/runLocalAiRuntimeTransportQa.ts",
+                    "server:ollama:health:qa":  "tsx server/scripts/runOllamaHealthQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",

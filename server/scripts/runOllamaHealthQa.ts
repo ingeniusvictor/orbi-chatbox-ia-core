@@ -1,0 +1,7 @@
+import { createServer } from "node:http";
+import { checkOllamaHealth } from "../src/services/ollamaHealthAdapter.js";
+const main = async (): Promise<void> => {
+  const server = createServer((request, response) => { if (request.url === "/api/version") { response.writeHead(200, { "Content-Type": "application/json" }); response.end('{"version":"synthetic"}'); return; } if (request.url === "/bad") { response.writeHead(200, { "Content-Type": "application/json" }); response.end("{}"); return; } response.writeHead(404); response.end(); });
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve)); const address = server.address(); const port = typeof address === "object" && address ? address.port : 0;
+  try { const valid = await checkOllamaHealth({ runtimeId: "ollama-local", endpoint: `http://127.0.0.1:${port}`, model: "placeholder", timeoutMs: 1000 }); const blocked = await checkOllamaHealth({ runtimeId: "ollama-local", endpoint: "http://example.invalid", model: "placeholder", timeoutMs: 1000 }); if (valid.readiness.state !== "ready" || valid.health.version !== "synthetic" || blocked.readiness.state !== "misconfigured" || !Object.isFrozen(valid)) throw new Error("Ollama health assertions failed."); console.info("Ollama Health QA: PASS (synthetic 127.0.0.1 version endpoint only)"); } finally { await new Promise<void>((resolve) => server.close(() => resolve())); }
+}; void main().catch((error: unknown) => { console.error(error instanceof Error ? error.message : "Ollama health QA failed."); process.exit(1); });
