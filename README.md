@@ -108,6 +108,16 @@ Validar el registry local:
 npm run server:knowledge:qa
 ```
 
+## AI Provider Abstraction
+
+0K-14 está cerrado. El módulo actual 0K-15A.1 define únicamente un contrato mínimo e independiente de proveedor para una futura ejecución de IA. No hay runtime de IA, proveedor activo, API keys ni llamadas externas: la respuesta determinista basada en conocimiento local sigue siendo el comportamiento de runtime actual.
+
+Validar el contrato estructural local:
+
+```bash
+npm run server:ai-contract:qa
+```
+
 ## Receiver Local QA Matrix
 
 La matriz local de QA valida el contrato del receiver con fixtures sintéticos: health, mensaje válido, public key inválida, mensaje vacío o largo, consentimiento ausente, channel inválido, JSON malformado, ruta inexistente y origin bloqueado.
