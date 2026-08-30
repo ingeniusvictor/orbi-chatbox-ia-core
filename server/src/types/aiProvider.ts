@@ -1,7 +1,9 @@
 import type { KnowledgeContext } from "./knowledge.js";
 
 /** Architecturally recognized provider identifiers. Only enabled modes are executable. */
-export type AiProviderId = "mock" | "openai" | "gemini";
+export type AiProviderId = "mock" | "qwen-local" | "gemma-local" | "openai" | "gemini";
+
+export type AiProviderDeployment = "development" | "local" | "cloud";
 
 /** Executable modes are deliberately narrower than supported provider identifiers. */
 export type AiProviderMode = "mock";

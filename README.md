@@ -110,7 +110,7 @@ npm run server:knowledge:qa
 
 ## AI Provider Abstraction
 
-0K-14, la familia 0K-15A y 0K-15B.1 están cerrados. El módulo actual 0K-15B.2 define el límite de configuración: arquitectónicamente se reconocen **Mock**, **OpenAI/ChatGPT** y **Gemini**; sólo **Mock** está habilitado y activo. OpenAI y Gemini son futuros y permanecen deshabilitados, sin credenciales ni ejecución. El runtime sigue: `Widget → Receiver → Validation → Knowledge Context → AiProvider contract → Provider registry → Mock provider → Sandbox Response`, sin IA real, SDK ni llamadas externas.
+0K-14, la familia 0K-15A, 0K-15B.1 y 0K-15B.2 están cerrados. El módulo actual 0K-15B.3 clasifica providers soportados: desarrollo (**Mock**), local/on-premise (**Qwen Local**, **Gemma Local**) y cloud (**OpenAI/ChatGPT**, **Gemini**). Sólo **Mock** está habilitado, activo y es ejecutable. Los providers locales y cloud son futuros arquitectónicos: no tienen credenciales, modelo runtime, API ni llamadas externas. ORBI podrá operar en futuros despliegues sin requerir obligatoriamente una API cloud de pago.
 
 Validar el contrato estructural local:
 

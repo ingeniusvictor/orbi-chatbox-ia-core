@@ -1,6 +1,7 @@
 import {
   ACTIVE_AI_PROVIDER,
   ENABLED_AI_PROVIDERS,
+  getAiProviderDeployment,
   isAiProviderEnabled,
   isAiProviderSupported,
   SUPPORTED_AI_PROVIDERS,
@@ -85,22 +86,33 @@ const main = async (): Promise<void> => {
   }));
 
   const passed = ACTIVE_AI_PROVIDER === "mock"
-    && SUPPORTED_AI_PROVIDERS.join(",") === "mock,openai,gemini"
+    && SUPPORTED_AI_PROVIDERS.join(",") === "mock,qwen-local,gemma-local,openai,gemini"
     && ENABLED_AI_PROVIDERS.length === 1
     && ENABLED_AI_PROVIDERS[0] === "mock"
     && Object.isFrozen(SUPPORTED_AI_PROVIDERS)
     && Object.isFrozen(ENABLED_AI_PROVIDERS)
     && isAiProviderSupported("mock")
     && isAiProviderEnabled("mock")
+    && getAiProviderDeployment("mock") === "development"
+    && isAiProviderSupported("qwen-local")
+    && !isAiProviderEnabled("qwen-local")
+    && getAiProviderDeployment("qwen-local") === "local"
+    && isAiProviderSupported("gemma-local")
+    && !isAiProviderEnabled("gemma-local")
+    && getAiProviderDeployment("gemma-local") === "local"
     && isAiProviderSupported("openai")
     && !isAiProviderEnabled("openai")
+    && getAiProviderDeployment("openai") === "cloud"
     && isAiProviderSupported("gemini")
     && !isAiProviderEnabled("gemini")
+    && getAiProviderDeployment("gemini") === "cloud"
     && REGISTERED_AI_PROVIDER_MODES.length === 1
     && REGISTERED_AI_PROVIDER_MODES[0] === "mock"
     && Object.isFrozen(REGISTERED_AI_PROVIDER_MODES)
     && provider.mode === "mock"
     && invalidProviderRejected
+    && rejectsRuntimeProvider("qwen-local")
+    && rejectsRuntimeProvider("gemma-local")
     && rejectsRuntimeProvider("openai")
     && rejectsRuntimeProvider("gemini")
     && request.requestId.length > 0
@@ -126,7 +138,7 @@ const main = async (): Promise<void> => {
     process.exit(1);
   }
 
-  console.info("AI Provider Contract QA: PASS (mock enabled; OpenAI and Gemini disabled-future)");
+  console.info("AI Provider Contract QA: PASS (mock enabled; local and cloud providers disabled-future)");
 };
 
 void main();
