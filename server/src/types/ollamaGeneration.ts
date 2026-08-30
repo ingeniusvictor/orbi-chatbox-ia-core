@@ -2,6 +2,8 @@ export type OllamaGenerationRequest = {
   readonly model: string;
   readonly prompt: string;
   readonly stream: false;
+  /** Disable Qwen3 reasoning mode for bounded, direct local responses. */
+  readonly think: false;
 };
 
 export type OllamaGenerationResponse = {

@@ -31,7 +31,7 @@ const main = async (): Promise<void> => {
       if (body.model === "missing") { outgoing.writeHead(200, { "Content-Type": "application/json" }); outgoing.end("{}"); return; }
       if (body.model === "empty") { outgoing.writeHead(200, { "Content-Type": "application/json" }); outgoing.end('{"response":" "}'); return; }
       if (body.model === "redirect") { outgoing.writeHead(302, { Location: "http://example.invalid" }); outgoing.end(); return; }
-      const valid = body.model === "synthetic-qwen" && body.stream === false && typeof body.prompt === "string";
+      const valid = body.model === "synthetic-qwen" && body.stream === false && body.think === false && typeof body.prompt === "string";
       outgoing.writeHead(valid ? 200 : 400, { "Content-Type": "application/json" }); outgoing.end(valid ? '{"response":"synthetic qwen answer"}' : "{}");
     });
   });
@@ -45,14 +45,14 @@ const main = async (): Promise<void> => {
     const prompt = buildQwenLocalPrompt(Object.freeze({ runtimeId: config.runtimeId, model: config.model, ...request(knownContext) }));
     const bounded = buildQwenLocalPrompt(Object.freeze({ runtimeId: config.runtimeId, model: config.model, ...request(knownContext, "x".repeat(MAX_QWEN_LOCAL_PROMPT_CHARACTERS + 100)) }));
     const failures = await Promise.all([
-      generateWithOllama({ ...config, endpoint: "http://127.0.0.1:1" }, { model: config.model, prompt: "synthetic", stream: false }),
-      generateWithOllama({ ...config, timeoutMs: 20 }, { model: "slow", prompt: "synthetic", stream: false }),
-      generateWithOllama(config, { model: "malformed", prompt: "synthetic", stream: false }),
-      generateWithOllama(config, { model: "missing", prompt: "synthetic", stream: false }),
-      generateWithOllama(config, { model: "empty", prompt: "synthetic", stream: false }),
-      generateWithOllama(config, { model: "redirect", prompt: "synthetic", stream: false }),
-      generateWithOllama({ ...config, endpoint: "http://example.invalid" }, { model: config.model, prompt: "synthetic", stream: false }),
-      generateWithOllama({ ...config, endpoint: "http://192.168.1.1" }, { model: config.model, prompt: "synthetic", stream: false }),
+      generateWithOllama({ ...config, endpoint: "http://127.0.0.1:1" }, { model: config.model, prompt: "synthetic", stream: false, think: false }),
+      generateWithOllama({ ...config, timeoutMs: 20 }, { model: "slow", prompt: "synthetic", stream: false, think: false }),
+      generateWithOllama(config, { model: "malformed", prompt: "synthetic", stream: false, think: false }),
+      generateWithOllama(config, { model: "missing", prompt: "synthetic", stream: false, think: false }),
+      generateWithOllama(config, { model: "empty", prompt: "synthetic", stream: false, think: false }),
+      generateWithOllama(config, { model: "redirect", prompt: "synthetic", stream: false, think: false }),
+      generateWithOllama({ ...config, endpoint: "http://example.invalid" }, { model: config.model, prompt: "synthetic", stream: false, think: false }),
+      generateWithOllama({ ...config, endpoint: "http://192.168.1.1" }, { model: config.model, prompt: "synthetic", stream: false, think: false }),
     ]);
     const mock = await mockAiProvider.generate(request(knownContext));
     const passed = port > 0

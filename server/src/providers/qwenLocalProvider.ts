@@ -17,6 +17,7 @@ export const createQwenLocalProvider = (
       model: localRequest.model,
       prompt: buildQwenLocalPrompt(localRequest),
       stream: false,
+      think: false,
     });
     if (result.ok === false) throw controlledFailure(result.reason);
     const sourceEntryIds = Object.freeze(localRequest.knowledgeContext.entries.map((entry) => entry.id));
