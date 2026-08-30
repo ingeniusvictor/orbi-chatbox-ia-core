@@ -168,6 +168,10 @@ Los requisitos previos de dominio, backend, CORS, public key, evidencia y rollba
 
 La arquitectura del producto instalable con ChatBox Web Widget y WhatsApp Floating Widget está en [docs/INSTALLABLE_WIDGET_SUITE_ARCHITECTURE.md](docs/INSTALLABLE_WIDGET_SUITE_ARCHITECTURE.md). La primera prueba futura será en Web ORBI y la arquitectura permitirá futuros clientes; estado: **ARCHITECTURE ONLY / NO DEPLOY / PRODUCTION BLOCKED**.
 
+## WhatsApp Floating Widget Internal Module
+
+El componente interno está documentado en [docs/WHATSAPP_FLOATING_WIDGET_INTERNAL_MODULE.md](docs/WHATSAPP_FLOATING_WIDGET_INTERNAL_MODULE.md). Opera solo como preview manual sandbox en Web Widget Workspace: no usa WhatsApp Business API, webhook, automatización ni producción.
+
 ## Validaciones obligatorias
 
 ```bash

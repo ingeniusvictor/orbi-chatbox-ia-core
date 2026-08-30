@@ -25,6 +25,7 @@ import {
   DEFAULT_RECEIVER_URL,
   sendMessageToBackendReceiver,
 } from "../../services/backendReceiverClient";
+import { WhatsAppFloatingWidget } from "../common";
 
 interface WebWidgetWorkspaceProps {
   companyProfile: CompanyProfile;
@@ -277,6 +278,26 @@ export const WebWidgetWorkspace: React.FC<WebWidgetWorkspaceProps> = ({
               <p className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-2 text-[11px] leading-relaxed text-amber-200">
                 Embed productivo bloqueado. Usar sólo en sandbox/local hasta completar Web ORBI Embed Controlled Plan.
               </p>
+            </div>
+
+            <div className="space-y-2 border-t border-slate-800 pt-4">
+              <div>
+                <h4 className="text-xs font-mono font-bold uppercase text-emerald-300">
+                  WhatsApp Floating Widget — Sandbox Preview
+                </h4>
+                <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
+                  Preview interno manual. Sin número configurado, sin enlace externo y sin automatización.
+                </p>
+              </div>
+              <WhatsAppFloatingWidget
+                phoneNumber=""
+                defaultMessage="Hola ORBI Ecosystem. Vengo desde la web y necesito información."
+                brandName="ORBI Ecosystem"
+                mode="sandbox"
+                enabled={true}
+                realAutomationAllowed={false}
+                placement="inline-preview"
+              />
             </div>
           </div>
         </div>

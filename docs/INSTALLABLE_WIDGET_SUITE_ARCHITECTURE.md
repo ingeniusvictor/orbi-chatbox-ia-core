@@ -57,7 +57,7 @@ Responsabilidad:
 - No operar como bot hasta una fase futura.
 - Futuro: integración WhatsApp Business API.
 
-**Estado actual:** PLANNED INTERNAL MODULE.
+**Estado actual:** INTERNAL SANDBOX MODULE READY. Ver [WhatsApp Floating Widget Internal Module](./WHATSAPP_FLOATING_WIDGET_INTERNAL_MODULE.md).
 
 ### 4. Client Configuration
 
