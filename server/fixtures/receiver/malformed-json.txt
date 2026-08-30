@@ -1,0 +1,4 @@
+{
+  "channel": "manual_test",
+  "message": "JSON malformado sintético",
+  "consentAccepted": true

@@ -88,6 +88,16 @@ La consola solo permite URLs locales `localhost`/`127.0.0.1` y no debe usarse co
 
 El receiver sandbox valida la public key, el consentimiento, el mensaje, su máximo de 2000 caracteres y el `channel`. Los errores usan un `errorCode` seguro y consistente. No almacena mensajes, no llama IA externa, no crea leads reales, no conecta WhatsApp ni usa una base de datos.
 
+## Receiver Local QA Matrix
+
+La matriz local de QA valida el contrato del receiver con fixtures sintéticos: health, mensaje válido, public key inválida, mensaje vacío o largo, consentimiento ausente, channel inválido, JSON malformado, ruta inexistente y origin bloqueado.
+
+1. En una terminal, ejecutar `npm run server:dev`.
+2. En otra terminal, ejecutar `npm run server:qa`.
+3. El script termina con `Receiver QA: PASS` o un código de salida distinto de cero si falla un caso.
+
+Por defecto usa `http://127.0.0.1:8787`. Puede probarse el listener local alternativo con `ORBI_RECEIVER_QA_URL=http://localhost:8787 npm run server:qa`. La matriz solo admite `localhost`/`127.0.0.1`, no inicia el backend y no persiste resultados, mensajes ni datos. No usa datos reales, WhatsApp, IA externa ni base de datos.
+
 ## Arquitectura actual
 
 La aplicación fue modularizada para evitar un monolito exportado desde Google AI Studio.

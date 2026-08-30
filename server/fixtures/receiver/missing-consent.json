@@ -1,0 +1,7 @@
+{
+  "channel": "manual_test",
+  "visitorId": "local-sandbox-visitor",
+  "message": "Prueba sintética sin consentimiento.",
+  "pageUrl": "http://localhost:3000",
+  "timestamp": "2026-08-28T00:00:00.000Z"
+}

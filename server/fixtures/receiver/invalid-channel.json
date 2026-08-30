@@ -1,0 +1,8 @@
+{
+  "channel": "invalid_channel",
+  "visitorId": "local-sandbox-visitor",
+  "message": "Prueba sintética con canal inválido.",
+  "pageUrl": "http://localhost:3000",
+  "consentAccepted": true,
+  "timestamp": "2026-08-28T00:00:00.000Z"
+}

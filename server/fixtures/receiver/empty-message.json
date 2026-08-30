@@ -1,0 +1,8 @@
+{
+  "channel": "manual_test",
+  "visitorId": "local-sandbox-visitor",
+  "message": "",
+  "pageUrl": "http://localhost:3000",
+  "consentAccepted": true,
+  "timestamp": "2026-08-28T00:00:00.000Z"
+}
