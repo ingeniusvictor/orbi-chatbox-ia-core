@@ -1,6 +1,9 @@
 import type { KnowledgeContext } from "./knowledge.js";
 
-/** Contract-only mode. No AI provider is active in this module. */
+/** Architecturally recognized provider identifiers. Only enabled modes are executable. */
+export type AiProviderId = "mock" | "openai" | "gemini";
+
+/** Executable modes are deliberately narrower than supported provider identifiers. */
 export type AiProviderMode = "mock";
 
 export type AiProviderRequest = {

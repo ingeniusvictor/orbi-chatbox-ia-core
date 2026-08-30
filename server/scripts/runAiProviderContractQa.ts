@@ -1,4 +1,10 @@
-import { ACTIVE_AI_PROVIDER } from "../src/config/aiProvider.js";
+import {
+  ACTIVE_AI_PROVIDER,
+  ENABLED_AI_PROVIDERS,
+  isAiProviderEnabled,
+  isAiProviderSupported,
+  SUPPORTED_AI_PROVIDERS,
+} from "../src/config/aiProvider.js";
 import {
   REGISTERED_AI_PROVIDER_MODES,
   resolveAiProvider,
@@ -54,6 +60,14 @@ const longContext: Readonly<KnowledgeContext> = Object.freeze({
 const main = async (): Promise<void> => {
   const provider = resolveAiProvider(ACTIVE_AI_PROVIDER);
   let invalidProviderRejected = false;
+  const rejectsRuntimeProvider = (providerId: string): boolean => {
+    try {
+      resolveAiProvider(providerId as never);
+      return false;
+    } catch (error) {
+      return error instanceof Error && error.message === "Unsupported AI provider mode.";
+    }
+  };
   try {
     resolveAiProvider("invalid-provider" as never);
   } catch (error) {
@@ -71,11 +85,24 @@ const main = async (): Promise<void> => {
   }));
 
   const passed = ACTIVE_AI_PROVIDER === "mock"
+    && SUPPORTED_AI_PROVIDERS.join(",") === "mock,openai,gemini"
+    && ENABLED_AI_PROVIDERS.length === 1
+    && ENABLED_AI_PROVIDERS[0] === "mock"
+    && Object.isFrozen(SUPPORTED_AI_PROVIDERS)
+    && Object.isFrozen(ENABLED_AI_PROVIDERS)
+    && isAiProviderSupported("mock")
+    && isAiProviderEnabled("mock")
+    && isAiProviderSupported("openai")
+    && !isAiProviderEnabled("openai")
+    && isAiProviderSupported("gemini")
+    && !isAiProviderEnabled("gemini")
     && REGISTERED_AI_PROVIDER_MODES.length === 1
     && REGISTERED_AI_PROVIDER_MODES[0] === "mock"
     && Object.isFrozen(REGISTERED_AI_PROVIDER_MODES)
     && provider.mode === "mock"
     && invalidProviderRejected
+    && rejectsRuntimeProvider("openai")
+    && rejectsRuntimeProvider("gemini")
     && request.requestId.length > 0
     && request.conversationId.length > 0
     && Object.isFrozen(request.knowledgeContext)
@@ -99,7 +126,7 @@ const main = async (): Promise<void> => {
     process.exit(1);
   }
 
-  console.info("AI Provider Contract QA: PASS (controlled local mock registry only)");
+  console.info("AI Provider Contract QA: PASS (mock enabled; OpenAI and Gemini disabled-future)");
 };
 
 void main();

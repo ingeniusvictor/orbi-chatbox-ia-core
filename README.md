@@ -110,7 +110,7 @@ npm run server:knowledge:qa
 
 ## AI Provider Abstraction
 
-0K-14 y la familia 0K-15A están cerrados. El módulo actual 0K-15B.1 centraliza la selección en un registry controlado: `Widget → Receiver → Validation → Knowledge Context → AiProvider contract → Provider registry → Mock provider → Sandbox Response`. Sólo `mock` está registrado y activo mediante configuración local compile-time. OpenAI/ChatGPT y Gemini son futuras posibilidades documentales: no hay credenciales, IA real, SDK, llamadas externas ni runtime productivo.
+0K-14, la familia 0K-15A y 0K-15B.1 están cerrados. El módulo actual 0K-15B.2 define el límite de configuración: arquitectónicamente se reconocen **Mock**, **OpenAI/ChatGPT** y **Gemini**; sólo **Mock** está habilitado y activo. OpenAI y Gemini son futuros y permanecen deshabilitados, sin credenciales ni ejecución. El runtime sigue: `Widget → Receiver → Validation → Knowledge Context → AiProvider contract → Provider registry → Mock provider → Sandbox Response`, sin IA real, SDK ni llamadas externas.
 
 Validar el contrato estructural local:
 
