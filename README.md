@@ -118,6 +118,8 @@ npm run server:knowledge:qa
 
 0K-16A.2 añade un adapter de salud Ollama para `GET /api/version` local mediante ese transporte. No llama generación, no carga ni descarga modelos; Mock continúa como único provider ejecutable.
 
+0K-16A.3 añade el contrato y mappers de un futuro adapter de proveedor local. No hay generación local habilitada: `qwen-local` y `gemma-local` permanecen deshabilitados, Ollama conserva sólo su health check y Mock continúa como único provider ejecutable.
+
 Validar el contrato estructural local:
 
 ```bash
