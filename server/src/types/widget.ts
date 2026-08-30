@@ -43,6 +43,9 @@ export type WidgetMessageResponse = {
   leadCreated: boolean;
   handoffRecommended: boolean;
   message: string;
+  responseMode: "knowledge-deterministic";
+  grounded: boolean;
+  sourceEntryIds: readonly string[];
   guardrails: string[];
   processedAt: string;
   normalizedChannel: WidgetChannel;

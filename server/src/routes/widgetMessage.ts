@@ -2,6 +2,7 @@ import { Router } from "express";
 import { createSandboxError } from "../security/errorResponses.js";
 import { buildConversationEnvelope } from "../services/conversationEnvelope.js";
 import { buildKnowledgeContext } from "../services/knowledgeContextBuilder.js";
+import { composeKnowledgeResponse } from "../services/knowledgeResponseComposer.js";
 import { processValidatedWidgetMessage } from "../services/widgetMessageProcessor.js";
 import type { WidgetMessageResponse } from "../types/widget.js";
 import { validateWidgetMessagePayload } from "../validation/widgetPayload.js";
@@ -38,14 +39,17 @@ export const createWidgetMessageRouter = (demoWidgetPublicKey: string): Router =
     const processed = processValidatedWidgetMessage(validation.payload);
     const knowledgeContext = buildKnowledgeContext(processed.normalizedMessage);
     const envelope = buildConversationEnvelope(validation.payload, processed, knowledgeContext);
+    const knowledgeResponse = composeKnowledgeResponse(envelope.knowledgeContext);
     const payload: WidgetMessageResponse = {
       ok: true,
       mode: "sandbox",
       received: true,
       leadCreated: false,
       handoffRecommended: false,
-      message:
-        "Mensaje recibido en modo sandbox. No se creó lead real ni se ejecutó automatización productiva.",
+      message: knowledgeResponse.text,
+      responseMode: knowledgeResponse.mode,
+      grounded: knowledgeResponse.grounded,
+      sourceEntryIds: knowledgeResponse.sourceEntryIds,
       guardrails: SANDBOX_GUARDRAILS,
       processedAt: envelope.runtime.receivedAt,
       normalizedChannel: envelope.source.channel,
