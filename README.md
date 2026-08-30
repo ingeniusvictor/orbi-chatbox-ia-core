@@ -8,7 +8,8 @@ ORBI ChatBox IA Core es una aplicación frontend modular para atención conversa
 - Estado: PASS — MVP funcional demo/sandbox
 - Producción externa: Bloqueada
 - WhatsApp real: No conectado
-- Backend real: No creado todavía
+- Backend receiver sandbox local: Implementado
+- Backend productivo: No implementado
 - Persistencia actual: LocalStorage
 - Rama de trabajo actual: feature/0k-13-minimal-backend-controlled-build
 
@@ -275,3 +276,5 @@ Bloqueado por diseño:
 0K-13C.1 — Functional MVP Close
 
 Objetivo: mantener un MVP funcional, local y controlado, sin deploy productivo ni datos reales.
+
+Estado de cierre: 0K-13A.1, 0K-13A.2 y 0K-13A.3 están cerrados; 0K-13C.1 verifica el flujo funcional local completo.
