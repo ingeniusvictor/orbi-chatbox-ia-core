@@ -156,6 +156,10 @@ El plan de preparación está en [docs/WEB_ORBI_EMBED_CONTROLLED_PLAN.md](docs/W
 
 Las instrucciones para una futura prueba de preview controlada están en [docs/CONTROLLED_EMBED_INSTRUCTION_PACK.md](docs/CONTROLLED_EMBED_INSTRUCTION_PACK.md). El paquete es solo documental y mantiene la integración productiva bloqueada.
 
+## Controlled Preview Readiness Gate
+
+La evidencia y criterios de decisión están en [docs/CONTROLLED_PREVIEW_READINESS_GATE.md](docs/CONTROLLED_PREVIEW_READINESS_GATE.md). El estado recomendado es **CONDITIONAL GO** para preparar preview y **NO-GO** para producción; producción sigue bloqueada.
+
 ## Validaciones obligatorias
 
 ```bash

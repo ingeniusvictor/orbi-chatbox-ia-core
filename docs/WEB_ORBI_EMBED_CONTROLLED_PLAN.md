@@ -60,3 +60,5 @@ El procedimiento de preparación, preflight, snippet conceptual y rollback está
 El paquete es **DOCUMENTATION ONLY / PRODUCTION BLOCKED**. No habilita una integración, endpoint ni despliegue productivo.
 
 Una prueba de preview únicamente podrá evaluarse con autorización explícita, dominio permitido, CORS controlado y datos sintéticos.
+
+La decisión formal debe pasar por el [Controlled Preview Readiness Gate](./CONTROLLED_PREVIEW_READINESS_GATE.md) antes de autorizar cualquier prueba controlada.
