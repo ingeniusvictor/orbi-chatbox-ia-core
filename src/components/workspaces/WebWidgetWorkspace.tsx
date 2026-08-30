@@ -274,6 +274,9 @@ export const WebWidgetWorkspace: React.FC<WebWidgetWorkspaceProps> = ({
               <pre className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-[11px] font-mono text-slate-300 overflow-x-auto whitespace-pre">
                 {embedCodeSnippet}
               </pre>
+              <p className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-2 text-[11px] leading-relaxed text-amber-200">
+                Embed productivo bloqueado. Usar sólo en sandbox/local hasta completar Web ORBI Embed Controlled Plan.
+              </p>
             </div>
           </div>
         </div>
