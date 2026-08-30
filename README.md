@@ -184,6 +184,10 @@ Los tipos y configuraciones template están documentados en [docs/INSTALLABLE_CL
 
 El paquete para preparar una futura prueba en web ORBI está en [docs/ORBI_WEBSITE_PREVIEW_PACKAGE.md](docs/ORBI_WEBSITE_PREVIEW_PACKAGE.md). Estado: **PREVIEW PACKAGE / NO INSTALL / NO DEPLOY / PRODUCTION BLOCKED**; no instala ni modifica la web ORBI todavía.
 
+## Controlled Web Preview Execution Gate
+
+La decisión de ejecución está documentada en [docs/CONTROLLED_WEB_PREVIEW_EXECUTION_GATE.md](docs/CONTROLLED_WEB_PREVIEW_EXECUTION_GATE.md). Estado: **EXECUTION GATE / NO DEPLOY / PRODUCTION BLOCKED**; hay CONDITIONAL GO para preparación y NO-GO para ejecución real hasta contar con URL preview, backend controlado, CORS, public key y autorización final.
+
 ## Validaciones obligatorias
 
 ```bash

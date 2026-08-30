@@ -139,3 +139,5 @@ Los requisitos concretos y sus estados iniciales están en [Preview Environment 
 La arquitectura futura de los canales instalables está documentada en [Installable Widget Suite Architecture](./INSTALLABLE_WIDGET_SUITE_ARCHITECTURE.md); no cambia la decisión NO-GO para producción.
 
 El [ORBI Website Preview Package](./ORBI_WEBSITE_PREVIEW_PACKAGE.md) debe existir como evidencia previa antes de cualquier decisión GO para una prueba ORBI.
+
+La evaluación específica de ejecución está en [Controlled Web Preview Execution Gate](./CONTROLLED_WEB_PREVIEW_EXECUTION_GATE.md).

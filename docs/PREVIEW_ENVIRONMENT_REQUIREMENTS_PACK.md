@@ -178,3 +178,5 @@ Debe existir un procedimiento claro para:
 La arquitectura de la suite que estos requisitos preparan está en [Installable Widget Suite Architecture](./INSTALLABLE_WIDGET_SUITE_ARCHITECTURE.md).
 
 Para la futura prueba específica de ORBI, consultar [ORBI Website Preview Package](./ORBI_WEBSITE_PREVIEW_PACKAGE.md).
+
+La decisión de avanzar hacia ejecución preview debe pasar por [Controlled Web Preview Execution Gate](./CONTROLLED_WEB_PREVIEW_EXECUTION_GATE.md).

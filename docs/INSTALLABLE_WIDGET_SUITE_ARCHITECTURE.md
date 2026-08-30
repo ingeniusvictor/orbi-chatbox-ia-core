@@ -85,6 +85,8 @@ Responsabilidad futura:
 
 El [ORBI Website Preview Package](./ORBI_WEBSITE_PREVIEW_PACKAGE.md) está **PREPARATION READY**; no implementa el loader ni autoriza instalación.
 
+Antes de cualquier ejecución preview, la arquitectura debe pasar el [Controlled Web Preview Execution Gate](./CONTROLLED_WEB_PREVIEW_EXECUTION_GATE.md).
+
 ### 6. Backend Receiver
 
 Responsabilidad:

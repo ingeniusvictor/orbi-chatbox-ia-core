@@ -142,6 +142,8 @@ NO-GO si se intenta usar producción, falta rollback/CORS/backend controlado, se
 
 **PREPARATION ONLY.** Todavía **NO-GO** para ejecutar preview real: faltan URL preview, backend controlado público/no productivo, CORS preview, public key preview y aprobación final explícita.
 
+La decisión final de ejecución debe pasar por [Controlled Web Preview Execution Gate](./CONTROLLED_WEB_PREVIEW_EXECUTION_GATE.md).
+
 ## Próxima fase
 
 `0K-15 — Controlled Web Preview Execution`
