@@ -11,7 +11,8 @@ ORBI ChatBox IA Core es una aplicación frontend modular para atención conversa
 - Backend receiver sandbox local: Implementado
 - Backend productivo: No implementado
 - Persistencia actual: LocalStorage
-- Rama de trabajo actual: feature/0k-13-minimal-backend-controlled-build
+- Bloque 0K-13: Cerrado
+- Rama de trabajo actual: feature/0k-14-local-knowledge-foundation
 
 ## Stack
 
@@ -96,6 +97,16 @@ El receiver sandbox valida la public key, el consentimiento, el mensaje, su máx
 ## Minimal Conversation Envelope
 
 0K-13A.3 conserva el procesamiento de 0K-13A.2 y añade un envelope interno por solicitud. Conserva contexto validado y procesado, y usa un `conversationId` efímero local: no representa almacenamiento, memoria ni una conversación persistida.
+
+## Local Knowledge Foundation
+
+0K-14A.1 añade un registry server-side estático, tipado y de solo lectura con contenido sintético sandbox. No es base de datos, RAG, embeddings, memoria de usuario, fuente externa ni integración de IA; todavía no participa en el pipeline de mensajes.
+
+Validar el registry local:
+
+```bash
+npm run server:knowledge:qa
+```
 
 ## Receiver Local QA Matrix
 
