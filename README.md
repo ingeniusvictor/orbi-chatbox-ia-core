@@ -122,6 +122,8 @@ npm run server:knowledge:qa
 
 0K-16B.1 cierra la familia 0K-16A y habilita arquitectónicamente `qwen-local`, aunque `mock` sigue activo por defecto. Qwen usa Ollama sólo por loopback mediante `POST /api/generate`, con QA sobre servidor sintético local; no instala ni descarga modelos. Gemma, OpenAI y Gemini continúan deshabilitados.
 
+0K-16B.2 añade selección local controlada no secreta mediante `ORBI_AI_PROVIDER`. Si falta, usa `mock`; sólo acepta `mock` o `qwen-local`. `qwen-local` requiere Ollama/modelo local ya disponible, sin instalación ni descarga automática. Valores inválidos no hacen fallback silencioso y los clientes HTTP no pueden seleccionar proveedor.
+
 Validar el contrato estructural local:
 
 ```bash

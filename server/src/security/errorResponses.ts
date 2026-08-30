@@ -7,6 +7,7 @@ export type SandboxErrorCode =
   | "ORIGIN_NOT_ALLOWED"
   | "RATE_LIMITED"
   | "ROUTE_NOT_FOUND"
+  | "LOCAL_AI_PROVIDER_UNAVAILABLE"
   | "INTERNAL_SANDBOX_ERROR";
 
 export type SandboxErrorResponse = {

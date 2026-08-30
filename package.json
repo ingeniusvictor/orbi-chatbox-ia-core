@@ -18,7 +18,8 @@
                     "server:local-ai:transport:qa":  "tsx server/scripts/runLocalAiRuntimeTransportQa.ts",
                     "server:ollama:health:qa":  "tsx server/scripts/runOllamaHealthQa.ts",
                     "server:local-ai:provider:qa":  "tsx server/scripts/runLocalAiProviderAdapterQa.ts",
-                    "server:qwen-local:qa":  "tsx server/scripts/runQwenLocalProviderQa.ts"
+                    "server:qwen-local:qa":  "tsx server/scripts/runQwenLocalProviderQa.ts",
+                    "server:ai-selection:qa":  "tsx server/scripts/runAiProviderSelectionQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",

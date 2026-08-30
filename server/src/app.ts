@@ -18,7 +18,7 @@ export const createApp = (runtimeEnv: ServerRuntimeEnv): express.Express => {
   );
   app.use(createAuditLog(runtimeEnv.auditLogEnabled));
   app.use(healthRouter);
-  app.use(createWidgetMessageRouter(runtimeEnv.demoWidgetPublicKey));
+  app.use(createWidgetMessageRouter(runtimeEnv.demoWidgetPublicKey, runtimeEnv.activeAiProvider));
 
   const notFoundHandler: RequestHandler = (_request, response) => {
     const error = createSandboxError(404, "ROUTE_NOT_FOUND", "Route not found.");

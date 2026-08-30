@@ -1,11 +1,10 @@
 import { Router } from "express";
-import { ACTIVE_AI_PROVIDER } from "../config/aiProvider.js";
 import { resolveAiProvider } from "../providers/aiProviderRegistry.js";
 import { createSandboxError } from "../security/errorResponses.js";
 import { buildConversationEnvelope } from "../services/conversationEnvelope.js";
 import { buildKnowledgeContext } from "../services/knowledgeContextBuilder.js";
 import { processValidatedWidgetMessage } from "../services/widgetMessageProcessor.js";
-import type { AiProviderRequest } from "../types/aiProvider.js";
+import type { AiProvider, AiProviderMode, AiProviderRequest } from "../types/aiProvider.js";
 import type { WidgetMessageResponse } from "../types/widget.js";
 import { validateWidgetMessagePayload } from "../validation/widgetPayload.js";
 
@@ -17,7 +16,11 @@ const SANDBOX_GUARDRAILS = [
   "Sin IA externa",
 ];
 
-export const createWidgetMessageRouter = (demoWidgetPublicKey: string): Router => {
+export const createWidgetMessageRouter = (
+  demoWidgetPublicKey: string,
+  activeProviderMode: AiProviderMode,
+  providerOverride?: AiProvider,
+): Router => {
   const router = Router();
 
   router.post("/api/public/widget/:publicKey/message", async (request, response, next) => {
@@ -48,7 +51,7 @@ export const createWidgetMessageRouter = (demoWidgetPublicKey: string): Router =
         message: envelope.message.text,
         knowledgeContext: envelope.knowledgeContext,
       });
-      const provider = resolveAiProvider(ACTIVE_AI_PROVIDER);
+      const provider = providerOverride ?? resolveAiProvider(activeProviderMode);
       const providerResponse = await provider.generate(providerRequest);
       const payload: WidgetMessageResponse = {
         ok: true,
@@ -80,6 +83,15 @@ export const createWidgetMessageRouter = (demoWidgetPublicKey: string): Router =
 
       response.json(payload);
     } catch (error) {
+      if (error instanceof Error && error.message.startsWith("qwen-local-unavailable:")) {
+        const providerError = createSandboxError(
+          503,
+          "LOCAL_AI_PROVIDER_UNAVAILABLE",
+          "Configured local AI provider is unavailable.",
+        );
+        response.status(providerError.statusCode).json(providerError.body);
+        return;
+      }
       next(error);
     }
   });
