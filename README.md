@@ -124,6 +124,8 @@ npm run server:knowledge:qa
 
 0K-16B.2 añade selección local controlada no secreta mediante `ORBI_AI_PROVIDER`. Si falta, usa `mock`; sólo acepta `mock` o `qwen-local`. `qwen-local` requiere Ollama/modelo local ya disponible, sin instalación ni descarga automática. Valores inválidos no hacen fallback silencioso y los clientes HTTP no pueden seleccionar proveedor.
 
+0K-16B.3-R2 valida la ruta real local con `qwen3:1.7b`, `think: false` y `stream: false` en Ryzen 7 serie 4000 / 16 GB RAM: la prueba ORBI end-to-end de contexto conocido respondió en aproximadamente 12 s. Qwen sigue siendo opcional, `mock` permanece como valor por defecto y la ruta local no requiere dependencias cloud. `qwen3:4b` no fue viable dentro del timeout seguro en esta máquina.
+
 Validar el contrato estructural local:
 
 ```bash

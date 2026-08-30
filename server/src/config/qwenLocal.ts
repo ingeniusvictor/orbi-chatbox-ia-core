@@ -4,6 +4,6 @@ import type { LocalAiRuntimeConfig } from "../types/localAiRuntime.js";
 export const QWEN_LOCAL_RUNTIME_CONFIG: Readonly<LocalAiRuntimeConfig> = Object.freeze({
   runtimeId: "qwen-local-ollama",
   endpoint: "http://127.0.0.1:11434",
-  model: "qwen3:4b",
+  model: "qwen3:1.7b",
   timeoutMs: 30_000,
 });
