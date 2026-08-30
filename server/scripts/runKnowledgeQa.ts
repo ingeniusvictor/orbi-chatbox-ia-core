@@ -4,6 +4,7 @@ import {
   getKnowledgeEntriesByDomain,
   getKnowledgeEntryById,
 } from "../src/services/localKnowledgeRegistry.js";
+import { searchLocalKnowledge } from "../src/services/localKnowledgeSearch.js";
 
 const assert = (condition: unknown, message: string): void => {
   if (!condition) {
@@ -42,7 +43,38 @@ const main = (): void => {
   assert(rereadEntries.length === beforeLength, "Returned values must not mutate the canonical registry.");
   assert(rereadEntries[0] !== entries[0], "Registry reads must return protected copies.");
 
-  console.info(`Knowledge QA: PASS (${entries.length} sandbox entries)`);
+  assert(searchLocalKnowledge("").length === 0, "Empty query must return no matches.");
+  assert(searchLocalKnowledge("   \t ").length === 0, "Whitespace-only query must return no matches.");
+
+  const assistantMatches = searchLocalKnowledge("Sandbox   Assistant");
+  assert(assistantMatches.some((match) => match.entry.id === "orbi-sandbox-assistant"), "Assistant query must find the sandbox assistant.");
+  assert(assistantMatches.every((match) => match.score > 0), "Matches must have a positive deterministic score.");
+
+  const tagMatches = searchLocalKnowledge("guardrails");
+  assert(tagMatches.some((match) => match.entry.id === "development-local-workflow"), "Tag query must find the expected entry.");
+  assert(searchLocalKnowledge("no-such-sandbox-query").length === 0, "Unknown query must return no matches.");
+
+  const rankedMatches = searchLocalKnowledge("sandbox", 10);
+  for (let index = 1; index < rankedMatches.length; index += 1) {
+    const previous = rankedMatches[index - 1];
+    const current = rankedMatches[index];
+    assert(
+      previous.score > current.score || (previous.score === current.score && previous.entry.id <= current.entry.id),
+      "Results must use stable score and ID ordering.",
+    );
+  }
+  assert(searchLocalKnowledge("sandbox", 1).length <= 1, "Result limit must be respected.");
+  assert(searchLocalKnowledge("sandbox", 99).length <= 10, "Result limit must remain bounded.");
+
+  const repeatedMatches = searchLocalKnowledge("sandbox", 10);
+  assert(
+    rankedMatches.map((match) => `${match.entry.id}:${match.score}`).join("|")
+      === repeatedMatches.map((match) => `${match.entry.id}:${match.score}`).join("|"),
+    "Repeated queries must return equivalent ordering and scores.",
+  );
+  assert(Object.isFrozen(assistantMatches[0]?.entry), "Search results must protect returned entries.");
+
+  console.info(`Knowledge QA: PASS (${entries.length} sandbox entries, deterministic lookup verified)`);
 };
 
 try {

@@ -17,3 +17,11 @@ export type KnowledgeEntry = {
   readonly tags: readonly string[];
   readonly status: "sandbox";
 };
+
+export type KnowledgeMatchField = "id" | "title" | "tags" | "content";
+
+export type KnowledgeMatch = {
+  readonly entry: Readonly<KnowledgeEntry>;
+  readonly score: number;
+  readonly matchedFields: readonly KnowledgeMatchField[];
+};
