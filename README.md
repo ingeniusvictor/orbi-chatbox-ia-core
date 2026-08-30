@@ -88,6 +88,10 @@ La consola solo permite URLs locales `localhost`/`127.0.0.1` y no debe usarse co
 
 El receiver sandbox valida la public key, el consentimiento, el mensaje, su máximo de 2000 caracteres y el `channel`. Los errores usan un `errorCode` seguro y consistente. No almacena mensajes, no llama IA externa, no crea leads reales, no conecta WhatsApp ni usa una base de datos.
 
+## Deterministic Processing Layer
+
+0K-13A.1 permanece cerrado. 0K-13A.2 añade una capa interna y sin efectos laterales entre la validación y la respuesta HTTP. Genera un `requestId` local, conserva el canal, normaliza solo espacios del mensaje y devuelve longitud, modo fijo `sandbox` e intención fija `unclassified`; no clasifica con IA ni persiste contenido.
+
 ## Receiver Local QA Matrix
 
 La matriz local de QA valida el contrato del receiver con fixtures sintéticos: health, mensaje válido, public key inválida, mensaje vacío o largo, consentimiento ausente, channel inválido, JSON malformado, ruta inexistente y origin bloqueado.

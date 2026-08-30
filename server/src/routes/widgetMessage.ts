@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { createSandboxError } from "../security/errorResponses.js";
+import { processValidatedWidgetMessage } from "../services/widgetMessageProcessor.js";
 import type { WidgetMessageResponse } from "../types/widget.js";
 import { validateWidgetMessagePayload } from "../validation/widgetPayload.js";
 
@@ -32,6 +33,7 @@ export const createWidgetMessageRouter = (demoWidgetPublicKey: string): Router =
       return;
     }
 
+    const processed = processValidatedWidgetMessage(validation.payload);
     const payload: WidgetMessageResponse = {
       ok: true,
       mode: "sandbox",
@@ -41,8 +43,13 @@ export const createWidgetMessageRouter = (demoWidgetPublicKey: string): Router =
       message:
         "Mensaje recibido en modo sandbox. No se creó lead real ni se ejecutó automatización productiva.",
       guardrails: SANDBOX_GUARDRAILS,
-      processedAt: new Date().toISOString(),
-      normalizedChannel: validation.payload.channel,
+      processedAt: processed.receivedAt,
+      normalizedChannel: processed.channel,
+      requestId: processed.requestId,
+      normalizedMessage: processed.normalizedMessage,
+      messageLength: processed.messageLength,
+      processingMode: processed.processingMode,
+      intent: processed.intent,
     };
 
     response.json(payload);

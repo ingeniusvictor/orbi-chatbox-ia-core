@@ -18,6 +18,17 @@ export type NormalizedWidgetMessageRequest = {
   timestamp: string;
 };
 
+export type WidgetMessageProcessingResult = {
+  requestId: string;
+  channel: WidgetChannel;
+  normalizedMessage: string;
+  messageLength: number;
+  consentAccepted: true;
+  receivedAt: string;
+  processingMode: "sandbox";
+  intent: "unclassified";
+};
+
 export type WidgetMessageResponse = {
   ok: true;
   mode: "sandbox";
@@ -28,4 +39,9 @@ export type WidgetMessageResponse = {
   guardrails: string[];
   processedAt: string;
   normalizedChannel: WidgetChannel;
+  requestId: string;
+  normalizedMessage: string;
+  messageLength: number;
+  processingMode: "sandbox";
+  intent: "unclassified";
 };
