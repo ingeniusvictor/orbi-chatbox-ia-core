@@ -13,10 +13,18 @@ import {
 import {
   CompanyProfile,
   LeadRecord,
+  LeadAnalysis,
+  EMPTY_ANALYSIS,
+  buildLeadRecord,
   CONTROLLED_EMBED_SNIPPETS,
   buildControlledEmbedInstructionSummary,
   CONTROLLED_EMBED_INSTRUCTION_ITEMS,
 } from "../../data";
+import {
+  DEFAULT_PUBLIC_KEY,
+  DEFAULT_RECEIVER_URL,
+  sendMessageToBackendReceiver,
+} from "../../services/backendReceiverClient";
 
 interface WebWidgetWorkspaceProps {
   companyProfile: CompanyProfile;
@@ -29,6 +37,8 @@ const WIDGET_THEMES = [
   { id: "indigo", name: "Indigo Corporate", primaryColor: "#6366f1", position: "bottom-right" },
   { id: "emerald", name: "Emerald Pro", primaryColor: "#10b981", position: "bottom-left" },
 ];
+
+type WidgetResponseMode = "demo" | "backend";
 
 export const WebWidgetWorkspace: React.FC<WebWidgetWorkspaceProps> = ({
   companyProfile,
@@ -48,13 +58,15 @@ export const WebWidgetWorkspace: React.FC<WebWidgetWorkspaceProps> = ({
     },
   ]);
   const [copiedSnippet, setCopiedSnippet] = useState(false);
+  const [responseMode, setResponseMode] = useState<WidgetResponseMode>("demo");
+  const [isSending, setIsSending] = useState(false);
 
   const embedSummary = React.useMemo(
     () => buildControlledEmbedInstructionSummary(CONTROLLED_EMBED_INSTRUCTION_ITEMS),
     []
   );
 
-  const handleWidgetSend = () => {
+  const handleWidgetSend = async () => {
     if (!widgetInput.trim()) return;
     const userMsg = {
       id: `w-user-${Date.now()}`,
@@ -63,6 +75,60 @@ export const WebWidgetWorkspace: React.FC<WebWidgetWorkspaceProps> = ({
     };
     setWidgetMessages((prev) => [...prev, userMsg]);
     setWidgetInput("");
+
+    if (responseMode === "backend") {
+      setIsSending(true);
+      const result = await sendMessageToBackendReceiver({
+        message: userMsg.text,
+        channel: "web_demo",
+        visitorId: "web-widget-local-sandbox-visitor",
+        pageUrl: "http://localhost:3000/web-widget-preview",
+      });
+      const detail = result.ok === true
+        ? `HTTP ${result.status}${result.normalizedChannel ? ` · channel: ${result.normalizedChannel}` : ""}${result.processedAt ? ` · ${result.processedAt}` : ""}`
+        : result.errorCode || result.message;
+
+      if (result.ok === true) {
+        const sandboxAnalysis: LeadAnalysis = {
+          ...EMPTY_ANALYSIS,
+          mainNeed: "Validación del backend sandbox desde Web Widget.",
+          aiSummary: "Lead sandbox generado desde Web Widget tras validación del backend local.",
+          recommendedAction: "Solo demo local: no realizar seguimiento real.",
+        };
+        const sandboxLead = buildLeadRecord({
+          sourceMessage: userMsg.text,
+          conversation: [{ ...userMsg, timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }],
+          analysis: sandboxAnalysis,
+          channel: "web_demo",
+        });
+        onAddLead({
+          ...sandboxLead,
+          name: "Lead sandbox web widget",
+          detectedService: "Web Widget backend local",
+          rawMessage: userMsg.text,
+          sandbox: {
+            source: "backend_sandbox",
+            status: "sandbox_validated",
+            realData: false,
+            backendStatus: 200,
+            note: "Lead sandbox generado desde Web Widget tras validación del backend local. No corresponde a un cliente real.",
+          },
+        });
+      }
+
+      setWidgetMessages((prev) => [
+        ...prev,
+        {
+          id: `w-backend-${Date.now()}`,
+          sender: "bot",
+          text: result.ok
+            ? `Mensaje validado por backend sandbox. Lead sandbox registrado.\n${detail}`
+            : `El backend sandbox respondió con error controlado: ${detail}`,
+        },
+      ]);
+      setIsSending(false);
+      return;
+    }
 
     setTimeout(() => {
       const botMsg = {
@@ -154,6 +220,31 @@ export const WebWidgetWorkspace: React.FC<WebWidgetWorkspaceProps> = ({
                     </p>
                   </button>
                 ))}
+              </div>
+            </div>
+
+            <div className="space-y-2 border-t border-slate-800 pt-4">
+              <label className="text-xs font-mono text-slate-400 uppercase">
+                Modo del widget
+              </label>
+              <select
+                value={responseMode}
+                onChange={(event) => setResponseMode(event.target.value as WidgetResponseMode)}
+                className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white outline-none focus:border-emerald-400"
+              >
+                <option value="demo">Demo local</option>
+                <option value="backend">Backend sandbox</option>
+              </select>
+              <p className="text-xs leading-relaxed text-slate-400">
+                {responseMode === "demo"
+                  ? "Simula respuesta local del widget."
+                  : "Envía el mensaje al receiver local sandbox y puede registrar un lead demo."}
+              </p>
+              <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3 font-mono text-[10px] text-slate-400">
+                <p>Mode: <span className="text-white">{responseMode === "demo" ? "Demo local" : "Backend sandbox"}</span></p>
+                <p>Receiver: <span className="text-white">{DEFAULT_RECEIVER_URL}</span></p>
+                <p>Public key: <span className="text-white">{DEFAULT_PUBLIC_KEY}</span></p>
+                <p className="mt-1 text-emerald-200">Local sandbox only · No real data · No production</p>
               </div>
             </div>
 
@@ -261,13 +352,14 @@ export const WebWidgetWorkspace: React.FC<WebWidgetWorkspaceProps> = ({
                     type="text"
                     value={widgetInput}
                     onChange={(e) => setWidgetInput(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleWidgetSend()}
+                    onKeyDown={(e) => e.key === "Enter" && void handleWidgetSend()}
                     placeholder="Escribe tu consulta..."
                     className="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
                   />
                   <button
-                    onClick={handleWidgetSend}
-                    className="p-1.5 rounded-lg text-white font-medium"
+                    onClick={() => void handleWidgetSend()}
+                    disabled={isSending || !widgetInput.trim()}
+                    className="p-1.5 rounded-lg text-white font-medium disabled:cursor-not-allowed disabled:opacity-50"
                     style={{ backgroundColor: selectedTheme.primaryColor }}
                   >
                     <Send className="w-3.5 h-3.5" />

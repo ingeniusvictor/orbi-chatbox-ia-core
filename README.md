@@ -140,6 +140,14 @@ npm run server:qa
 
 Resultado esperado: `Receiver QA: PASS`.
 
+## Web Widget Functional Bridge
+
+1. Ejecutar `npm run server:dev`.
+2. Ejecutar `npm run dev` y abrir `http://localhost:3000`.
+3. Ir a **Web Widget**, seleccionar **Backend sandbox** y enviar un mensaje sintético.
+
+El widget llama al receiver local, muestra la respuesta controlada y, tras HTTP 200, crea un lead sandbox visible en **Lead Intelligence**. No usa datos reales, WhatsApp, IA externa ni base de datos real.
+
 ## Validaciones obligatorias
 
 ```bash
@@ -165,18 +173,17 @@ npm run server:qa
 
 - No es producción ni tiene login o multiempresa real.
 - No tiene WhatsApp real, voz, base de datos real ni IA externa conectada.
-- El Web Widget bridge queda diferido.
+- El Web Widget bridge solo está disponible para el sandbox local; no es un embed productivo.
 - Los leads son exclusivamente sandbox/demo.
 
 ## Próximas fases, sin implementar ahora
 
-1. Web Widget Bridge real.
-2. Web ORBI embed controlado.
-3. WhatsApp Business bajo volumen.
-4. IA real con Knowledge Base ORBI.
-5. Voz oficial ORBI.
-6. Base de datos real.
-7. Escalamiento para mayor volumen.
+1. Web ORBI embed controlado.
+2. WhatsApp Business bajo volumen.
+3. IA real con Knowledge Base ORBI.
+4. Voz oficial ORBI.
+5. Base de datos real.
+6. Escalamiento para mayor volumen.
 
 ## Arquitectura actual
 
