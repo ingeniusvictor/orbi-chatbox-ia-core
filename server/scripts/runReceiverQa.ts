@@ -20,6 +20,8 @@ const hasValidProcessingResult = (body: unknown): boolean =>
   isRecord(body)
   && typeof body.requestId === "string"
   && body.requestId.length > 0
+  && typeof body.conversationId === "string"
+  && body.conversationId.length > 0
   && body.processingMode === "sandbox"
   && body.intent === "unclassified"
   && body.normalizedChannel === "manual_test"

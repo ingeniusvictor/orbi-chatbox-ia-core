@@ -92,6 +92,10 @@ El receiver sandbox valida la public key, el consentimiento, el mensaje, su máx
 
 0K-13A.1 permanece cerrado. 0K-13A.2 añade una capa interna y sin efectos laterales entre la validación y la respuesta HTTP. Genera un `requestId` local, conserva el canal, normaliza solo espacios del mensaje y devuelve longitud, modo fijo `sandbox` e intención fija `unclassified`; no clasifica con IA ni persiste contenido.
 
+## Minimal Conversation Envelope
+
+0K-13A.3 conserva el procesamiento de 0K-13A.2 y añade un envelope interno por solicitud. Conserva contexto validado y procesado, y usa un `conversationId` efímero local: no representa almacenamiento, memoria ni una conversación persistida.
+
 ## Receiver Local QA Matrix
 
 La matriz local de QA valida el contrato del receiver con fixtures sintéticos: health, mensaje válido, public key inválida, mensaje vacío o largo, consentimiento ausente, channel inválido, JSON malformado, ruta inexistente y origin bloqueado.

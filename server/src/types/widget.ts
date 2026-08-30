@@ -40,6 +40,7 @@ export type WidgetMessageResponse = {
   processedAt: string;
   normalizedChannel: WidgetChannel;
   requestId: string;
+  conversationId: string;
   normalizedMessage: string;
   messageLength: number;
   processingMode: "sandbox";
