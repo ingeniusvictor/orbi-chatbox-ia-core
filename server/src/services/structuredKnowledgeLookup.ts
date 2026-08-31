@@ -4,7 +4,7 @@ import type { StructuredKnowledgeLookupResult } from "../types/structuredKnowled
 export const DEFAULT_STRUCTURED_KNOWLEDGE_LOOKUP_LIMIT = 5;
 export const MAX_STRUCTURED_KNOWLEDGE_LOOKUP_LIMIT = 10;
 const normalize = (value: string): string => value.trim().toLowerCase().replace(/[^a-z0-9áéíóúüñ]+/gi, " ").replace(/\s+/g, " ").trim();
-const terms = (query: string): readonly string[] => Object.freeze([...new Set(normalize(query).split(" ").filter(Boolean))].slice(0, 12));
+const terms = (query: string): readonly string[] => Object.freeze([...new Set(normalize(query).split(" ").filter((term) => term.length >= 3))].slice(0, 12));
 const authorityRank = { official: 2, controlled: 1, reference: 0 } as const;
 export const lookupStructuredKnowledge = (query: string, options: Readonly<{ limit?: number }> = {}): readonly Readonly<StructuredKnowledgeLookupResult>[] => {
   const queryTerms = terms(query); if (queryTerms.length === 0) return Object.freeze([]);
@@ -15,6 +15,6 @@ export const lookupStructuredKnowledge = (query: string, options: Readonly<{ lim
     const matchedTerms = queryTerms.filter((term) => title.includes(term) || summary.includes(term) || content.includes(term) || tags.some((tag) => tag === term));
     const score = queryTerms.reduce((total, term) => total + (title.includes(term) ? 4 : 0) + (tags.some((tag) => tag === term) ? 3 : 0) + (summary.includes(term) ? 2 : 0) + (content.includes(term) ? 1 : 0), 0);
     return Object.freeze({ entry, score, matchedTerms: Object.freeze(matchedTerms) });
-  }).filter((result) => result.score > 0).sort((left, right) => right.score - left.score || authorityRank[right.entry.authority] - authorityRank[left.entry.authority] || (left.entry.id < right.entry.id ? -1 : 1));
+  }).filter((result) => result.score > 0 && result.matchedTerms.length === queryTerms.length).sort((left, right) => right.score - left.score || authorityRank[right.entry.authority] - authorityRank[left.entry.authority] || (left.entry.id < right.entry.id ? -1 : 1));
   return Object.freeze(results.slice(0, limit).map((result) => Object.freeze({ ...result, entry: Object.freeze({ ...result.entry, tags: Object.freeze([...result.entry.tags]) }), matchedTerms: Object.freeze([...result.matchedTerms]) })));
 };

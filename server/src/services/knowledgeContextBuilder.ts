@@ -1,4 +1,6 @@
 import { normalizeKnowledgeQuery, searchLocalKnowledge } from "./localKnowledgeSearch.js";
+import { lookupStructuredKnowledge } from "./structuredKnowledgeLookup.js";
+import { mapStructuredKnowledgeResultToContextEntry } from "./structuredKnowledgeContextMapper.js";
 import type { KnowledgeContext, KnowledgeContextEntry } from "../types/knowledge.js";
 
 export const MAX_CONTEXT_ENTRIES = 3;
@@ -14,23 +16,28 @@ const createContextEntry = (
   content: string,
   score: number,
 ): Readonly<KnowledgeContextEntry> =>
-  Object.freeze({ id, domain, title, content, score });
+  Object.freeze({ id, sourceType: "local-static", domain, title, content, score });
 
 export const buildKnowledgeContext = (query: string): Readonly<KnowledgeContext> => {
   const normalizedQuery = normalizeKnowledgeQuery(query);
   const matches = searchLocalKnowledge(normalizedQuery, 10);
+  const structured = lookupStructuredKnowledge(normalizedQuery, { limit: 10 }).map(mapStructuredKnowledgeResultToContextEntry);
   const entries: Readonly<KnowledgeContextEntry>[] = [];
   let totalCharacters = 0;
   let truncated = false;
 
-  for (const match of matches) {
-    const entry = createContextEntry(
-      match.entry.id,
-      match.entry.domain,
-      match.entry.title,
-      match.entry.content,
-      match.score,
-    );
+  const candidates = [
+    ...structured,
+    ...matches.map((match) => createContextEntry(match.entry.id, match.entry.domain, match.entry.title, match.entry.content, match.score)),
+  ];
+  const seenEntryIds = new Set<string>();
+
+  for (const entry of candidates) {
+    if (seenEntryIds.has(entry.id)) {
+      continue;
+    }
+
+    seenEntryIds.add(entry.id);
     const characterCount = entryCharacterCount(entry);
 
     if (
@@ -49,7 +56,7 @@ export const buildKnowledgeContext = (query: string): Readonly<KnowledgeContext>
     query: normalizedQuery,
     source: "local-static",
     mode: "sandbox",
-    matchCount: matches.length,
+    matchCount: matches.length + structured.length,
     entries: Object.freeze(entries),
     totalCharacters,
     truncated,

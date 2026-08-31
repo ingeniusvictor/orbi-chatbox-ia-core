@@ -28,6 +28,8 @@ export type KnowledgeMatch = {
 
 export type KnowledgeContextEntry = {
   readonly id: string;
+  readonly sourceId?: string;
+  readonly sourceType?: "local-static" | "structured";
   readonly domain: KnowledgeDomain;
   readonly title: string;
   readonly content: string;

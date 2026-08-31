@@ -1,5 +1,9 @@
 # ORBI ChatBox IA Core v0.13.0-functional-mvp-demo
 
+## 0K-18B.2 — Structured Knowledge Context Integration
+
+Structured knowledge lookup results now join the existing `KnowledgeContext`: structured entries are prioritized, while the legacy local catalog fills the remaining capacity. The global limit remains three entries and 1200 characters, with entry and source provenance preserved. This keeps the 0K-14 local lookup route active and does not enable external connectors.
+
 ORBI ChatBox IA Core es una aplicación frontend modular para atención conversacional empresarial, captura de leads, simulación de Web Widget, preparación futura para WhatsApp Business, base de conocimiento local y paneles de diagnóstico comercial.
 
 ## Estado actual
