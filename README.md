@@ -142,6 +142,8 @@ npm run server:knowledge:qa
 
 0K-18A.2 añade entradas estructuradas fundacionales con procedencia obligatoria, límites, versión, estado y autoridad validada contra su fuente. Aún no están conectadas a la recuperación de runtime.
 
+0K-18B.1 permite buscar entradas estructuradas activas de forma determinista; el estado de fuente participa en elegibilidad y la autoridad sólo desempata. No usa embeddings ni modifica el lookup/runtime de 0K-14.
+
 Validar el contrato estructural local:
 
 ```bash
