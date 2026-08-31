@@ -128,6 +128,8 @@ npm run server:knowledge:qa
 
 0K-16C.1 endurece la operación local: `qwen3:1.7b` comprueba salud de Ollama antes de generar y mapea fallos de runtime, modelo, timeout, respuesta inválida y generación a errores HTTP controlados. No existe fallback silencioso; `mock` permanece activo por defecto y Qwen es seleccionable sólo por configuración local.
 
+0K-16 está cerrado. El bloque activo 0K-17 — LUMI Personality & Identity Layer — inicia con 0K-17A.1: LUMI es **ORBI Intelligent Companion**, la identidad visible de ORBI. Es un contrato estático e independiente de proveedores: no integra prompts o runtime todavía, ni incluye una implementación visual o widget.
+
 Validar el contrato estructural local:
 
 ```bash
