@@ -5,6 +5,7 @@ import { createSandboxError } from "../security/errorResponses.js";
 import { buildConversationEnvelope } from "../services/conversationEnvelope.js";
 import { getAssistantIdentity } from "../services/assistantIdentity.js";
 import { composeAssistantInstruction } from "../services/assistantInstructionComposer.js";
+import { composeCompactAssistantRuntimeInstruction } from "../services/assistantRuntimeInstructionComposer.js";
 import { buildKnowledgeContext } from "../services/knowledgeContextBuilder.js";
 import { processValidatedWidgetMessage } from "../services/widgetMessageProcessor.js";
 import type { AiProvider, AiProviderMode, AiProviderRequest } from "../types/aiProvider.js";
@@ -49,12 +50,14 @@ export const createWidgetMessageRouter = (
       const knowledgeContext = buildKnowledgeContext(processed.normalizedMessage);
       const envelope = buildConversationEnvelope(validation.payload, processed, knowledgeContext);
       const assistantInstruction = composeAssistantInstruction(getAssistantIdentity());
+      const assistantRuntimeInstruction = composeCompactAssistantRuntimeInstruction(assistantInstruction);
       const providerRequest: Readonly<AiProviderRequest> = Object.freeze({
         requestId: envelope.requestId,
         conversationId: envelope.conversationId,
         message: envelope.message.text,
         knowledgeContext: envelope.knowledgeContext,
         assistantInstruction,
+        assistantRuntimeInstruction,
       });
       const provider = providerOverride ?? resolveAiProvider(activeProviderMode);
       const providerResponse = await provider.generate(providerRequest);

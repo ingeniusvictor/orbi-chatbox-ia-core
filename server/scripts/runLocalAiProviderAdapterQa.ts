@@ -6,6 +6,7 @@ import {
 import { LOCAL_AI_GENERATION_DISABLED, localAiProviderAdapter } from "../src/providers/localAiProviderAdapter.js";
 import { LUMI_IDENTITY } from "../src/data/lumiIdentity.js";
 import { composeAssistantInstruction } from "../src/services/assistantInstructionComposer.js";
+import { composeCompactAssistantRuntimeInstruction } from "../src/services/assistantRuntimeInstructionComposer.js";
 import { REGISTERED_AI_PROVIDER_MODES } from "../src/providers/aiProviderRegistry.js";
 import {
   mapAiProviderRequestToLocalAiProviderRequest,
@@ -31,6 +32,7 @@ const request: Readonly<AiProviderRequest> = Object.freeze({
   requestId: "synthetic-request", conversationId: "synthetic-conversation",
   message: "synthetic normalized message", knowledgeContext: context,
   assistantInstruction: composeAssistantInstruction(LUMI_IDENTITY),
+  assistantRuntimeInstruction: composeCompactAssistantRuntimeInstruction(composeAssistantInstruction(LUMI_IDENTITY)),
 });
 const response: Readonly<LocalAiProviderResponse> = Object.freeze({
   text: "future local response shape", model: "synthetic-local-model", grounded: true,
@@ -50,6 +52,7 @@ const main = async (): Promise<void> => {
     && mapped.knowledgeContext.entries.length === 1
     && mapped.knowledgeContext.entries[0]?.id === "synthetic-source-id"
     && mapped.assistantInstruction === request.assistantInstruction
+    && mapped.assistantRuntimeInstruction === request.assistantRuntimeInstruction
     && Object.isFrozen(mapped)
     && Object.isFrozen(mapped.knowledgeContext)
     && Object.isFrozen(mapped.knowledgeContext.entries)

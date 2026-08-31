@@ -134,6 +134,8 @@ npm run server:knowledge:qa
 
 0K-17A.3 integra la instrucción canónica de LUMI en el request común de proveedores. `qwen-local` consume únicamente esa instrucción genérica junto al contexto de conocimiento y el mensaje; la personalidad no es fuente de grounding. El mock continúa compatible. No hay integración visual/avatar, memoria ni herramientas.
 
+0K-17A está cerrado. 0K-17B.1 mantiene la identidad canónica y su `AssistantInstruction` completo como fuente de verdad, y deriva una `AssistantRuntimeInstruction` compacta, neutral respecto de proveedores, para modelos locales ligeros. No es otra personalidad: sólo evita enviar el texto canónico completo al prompt de ejecución.
+
 Validar el contrato estructural local:
 
 ```bash

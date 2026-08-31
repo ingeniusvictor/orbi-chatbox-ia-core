@@ -1,5 +1,6 @@
 import type { KnowledgeContext } from "./knowledge.js";
 import type { AssistantInstruction } from "./assistantInstruction.js";
+import type { AssistantRuntimeInstruction } from "./assistantRuntimeInstruction.js";
 
 /** Architecturally recognized provider identifiers. Only enabled modes are executable. */
 export type AiProviderId = "mock" | "qwen-local" | "gemma-local" | "openai" | "gemini";
@@ -15,6 +16,7 @@ export type AiProviderRequest = {
   readonly message: string;
   readonly knowledgeContext: Readonly<KnowledgeContext>;
   readonly assistantInstruction: Readonly<AssistantInstruction>;
+  readonly assistantRuntimeInstruction: Readonly<AssistantRuntimeInstruction>;
 };
 
 export type AiProviderResponse = {

@@ -6,6 +6,7 @@ import { mockAiProvider } from "../src/providers/mockAiProvider.js";
 import { createWidgetMessageRouter } from "../src/routes/widgetMessage.js";
 import { getAssistantIdentity } from "../src/services/assistantIdentity.js";
 import { composeAssistantInstruction } from "../src/services/assistantInstructionComposer.js";
+import { composeCompactAssistantRuntimeInstruction } from "../src/services/assistantRuntimeInstructionComposer.js";
 import { mapAiProviderRequestToLocalAiProviderRequest } from "../src/services/localAiProviderMapper.js";
 import { MAX_QWEN_LOCAL_PROMPT_CHARACTERS, buildQwenLocalPrompt } from "../src/services/qwenLocalPromptBuilder.js";
 import type { AiProvider, AiProviderRequest } from "../src/types/aiProvider.js";
@@ -18,8 +19,9 @@ const knownContext: Readonly<KnowledgeContext> = Object.freeze({
 });
 const emptyContext: Readonly<KnowledgeContext> = Object.freeze({ ...knownContext, query: "unknown synthetic context", matchCount: 0, entries: Object.freeze([]), totalCharacters: 0 });
 const instruction = composeAssistantInstruction(getAssistantIdentity());
+const runtimeInstruction = composeCompactAssistantRuntimeInstruction(instruction);
 const request = (knowledgeContext: Readonly<KnowledgeContext>, message = "How does this controlled local flow work?"): Readonly<AiProviderRequest> => Object.freeze({
-  requestId: "synthetic-lumi-request", conversationId: "synthetic-lumi-conversation", message, knowledgeContext, assistantInstruction: instruction,
+  requestId: "synthetic-lumi-request", conversationId: "synthetic-lumi-conversation", message, knowledgeContext, assistantInstruction: instruction, assistantRuntimeInstruction: runtimeInstruction,
 });
 
 const main = async (): Promise<void> => {
@@ -52,10 +54,12 @@ const main = async (): Promise<void> => {
       && captured?.assistantInstruction.assistantId === "lumi"
       && captured?.assistantInstruction.text === instruction.text
       && Object.isFrozen(captured?.assistantInstruction)
+      && captured?.assistantRuntimeInstruction.text === runtimeInstruction.text
       && mapped.assistantInstruction === instruction
-      && prompt.includes("[ASSISTANT INSTRUCTION]") && prompt.includes(instruction.text)
-      && prompt.includes("[ORBI KNOWLEDGE CONTEXT]") && prompt.includes("Synthetic LUMI Context")
-      && prompt.includes("[USER MESSAGE]") && prompt.includes("controlled local flow")
+      && mapped.assistantRuntimeInstruction === runtimeInstruction
+      && prompt.includes("INSTRUCTION") && prompt.includes(runtimeInstruction.text) && !prompt.includes(instruction.text)
+      && prompt.includes("ORBI CONTEXT") && prompt.includes("Synthetic LUMI Context")
+      && prompt.includes("USER") && prompt.includes("controlled local flow")
       && prompt === repeatedPrompt && prompt.length <= MAX_QWEN_LOCAL_PROMPT_CHARACTERS && boundedPrompt.length <= MAX_QWEN_LOCAL_PROMPT_CHARACTERS
       && knownMock.grounded && knownMock.sourceEntryIds.join(",") === "synthetic-lumi-source"
       && !unknownMock.grounded && unknownMock.sourceEntryIds.length === 0

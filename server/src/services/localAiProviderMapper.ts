@@ -24,6 +24,7 @@ export const mapAiProviderRequestToLocalAiProviderRequest = (
   message: request.message,
   knowledgeContext: freezeKnowledgeContext(request.knowledgeContext),
   assistantInstruction: request.assistantInstruction,
+  assistantRuntimeInstruction: request.assistantRuntimeInstruction,
 });
 
 /**

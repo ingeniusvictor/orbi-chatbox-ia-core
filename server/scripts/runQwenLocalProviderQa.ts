@@ -6,6 +6,7 @@ import { REGISTERED_AI_PROVIDER_MODES, resolveAiProvider } from "../src/provider
 import { generateWithOllama } from "../src/services/ollamaGenerationAdapter.js";
 import { LUMI_IDENTITY } from "../src/data/lumiIdentity.js";
 import { composeAssistantInstruction } from "../src/services/assistantInstructionComposer.js";
+import { composeCompactAssistantRuntimeInstruction } from "../src/services/assistantRuntimeInstructionComposer.js";
 import { MAX_QWEN_LOCAL_PROMPT_CHARACTERS, buildQwenLocalPrompt } from "../src/services/qwenLocalPromptBuilder.js";
 import type { AiProviderRequest } from "../src/types/aiProvider.js";
 import type { KnowledgeContext } from "../src/types/knowledge.js";
@@ -15,7 +16,7 @@ const context = (entries: readonly Readonly<KnowledgeContext["entries"][number]>
   entries: Object.freeze(entries), totalCharacters: entries.reduce((total, entry) => total + entry.content.length, 0), truncated: false,
 });
 const knownContext = context([Object.freeze({ id: "synthetic-qwen-source", domain: "system" as const, title: "Synthetic Qwen Source", content: "Use this synthetic local context.", score: 1 })]);
-const request = (knowledgeContext: Readonly<KnowledgeContext>, message = "How does the synthetic local flow work?"): Readonly<AiProviderRequest> => Object.freeze({ requestId: "synthetic-qwen-request", conversationId: "synthetic-qwen-conversation", message, knowledgeContext, assistantInstruction: composeAssistantInstruction(LUMI_IDENTITY) });
+const request = (knowledgeContext: Readonly<KnowledgeContext>, message = "How does the synthetic local flow work?"): Readonly<AiProviderRequest> => Object.freeze({ requestId: "synthetic-qwen-request", conversationId: "synthetic-qwen-conversation", message, knowledgeContext, assistantInstruction: composeAssistantInstruction(LUMI_IDENTITY), assistantRuntimeInstruction: composeCompactAssistantRuntimeInstruction(composeAssistantInstruction(LUMI_IDENTITY)) });
 
 const rejects = (providerId: string): boolean => {
   try { resolveAiProvider(providerId as never); return false; } catch (error) { return error instanceof Error && error.message === "Unsupported AI provider mode."; }
@@ -65,7 +66,7 @@ const main = async (): Promise<void> => {
       && ACTIVE_AI_PROVIDER === "mock"
       && known.provider === "qwen-local" && known.text === "synthetic qwen answer" && known.grounded && known.sourceEntryIds.join(",") === "synthetic-qwen-source"
       && !noContext.grounded && noContext.sourceEntryIds.length === 0
-      && prompt.includes("Synthetic Qwen Source") && prompt.includes("synthetic local context") && prompt.includes("[ASSISTANT INSTRUCTION]") && prompt.includes("LUMI")
+      && prompt.includes("Synthetic Qwen Source") && prompt.includes("synthetic local context") && prompt.includes("INSTRUCTION") && prompt.includes("LUMI")
       && bounded.length === MAX_QWEN_LOCAL_PROMPT_CHARACTERS
       && failures.every((result) => !result.ok)
       && !sawAuthorization
