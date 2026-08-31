@@ -140,6 +140,8 @@ npm run server:knowledge:qa
 
 0K-17 está cerrado. 0K-18 — Knowledge Engine Expansion — inicia con 0K-18A.1: un contrato estructurado y estático para describir fuentes de conocimiento ORBI. Los descriptores no son contenido ni activan ingesta; no hay conectores de Drive, Notion o web, y la recuperación sintética de 0K-14 permanece sin cambios.
 
+0K-18A.2 añade entradas estructuradas fundacionales con procedencia obligatoria, límites, versión, estado y autoridad validada contra su fuente. Aún no están conectadas a la recuperación de runtime.
+
 Validar el contrato estructural local:
 
 ```bash
