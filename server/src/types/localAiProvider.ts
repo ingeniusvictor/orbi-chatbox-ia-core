@@ -1,4 +1,5 @@
 import type { KnowledgeContext } from "./knowledge.js";
+import type { AssistantInstruction } from "./assistantInstruction.js";
 
 /** Future-facing local provider input. It is not an executable provider contract. */
 export type LocalAiProviderRequest = {
@@ -8,6 +9,7 @@ export type LocalAiProviderRequest = {
   readonly conversationId: string;
   readonly message: string;
   readonly knowledgeContext: Readonly<KnowledgeContext>;
+  readonly assistantInstruction: Readonly<AssistantInstruction>;
 };
 
 /** Future-facing local provider output, deliberately independent of runtime payloads. */

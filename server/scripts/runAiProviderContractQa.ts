@@ -11,6 +11,8 @@ import {
   resolveAiProvider,
 } from "../src/providers/aiProviderRegistry.js";
 import { MAX_KNOWLEDGE_RESPONSE_CHARACTERS, NO_KNOWLEDGE_RESPONSE_TEXT } from "../src/services/knowledgeResponseComposer.js";
+import { LUMI_IDENTITY } from "../src/data/lumiIdentity.js";
+import { composeAssistantInstruction } from "../src/services/assistantInstructionComposer.js";
 import type { AiProviderRequest } from "../src/types/aiProvider.js";
 import type { KnowledgeContext } from "../src/types/knowledge.js";
 
@@ -37,6 +39,7 @@ const request: Readonly<AiProviderRequest> = Object.freeze({
   conversationId: "synthetic-conversation-id",
   message: "sandbox assistant",
   knowledgeContext: knownContext,
+  assistantInstruction: composeAssistantInstruction(LUMI_IDENTITY),
 });
 const noMatchContext: Readonly<KnowledgeContext> = Object.freeze({
   ...knownContext,

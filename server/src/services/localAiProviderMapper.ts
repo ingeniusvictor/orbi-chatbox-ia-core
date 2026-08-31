@@ -23,6 +23,7 @@ export const mapAiProviderRequestToLocalAiProviderRequest = (
   conversationId: request.conversationId,
   message: request.message,
   knowledgeContext: freezeKnowledgeContext(request.knowledgeContext),
+  assistantInstruction: request.assistantInstruction,
 });
 
 /**

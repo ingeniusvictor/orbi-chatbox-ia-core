@@ -3,6 +3,8 @@ import { resolveAiProvider } from "../providers/aiProviderRegistry.js";
 import { QwenLocalProviderError } from "../providers/qwenLocalProvider.js";
 import { createSandboxError } from "../security/errorResponses.js";
 import { buildConversationEnvelope } from "../services/conversationEnvelope.js";
+import { getAssistantIdentity } from "../services/assistantIdentity.js";
+import { composeAssistantInstruction } from "../services/assistantInstructionComposer.js";
 import { buildKnowledgeContext } from "../services/knowledgeContextBuilder.js";
 import { processValidatedWidgetMessage } from "../services/widgetMessageProcessor.js";
 import type { AiProvider, AiProviderMode, AiProviderRequest } from "../types/aiProvider.js";
@@ -46,11 +48,13 @@ export const createWidgetMessageRouter = (
       const processed = processValidatedWidgetMessage(validation.payload);
       const knowledgeContext = buildKnowledgeContext(processed.normalizedMessage);
       const envelope = buildConversationEnvelope(validation.payload, processed, knowledgeContext);
+      const assistantInstruction = composeAssistantInstruction(getAssistantIdentity());
       const providerRequest: Readonly<AiProviderRequest> = Object.freeze({
         requestId: envelope.requestId,
         conversationId: envelope.conversationId,
         message: envelope.message.text,
         knowledgeContext: envelope.knowledgeContext,
+        assistantInstruction,
       });
       const provider = providerOverride ?? resolveAiProvider(activeProviderMode);
       const providerResponse = await provider.generate(providerRequest);

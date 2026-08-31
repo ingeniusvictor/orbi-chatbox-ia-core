@@ -22,7 +22,8 @@
                     "server:ai-selection:qa":  "tsx server/scripts/runAiProviderSelectionQa.ts",
                     "server:local-ai:hardening:qa":  "tsx server/scripts/runLocalAiOperationalHardeningQa.ts",
                     "server:assistant-identity:qa":  "tsx server/scripts/runAssistantIdentityQa.ts",
-                    "server:assistant-instruction:qa":  "tsx server/scripts/runAssistantInstructionQa.ts"
+                    "server:assistant-instruction:qa":  "tsx server/scripts/runAssistantInstructionQa.ts",
+                    "server:assistant-runtime:qa":  "tsx server/scripts/runAssistantRuntimeIntegrationQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",

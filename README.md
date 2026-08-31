@@ -130,7 +130,9 @@ npm run server:knowledge:qa
 
 0K-16 está cerrado. El bloque activo 0K-17 — LUMI Personality & Identity Layer — inicia con 0K-17A.1: LUMI es **ORBI Intelligent Companion**, la identidad visible de ORBI. Es un contrato estático e independiente de proveedores: no integra prompts o runtime todavía, ni incluye una implementación visual o widget.
 
-0K-17A.2 compone esa identidad en una instrucción de asistente determinista, acotada y neutral respecto de proveedores. Ningún provider o runtime consume aún la instrucción; esa integración corresponde a un módulo futuro.
+0K-17A.2 compone esa identidad en una instrucción de asistente determinista, acotada y neutral respecto de proveedores.
+
+0K-17A.3 integra la instrucción canónica de LUMI en el request común de proveedores. `qwen-local` consume únicamente esa instrucción genérica junto al contexto de conocimiento y el mensaje; la personalidad no es fuente de grounding. El mock continúa compatible. No hay integración visual/avatar, memoria ni herramientas.
 
 Validar el contrato estructural local:
 
