@@ -13,6 +13,8 @@ ORBI ChatBox IA Core es una aplicación frontend modular para atención conversa
 - 0K-18B family: CLOSED
 - 0K-18C.1: CLOSED
 - Knowledge Engine: contratos de fuentes y entradas estructuradas, lookup determinista, `KnowledgeContext` estructurado + local con procedencia, grounding acotado y validación qwen-local. La ingesta controlada futura queda fuera de 0K-18.
+- 0K-19 — Minimal Conversation Continuity: ACTIVE
+- 0K-19A.1: contrato de turnos efímeros `user`/`assistant`, con contenido acotado y orden por secuencia. No incorpora historial almacenado, memoria persistente, perfiles, memoria entre sesiones ni integración de turnos al provider.
 
 - Versión: v0.13.0-functional-mvp-demo
 - Estado: PASS — MVP funcional demo/sandbox
