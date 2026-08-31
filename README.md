@@ -138,6 +138,8 @@ npm run server:knowledge:qa
 
 0K-17B.2 agrega una política de respuesta de LUMI neutral respecto de proveedores: sigue el idioma del usuario cuando es claro (incluido español), equilibra concisión y detalle, conserva incertidumbre y grounding, evita la presentación repetitiva y sólo propone siguientes pasos cuando aportan valor. No añade memoria ni perfilado de usuarios.
 
+0K-17 está cerrado. 0K-18 — Knowledge Engine Expansion — inicia con 0K-18A.1: un contrato estructurado y estático para describir fuentes de conocimiento ORBI. Los descriptores no son contenido ni activan ingesta; no hay conectores de Drive, Notion o web, y la recuperación sintética de 0K-14 permanece sin cambios.
+
 Validar el contrato estructural local:
 
 ```bash

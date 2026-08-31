@@ -13,6 +13,7 @@
                     "server:check":  "tsc -p server/tsconfig.json --noEmit",
                     "server:qa":  "tsx server/scripts/runReceiverQa.ts",
                     "server:knowledge:qa":  "tsx server/scripts/runKnowledgeQa.ts",
+                    "server:knowledge-source:qa":  "tsx server/scripts/runKnowledgeSourceContractQa.ts",
                     "server:ai-contract:qa":  "tsx server/scripts/runAiProviderContractQa.ts",
                     "server:local-ai:qa":  "tsx server/scripts/runLocalAiRuntimeContractQa.ts",
                     "server:local-ai:transport:qa":  "tsx server/scripts/runLocalAiRuntimeTransportQa.ts",
