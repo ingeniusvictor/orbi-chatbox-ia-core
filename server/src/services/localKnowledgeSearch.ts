@@ -14,7 +14,7 @@ export const normalizeKnowledgeQuery = (value: string): string =>
   value.trim().toLowerCase().replace(/\s+/g, " ");
 
 const tokenizeQuery = (query: string): readonly string[] =>
-  [...new Set(normalizeKnowledgeQuery(query).split(" ").filter(Boolean))];
+  [...new Set(normalizeKnowledgeQuery(query).split(" ").filter((token) => token.length >= 3))];
 
 const resolveLimit = (value: number): number =>
   Number.isSafeInteger(value) && value > 0 ? Math.min(value, MAX_LIMIT) : DEFAULT_LIMIT;

@@ -17,6 +17,7 @@
                     "server:structured-knowledge:qa":  "tsx server/scripts/runStructuredKnowledgeEntryContractQa.ts",
                     "server:structured-knowledge-lookup:qa":  "tsx server/scripts/runStructuredKnowledgeLookupQa.ts",
                     "server:structured-knowledge-context:qa":  "tsx server/scripts/runStructuredKnowledgeContextIntegrationQa.ts",
+                    "server:knowledge-engine:qa":  "tsx server/scripts/runKnowledgeEngineFinalQa.ts",
                     "server:ai-contract:qa":  "tsx server/scripts/runAiProviderContractQa.ts",
                     "server:local-ai:qa":  "tsx server/scripts/runLocalAiRuntimeContractQa.ts",
                     "server:local-ai:transport:qa":  "tsx server/scripts/runLocalAiRuntimeTransportQa.ts",

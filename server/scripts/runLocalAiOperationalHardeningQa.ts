@@ -38,10 +38,13 @@ const main = async (): Promise<void> => {
   const healthy = await start("healthy");
   let healthyResult = false;
   try { const result = await healthy.provider.generate(request); healthyResult = result.text === "synthetic healthy response" && result.provider === "qwen-local"; } finally { await healthy.close(); }
-  const [healthInvalid, modelMissing, timeout, malformed, empty, generationFailed, unavailable] = await Promise.all([
-    failureCode("health-invalid"), failureCode("model-missing"), failureCode("timeout"), failureCode("malformed"), failureCode("empty"), failureCode("generation-failed"),
-    (async () => { try { await createQwenLocalProvider(Object.freeze({ runtimeId: "hardening", endpoint: "http://127.0.0.1:1", model: QWEN_LOCAL_RUNTIME_CONFIG.model, timeoutMs: 20 })).generate(request); return ""; } catch (error) { return error instanceof QwenLocalProviderError ? error.code : ""; } })(),
-  ]);
+  const healthInvalid = await failureCode("health-invalid");
+  const modelMissing = await failureCode("model-missing");
+  const timeout = await failureCode("timeout");
+  const malformed = await failureCode("malformed");
+  const empty = await failureCode("empty");
+  const generationFailed = await failureCode("generation-failed");
+  const unavailable = await (async () => { try { await createQwenLocalProvider(Object.freeze({ runtimeId: "hardening", endpoint: "http://127.0.0.1:1", model: QWEN_LOCAL_RUNTIME_CONFIG.model, timeoutMs: 20 })).generate(request); return ""; } catch (error) { return error instanceof QwenLocalProviderError ? error.code : ""; } })();
   const httpRuntime = await start("model-missing"); const app = express(); app.use(express.json()); app.use(createWidgetMessageRouter("key", "qwen-local", httpRuntime.provider));
   const httpServer = createServer(app); await new Promise<void>((resolve) => httpServer.listen(0, "127.0.0.1", resolve)); const address = httpServer.address(); const port = typeof address === "object" && address ? address.port : 0;
   try {
