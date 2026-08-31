@@ -14,10 +14,11 @@ export const buildQwenLocalPrompt = (request: Readonly<LocalAiProviderRequest>):
     : request.knowledgeContext.entries
       .map((entry) => `[${entry.id}] ${entry.title}\n${entry.content}`)
       .join("\n\n");
-  const assistantSection = `INSTRUCTION\n${request.assistantRuntimeInstruction.text}`;
+  const assistantSection = `LUMI\n${request.assistantRuntimeInstruction.text}`;
+  const behaviorSection = `BEHAVIOR\n${request.assistantBehaviorInstruction.text}`;
   const contextSection = `ORBI CONTEXT\n${bound(context, MAX_QWEN_LOCAL_KNOWLEDGE_CONTEXT_CHARACTERS)}`;
   const userPrefix = "USER\n";
-  const userBudget = MAX_QWEN_LOCAL_PROMPT_CHARACTERS - assistantSection.length - contextSection.length - userPrefix.length - 4;
+  const userBudget = MAX_QWEN_LOCAL_PROMPT_CHARACTERS - assistantSection.length - behaviorSection.length - contextSection.length - userPrefix.length - 6;
   const userSection = `${userPrefix}${bound(request.message, Math.max(0, userBudget))}`;
-  return [assistantSection, contextSection, userSection].join("\n\n");
+  return [assistantSection, behaviorSection, contextSection, userSection].join("\n\n");
 };

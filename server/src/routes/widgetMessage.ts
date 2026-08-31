@@ -6,6 +6,8 @@ import { buildConversationEnvelope } from "../services/conversationEnvelope.js";
 import { getAssistantIdentity } from "../services/assistantIdentity.js";
 import { composeAssistantInstruction } from "../services/assistantInstructionComposer.js";
 import { composeCompactAssistantRuntimeInstruction } from "../services/assistantRuntimeInstructionComposer.js";
+import { composeAssistantBehaviorInstruction } from "../services/assistantBehaviorPolicyComposer.js";
+import { LUMI_BEHAVIOR_POLICY } from "../data/lumiBehaviorPolicy.js";
 import { buildKnowledgeContext } from "../services/knowledgeContextBuilder.js";
 import { processValidatedWidgetMessage } from "../services/widgetMessageProcessor.js";
 import type { AiProvider, AiProviderMode, AiProviderRequest } from "../types/aiProvider.js";
@@ -51,6 +53,7 @@ export const createWidgetMessageRouter = (
       const envelope = buildConversationEnvelope(validation.payload, processed, knowledgeContext);
       const assistantInstruction = composeAssistantInstruction(getAssistantIdentity());
       const assistantRuntimeInstruction = composeCompactAssistantRuntimeInstruction(assistantInstruction);
+      const assistantBehaviorInstruction = composeAssistantBehaviorInstruction(LUMI_BEHAVIOR_POLICY, assistantInstruction.assistantId);
       const providerRequest: Readonly<AiProviderRequest> = Object.freeze({
         requestId: envelope.requestId,
         conversationId: envelope.conversationId,
@@ -58,6 +61,7 @@ export const createWidgetMessageRouter = (
         knowledgeContext: envelope.knowledgeContext,
         assistantInstruction,
         assistantRuntimeInstruction,
+        assistantBehaviorInstruction,
       });
       const provider = providerOverride ?? resolveAiProvider(activeProviderMode);
       const providerResponse = await provider.generate(providerRequest);

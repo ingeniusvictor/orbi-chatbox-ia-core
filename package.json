@@ -24,7 +24,8 @@
                     "server:assistant-identity:qa":  "tsx server/scripts/runAssistantIdentityQa.ts",
                     "server:assistant-instruction:qa":  "tsx server/scripts/runAssistantInstructionQa.ts",
                     "server:assistant-runtime:qa":  "tsx server/scripts/runAssistantRuntimeIntegrationQa.ts",
-                    "server:assistant-runtime-optimization:qa":  "tsx server/scripts/runAssistantRuntimeOptimizationQa.ts"
+                    "server:assistant-runtime-optimization:qa":  "tsx server/scripts/runAssistantRuntimeOptimizationQa.ts",
+                    "server:assistant-behavior:qa":  "tsx server/scripts/runAssistantBehaviorPolicyQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",

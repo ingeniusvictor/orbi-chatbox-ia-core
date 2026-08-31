@@ -14,6 +14,8 @@ import { MAX_KNOWLEDGE_RESPONSE_CHARACTERS, NO_KNOWLEDGE_RESPONSE_TEXT } from ".
 import { LUMI_IDENTITY } from "../src/data/lumiIdentity.js";
 import { composeAssistantInstruction } from "../src/services/assistantInstructionComposer.js";
 import { composeCompactAssistantRuntimeInstruction } from "../src/services/assistantRuntimeInstructionComposer.js";
+import { LUMI_BEHAVIOR_POLICY } from "../src/data/lumiBehaviorPolicy.js";
+import { composeAssistantBehaviorInstruction } from "../src/services/assistantBehaviorPolicyComposer.js";
 import type { AiProviderRequest } from "../src/types/aiProvider.js";
 import type { KnowledgeContext } from "../src/types/knowledge.js";
 
@@ -42,6 +44,7 @@ const request: Readonly<AiProviderRequest> = Object.freeze({
   knowledgeContext: knownContext,
   assistantInstruction: composeAssistantInstruction(LUMI_IDENTITY),
   assistantRuntimeInstruction: composeCompactAssistantRuntimeInstruction(composeAssistantInstruction(LUMI_IDENTITY)),
+  assistantBehaviorInstruction: composeAssistantBehaviorInstruction(LUMI_BEHAVIOR_POLICY),
 });
 const noMatchContext: Readonly<KnowledgeContext> = Object.freeze({
   ...knownContext,

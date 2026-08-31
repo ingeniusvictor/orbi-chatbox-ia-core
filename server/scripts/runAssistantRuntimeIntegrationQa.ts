@@ -7,6 +7,8 @@ import { createWidgetMessageRouter } from "../src/routes/widgetMessage.js";
 import { getAssistantIdentity } from "../src/services/assistantIdentity.js";
 import { composeAssistantInstruction } from "../src/services/assistantInstructionComposer.js";
 import { composeCompactAssistantRuntimeInstruction } from "../src/services/assistantRuntimeInstructionComposer.js";
+import { LUMI_BEHAVIOR_POLICY } from "../src/data/lumiBehaviorPolicy.js";
+import { composeAssistantBehaviorInstruction } from "../src/services/assistantBehaviorPolicyComposer.js";
 import { mapAiProviderRequestToLocalAiProviderRequest } from "../src/services/localAiProviderMapper.js";
 import { MAX_QWEN_LOCAL_PROMPT_CHARACTERS, buildQwenLocalPrompt } from "../src/services/qwenLocalPromptBuilder.js";
 import type { AiProvider, AiProviderRequest } from "../src/types/aiProvider.js";
@@ -20,8 +22,9 @@ const knownContext: Readonly<KnowledgeContext> = Object.freeze({
 const emptyContext: Readonly<KnowledgeContext> = Object.freeze({ ...knownContext, query: "unknown synthetic context", matchCount: 0, entries: Object.freeze([]), totalCharacters: 0 });
 const instruction = composeAssistantInstruction(getAssistantIdentity());
 const runtimeInstruction = composeCompactAssistantRuntimeInstruction(instruction);
+const behaviorInstruction = composeAssistantBehaviorInstruction(LUMI_BEHAVIOR_POLICY);
 const request = (knowledgeContext: Readonly<KnowledgeContext>, message = "How does this controlled local flow work?"): Readonly<AiProviderRequest> => Object.freeze({
-  requestId: "synthetic-lumi-request", conversationId: "synthetic-lumi-conversation", message, knowledgeContext, assistantInstruction: instruction, assistantRuntimeInstruction: runtimeInstruction,
+  requestId: "synthetic-lumi-request", conversationId: "synthetic-lumi-conversation", message, knowledgeContext, assistantInstruction: instruction, assistantRuntimeInstruction: runtimeInstruction, assistantBehaviorInstruction: behaviorInstruction,
 });
 
 const main = async (): Promise<void> => {
@@ -55,9 +58,12 @@ const main = async (): Promise<void> => {
       && captured?.assistantInstruction.text === instruction.text
       && Object.isFrozen(captured?.assistantInstruction)
       && captured?.assistantRuntimeInstruction.text === runtimeInstruction.text
+      && captured?.assistantBehaviorInstruction.text === behaviorInstruction.text
       && mapped.assistantInstruction === instruction
       && mapped.assistantRuntimeInstruction === runtimeInstruction
-      && prompt.includes("INSTRUCTION") && prompt.includes(runtimeInstruction.text) && !prompt.includes(instruction.text)
+      && mapped.assistantBehaviorInstruction === behaviorInstruction
+      && prompt.includes("LUMI") && prompt.includes(runtimeInstruction.text) && !prompt.includes(instruction.text)
+      && prompt.includes("BEHAVIOR") && prompt.includes(behaviorInstruction.text)
       && prompt.includes("ORBI CONTEXT") && prompt.includes("Synthetic LUMI Context")
       && prompt.includes("USER") && prompt.includes("controlled local flow")
       && prompt === repeatedPrompt && prompt.length <= MAX_QWEN_LOCAL_PROMPT_CHARACTERS && boundedPrompt.length <= MAX_QWEN_LOCAL_PROMPT_CHARACTERS

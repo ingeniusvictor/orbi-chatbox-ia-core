@@ -136,6 +136,8 @@ npm run server:knowledge:qa
 
 0K-17A está cerrado. 0K-17B.1 mantiene la identidad canónica y su `AssistantInstruction` completo como fuente de verdad, y deriva una `AssistantRuntimeInstruction` compacta, neutral respecto de proveedores, para modelos locales ligeros. No es otra personalidad: sólo evita enviar el texto canónico completo al prompt de ejecución.
 
+0K-17B.2 agrega una política de respuesta de LUMI neutral respecto de proveedores: sigue el idioma del usuario cuando es claro (incluido español), equilibra concisión y detalle, conserva incertidumbre y grounding, evita la presentación repetitiva y sólo propone siguientes pasos cuando aportan valor. No añade memoria ni perfilado de usuarios.
+
 Validar el contrato estructural local:
 
 ```bash

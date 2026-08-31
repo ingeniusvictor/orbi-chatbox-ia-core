@@ -5,6 +5,8 @@ import { MAX_COMPACT_ASSISTANT_RUNTIME_INSTRUCTION_CHARACTERS, composeCompactAss
 import { mapAiProviderRequestToLocalAiProviderRequest } from "../src/services/localAiProviderMapper.js";
 import { MAX_QWEN_LOCAL_PROMPT_CHARACTERS, buildQwenLocalPrompt } from "../src/services/qwenLocalPromptBuilder.js";
 import { mockAiProvider } from "../src/providers/mockAiProvider.js";
+import { LUMI_BEHAVIOR_POLICY } from "../src/data/lumiBehaviorPolicy.js";
+import { composeAssistantBehaviorInstruction } from "../src/services/assistantBehaviorPolicyComposer.js";
 import type { AiProviderRequest } from "../src/types/aiProvider.js";
 import type { KnowledgeContext } from "../src/types/knowledge.js";
 
@@ -16,9 +18,10 @@ const knownContext: Readonly<KnowledgeContext> = Object.freeze({
 const emptyContext: Readonly<KnowledgeContext> = Object.freeze({ ...knownContext, matchCount: 0, entries: Object.freeze([]), totalCharacters: 0 });
 const canonical = composeAssistantInstruction(getAssistantIdentity());
 const compact = composeCompactAssistantRuntimeInstruction(canonical);
+const behaviorInstruction = composeAssistantBehaviorInstruction(LUMI_BEHAVIOR_POLICY);
 const request = (knowledgeContext: Readonly<KnowledgeContext>): Readonly<AiProviderRequest> => Object.freeze({
   requestId: "compact-runtime-request", conversationId: "compact-runtime-conversation", message: "How can I continue with this synthetic ORBI flow?", knowledgeContext,
-  assistantInstruction: canonical, assistantRuntimeInstruction: compact,
+  assistantInstruction: canonical, assistantRuntimeInstruction: compact, assistantBehaviorInstruction: behaviorInstruction,
 });
 
 const main = async (): Promise<void> => {

@@ -8,12 +8,14 @@ import { createWidgetMessageRouter } from "../src/routes/widgetMessage.js";
 import { LUMI_IDENTITY } from "../src/data/lumiIdentity.js";
 import { composeAssistantInstruction } from "../src/services/assistantInstructionComposer.js";
 import { composeCompactAssistantRuntimeInstruction } from "../src/services/assistantRuntimeInstructionComposer.js";
+import { LUMI_BEHAVIOR_POLICY } from "../src/data/lumiBehaviorPolicy.js";
+import { composeAssistantBehaviorInstruction } from "../src/services/assistantBehaviorPolicyComposer.js";
 import type { AiProviderRequest } from "../src/types/aiProvider.js";
 import type { KnowledgeContext } from "../src/types/knowledge.js";
 
 type Scenario = "healthy" | "health-invalid" | "model-missing" | "timeout" | "malformed" | "empty" | "generation-failed";
 const context: Readonly<KnowledgeContext> = Object.freeze({ query: "sandbox assistant", source: "local-static", mode: "sandbox", matchCount: 1, entries: Object.freeze([Object.freeze({ id: "source", domain: "system" as const, title: "Source", content: "Synthetic context.", score: 1 })]), totalCharacters: 18, truncated: false });
-const request: Readonly<AiProviderRequest> = Object.freeze({ requestId: "hardening-request", conversationId: "hardening-conversation", message: "sandbox assistant", knowledgeContext: context, assistantInstruction: composeAssistantInstruction(LUMI_IDENTITY), assistantRuntimeInstruction: composeCompactAssistantRuntimeInstruction(composeAssistantInstruction(LUMI_IDENTITY)) });
+const request: Readonly<AiProviderRequest> = Object.freeze({ requestId: "hardening-request", conversationId: "hardening-conversation", message: "sandbox assistant", knowledgeContext: context, assistantInstruction: composeAssistantInstruction(LUMI_IDENTITY), assistantRuntimeInstruction: composeCompactAssistantRuntimeInstruction(composeAssistantInstruction(LUMI_IDENTITY)), assistantBehaviorInstruction: composeAssistantBehaviorInstruction(LUMI_BEHAVIOR_POLICY) });
 const start = async (scenario: Scenario): Promise<{ provider: ReturnType<typeof createQwenLocalProvider>; base: string; close: () => Promise<void> }> => {
   const server = createServer((incoming, outgoing) => {
     if (incoming.url === "/api/version") { outgoing.writeHead(200, { "Content-Type": "application/json" }); outgoing.end(scenario === "health-invalid" ? "{}" : '{"version":"synthetic"}'); return; }
