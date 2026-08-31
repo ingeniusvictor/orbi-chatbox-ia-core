@@ -47,6 +47,9 @@ export const validateWidgetMessagePayload = (body: unknown): WidgetPayloadValida
   if (payload.visitorId !== undefined && (typeof payload.visitorId !== "string" || payload.visitorId.length > 120)) {
     return invalidBody("Visitor ID must be a string with at most 120 characters.");
   }
+  if (payload.conversationId !== undefined && (typeof payload.conversationId !== "string" || payload.conversationId.trim().length === 0 || payload.conversationId.length > 120)) {
+    return invalidBody("Conversation ID must be a non-empty string with at most 120 characters.");
+  }
   if (payload.pageUrl !== undefined && (typeof payload.pageUrl !== "string" || payload.pageUrl.length > 500)) {
     return invalidBody("Page URL must be a string with at most 500 characters.");
   }
@@ -59,6 +62,7 @@ export const validateWidgetMessagePayload = (body: unknown): WidgetPayloadValida
     payload: {
       channel: isWidgetChannel(payload.channel) ? payload.channel : "manual_test",
       visitorId: payload.visitorId ?? "anonymous-local-sandbox-visitor",
+      conversationId: payload.conversationId?.trim(),
       message: payload.message.trim(),
       pageUrl: payload.pageUrl ?? "unknown-local-page",
       consentAccepted: true,

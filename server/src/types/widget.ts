@@ -3,6 +3,7 @@ export type WidgetChannel = "web_demo" | "manual_test" | "whatsapp_future";
 export type WidgetMessageRequest = {
   channel?: WidgetChannel | string;
   visitorId?: string;
+  conversationId?: string;
   message?: string;
   pageUrl?: string;
   consentAccepted?: boolean;
@@ -12,6 +13,7 @@ export type WidgetMessageRequest = {
 export type NormalizedWidgetMessageRequest = {
   channel: WidgetChannel;
   visitorId: string;
+  conversationId?: string;
   message: string;
   pageUrl: string;
   consentAccepted: true;

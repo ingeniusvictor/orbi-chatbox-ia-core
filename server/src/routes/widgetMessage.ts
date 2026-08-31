@@ -9,6 +9,9 @@ import { composeCompactAssistantRuntimeInstruction } from "../services/assistant
 import { composeAssistantBehaviorInstruction } from "../services/assistantBehaviorPolicyComposer.js";
 import { LUMI_BEHAVIOR_POLICY } from "../data/lumiBehaviorPolicy.js";
 import { buildKnowledgeContext } from "../services/knowledgeContextBuilder.js";
+import { buildAssistantConversationHistory } from "../services/assistantConversationHistoryBuilder.js";
+import { appendConversationTurn, getConversationHistory } from "../services/ephemeralConversationHistory.js";
+import { createConversationTurn } from "../services/conversationTurn.js";
 import { processValidatedWidgetMessage } from "../services/widgetMessageProcessor.js";
 import type { AiProvider, AiProviderMode, AiProviderRequest } from "../types/aiProvider.js";
 import type { WidgetMessageResponse } from "../types/widget.js";
@@ -51,6 +54,7 @@ export const createWidgetMessageRouter = (
       const processed = processValidatedWidgetMessage(validation.payload);
       const knowledgeContext = buildKnowledgeContext(processed.normalizedMessage);
       const envelope = buildConversationEnvelope(validation.payload, processed, knowledgeContext);
+      const previousHistory = getConversationHistory(envelope.conversationId);
       const assistantInstruction = composeAssistantInstruction(getAssistantIdentity());
       const assistantRuntimeInstruction = composeCompactAssistantRuntimeInstruction(assistantInstruction);
       const assistantBehaviorInstruction = composeAssistantBehaviorInstruction(LUMI_BEHAVIOR_POLICY, assistantInstruction.assistantId);
@@ -58,6 +62,7 @@ export const createWidgetMessageRouter = (
         requestId: envelope.requestId,
         conversationId: envelope.conversationId,
         message: envelope.message.text,
+        conversationHistory: buildAssistantConversationHistory(previousHistory),
         knowledgeContext: envelope.knowledgeContext,
         assistantInstruction,
         assistantRuntimeInstruction,
@@ -65,6 +70,10 @@ export const createWidgetMessageRouter = (
       });
       const provider = providerOverride ?? resolveAiProvider(activeProviderMode);
       const providerResponse = await provider.generate(providerRequest);
+      const userTurn = createConversationTurn({ conversationId: envelope.conversationId, role: "user", content: envelope.message.text, sequence: previousHistory.turnCount === 0 ? 1 : previousHistory.turns[previousHistory.turnCount - 1]!.sequence + 1 });
+      const assistantTurn = createConversationTurn({ conversationId: envelope.conversationId, role: "assistant", content: providerResponse.text, sequence: userTurn.sequence + 1 });
+      appendConversationTurn(userTurn);
+      appendConversationTurn(assistantTurn);
       const payload: WidgetMessageResponse = {
         ok: true,
         mode: "sandbox",

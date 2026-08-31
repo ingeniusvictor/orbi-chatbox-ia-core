@@ -12,7 +12,7 @@ export const buildConversationEnvelope = (
   knowledgeContext: Readonly<KnowledgeContext>,
 ): ConversationEnvelope => ({
   requestId: processed.requestId,
-  conversationId: randomUUID(),
+  conversationId: input.conversationId ?? randomUUID(),
   source: {
     visitorId: input.visitorId,
     channel: processed.channel,

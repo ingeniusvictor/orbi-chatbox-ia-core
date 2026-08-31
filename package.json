@@ -32,7 +32,8 @@
                     "server:assistant-runtime-optimization:qa":  "tsx server/scripts/runAssistantRuntimeOptimizationQa.ts",
                     "server:assistant-behavior:qa":  "tsx server/scripts/runAssistantBehaviorPolicyQa.ts",
                     "server:conversation-turn:qa":  "tsx server/scripts/runConversationTurnContractQa.ts",
-                    "server:conversation-history:qa":  "tsx server/scripts/runEphemeralConversationHistoryQa.ts"
+                    "server:conversation-history:qa":  "tsx server/scripts/runEphemeralConversationHistoryQa.ts",
+                    "server:conversation-runtime:qa":  "tsx server/scripts/runConversationRuntimeIntegrationQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",

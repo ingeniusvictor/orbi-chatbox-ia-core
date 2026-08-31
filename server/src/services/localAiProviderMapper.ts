@@ -10,6 +10,9 @@ const freezeKnowledgeContext = (context: Readonly<KnowledgeContext>): Readonly<K
   ...context,
   entries: Object.freeze(context.entries.map((entry) => Object.freeze({ ...entry }))),
 });
+const freezeConversationHistory = (history: Readonly<AiProviderRequest>["conversationHistory"]) => Object.freeze({
+  turns: Object.freeze((history?.turns ?? []).map((turn) => Object.freeze({ ...turn }))),
+});
 
 /** Pure mapping boundary from the active provider pipeline to a future local provider. */
 export const mapAiProviderRequestToLocalAiProviderRequest = (
@@ -22,6 +25,7 @@ export const mapAiProviderRequestToLocalAiProviderRequest = (
   requestId: request.requestId,
   conversationId: request.conversationId,
   message: request.message,
+  conversationHistory: freezeConversationHistory(request.conversationHistory),
   knowledgeContext: freezeKnowledgeContext(request.knowledgeContext),
   assistantInstruction: request.assistantInstruction,
   assistantRuntimeInstruction: request.assistantRuntimeInstruction,

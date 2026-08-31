@@ -2,6 +2,7 @@ import type { KnowledgeContext } from "./knowledge.js";
 import type { AssistantInstruction } from "./assistantInstruction.js";
 import type { AssistantRuntimeInstruction } from "./assistantRuntimeInstruction.js";
 import type { AssistantBehaviorInstruction } from "./assistantBehaviorPolicy.js";
+import type { AssistantConversationHistory } from "./assistantConversationHistory.js";
 
 /** Architecturally recognized provider identifiers. Only enabled modes are executable. */
 export type AiProviderId = "mock" | "qwen-local" | "gemma-local" | "openai" | "gemini";
@@ -15,6 +16,8 @@ export type AiProviderRequest = {
   readonly requestId: string;
   readonly conversationId: string;
   readonly message: string;
+  /** Optional only for legacy provider test fixtures; runtime requests always provide it. */
+  readonly conversationHistory?: Readonly<AssistantConversationHistory>;
   readonly knowledgeContext: Readonly<KnowledgeContext>;
   readonly assistantInstruction: Readonly<AssistantInstruction>;
   readonly assistantRuntimeInstruction: Readonly<AssistantRuntimeInstruction>;
