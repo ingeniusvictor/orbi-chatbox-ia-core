@@ -22,7 +22,8 @@ ORBI ChatBox IA Core es una aplicación frontend modular para atención conversa
 - 0K-20 — Controlled Tool & Capability Boundary: ACTIVE
 - 0K-20A.1: CLOSED — contrato y registry de capacidades explícitas y controladas, con estados `enabled`, `disabled` y `unavailable`.
 - 0K-20A.2: CLOSED — solicitudes declarativas y efímeras; estado, riesgo y modo de ejecución determinan elegibilidad, sin tool calling desde el provider.
-- 0K-20B.1 — Safe Internal Capability Execution: `knowledge-search` es la única capacidad ejecutable, después de evaluación controlada. Su retrieval es local, interno, de sólo lectura y con resultados acotados; no invoca provider/IA, no hace tool calling ni produce efectos externos. El resto permanece bloqueado o no disponible.
+- 0K-20B.1: CLOSED — `knowledge-search` es la única capacidad ejecutable, local, interna y de sólo lectura; el resto permanece bloqueado o no disponible.
+- 0K-20B.2 — Controlled LUMI Capability Invocation: una política determinista del Core puede invocar `knowledge-search` sólo ante solicitudes explícitas sobre ORBI. LUMI/provider recibe un contexto acotado de resultado y no selecciona ni ejecuta tools. `KnowledgeContext` mantiene la autoridad de grounding; no hay acciones externas, agentes ni tool calling autónomo.
 
 - Versión: v0.13.0-functional-mvp-demo
 - Estado: PASS — MVP funcional demo/sandbox

@@ -13,6 +13,9 @@ import { buildAssistantConversationHistory } from "../services/assistantConversa
 import { appendConversationTurn, getConversationHistory } from "../services/ephemeralConversationHistory.js";
 import { createConversationTurn } from "../services/conversationTurn.js";
 import { processValidatedWidgetMessage } from "../services/widgetMessageProcessor.js";
+import { createControlledKnowledgeSearchRequest } from "../services/capabilityInvocationPolicy.js";
+import { executeInternalCapability } from "../services/internalCapabilityExecutor.js";
+import { buildAssistantCapabilityContext } from "../services/assistantCapabilityContextBuilder.js";
 import type { AiProvider, AiProviderMode, AiProviderRequest } from "../types/aiProvider.js";
 import type { WidgetMessageResponse } from "../types/widget.js";
 import { validateWidgetMessagePayload } from "../validation/widgetPayload.js";
@@ -58,6 +61,10 @@ export const createWidgetMessageRouter = (
       const assistantInstruction = composeAssistantInstruction(getAssistantIdentity());
       const assistantRuntimeInstruction = composeCompactAssistantRuntimeInstruction(assistantInstruction);
       const assistantBehaviorInstruction = composeAssistantBehaviorInstruction(LUMI_BEHAVIOR_POLICY, assistantInstruction.assistantId);
+      const capabilityRequest = createControlledKnowledgeSearchRequest(envelope.message.text);
+      const assistantCapabilityContext = capabilityRequest
+        ? buildAssistantCapabilityContext(executeInternalCapability(capabilityRequest))
+        : undefined;
       const providerRequest: Readonly<AiProviderRequest> = Object.freeze({
         requestId: envelope.requestId,
         conversationId: envelope.conversationId,
@@ -67,6 +74,7 @@ export const createWidgetMessageRouter = (
         assistantInstruction,
         assistantRuntimeInstruction,
         assistantBehaviorInstruction,
+        assistantCapabilityContext,
       });
       const provider = providerOverride ?? resolveAiProvider(activeProviderMode);
       const providerResponse = await provider.generate(providerRequest);

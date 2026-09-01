@@ -3,6 +3,7 @@ import type { AssistantInstruction } from "./assistantInstruction.js";
 import type { AssistantRuntimeInstruction } from "./assistantRuntimeInstruction.js";
 import type { AssistantBehaviorInstruction } from "./assistantBehaviorPolicy.js";
 import type { AssistantConversationHistory } from "./assistantConversationHistory.js";
+import type { AssistantCapabilityContext } from "./assistantCapabilityContext.js";
 
 /** Future-facing local provider input. It is not an executable provider contract. */
 export type LocalAiProviderRequest = {
@@ -16,6 +17,7 @@ export type LocalAiProviderRequest = {
   readonly assistantInstruction: Readonly<AssistantInstruction>;
   readonly assistantRuntimeInstruction: Readonly<AssistantRuntimeInstruction>;
   readonly assistantBehaviorInstruction: Readonly<AssistantBehaviorInstruction>;
+  readonly assistantCapabilityContext?: Readonly<AssistantCapabilityContext>;
 };
 
 /** Future-facing local provider output, deliberately independent of runtime payloads. */

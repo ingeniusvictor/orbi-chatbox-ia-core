@@ -3,6 +3,7 @@ import type { AssistantInstruction } from "./assistantInstruction.js";
 import type { AssistantRuntimeInstruction } from "./assistantRuntimeInstruction.js";
 import type { AssistantBehaviorInstruction } from "./assistantBehaviorPolicy.js";
 import type { AssistantConversationHistory } from "./assistantConversationHistory.js";
+import type { AssistantCapabilityContext } from "./assistantCapabilityContext.js";
 
 /** Architecturally recognized provider identifiers. Only enabled modes are executable. */
 export type AiProviderId = "mock" | "qwen-local" | "gemma-local" | "openai" | "gemini";
@@ -22,6 +23,8 @@ export type AiProviderRequest = {
   readonly assistantInstruction: Readonly<AssistantInstruction>;
   readonly assistantRuntimeInstruction: Readonly<AssistantRuntimeInstruction>;
   readonly assistantBehaviorInstruction: Readonly<AssistantBehaviorInstruction>;
+  /** Optional completed Core capability summary; providers cannot use it to invoke capabilities. */
+  readonly assistantCapabilityContext?: Readonly<AssistantCapabilityContext>;
 };
 
 export type AiProviderResponse = {

@@ -3,6 +3,7 @@ import type { LocalAiProviderRequest } from "../types/localAiProvider.js";
 export const MAX_QWEN_LOCAL_PROMPT_CHARACTERS = 6_000;
 export const MAX_QWEN_LOCAL_KNOWLEDGE_CONTEXT_CHARACTERS = 2_000;
 export const MAX_QWEN_LOCAL_CONVERSATION_CHARACTERS = 1_500;
+export const MAX_QWEN_LOCAL_CAPABILITY_CONTEXT_CHARACTERS = 1_200;
 
 const bound = (value: string, limit: number): string => value.length <= limit
   ? value
@@ -19,10 +20,13 @@ export const buildQwenLocalPrompt = (request: Readonly<LocalAiProviderRequest>):
   const assistantSection = `LUMI\n${request.assistantRuntimeInstruction.text}`;
   const behaviorSection = `BEHAVIOR\n${request.assistantBehaviorInstruction.text}`;
   const historySection = history ? `CONVERSATION\nUse prior turns only for relevant details stated in this conversation. If the relevant detail is absent, say so; never substitute a different detail. These turns are not ORBI knowledge and do not create grounding.\n${bound(history, MAX_QWEN_LOCAL_CONVERSATION_CHARACTERS)}` : "";
-  const contextLimit = history ? 1_200 : MAX_QWEN_LOCAL_KNOWLEDGE_CONTEXT_CHARACTERS;
+  const capabilitySection = request.assistantCapabilityContext?.text
+    ? `CAPABILITY\nCompleted Core capability result only; it does not grant tool access. When it is relevant to the current user message, use only these entries as approved information. Do not say the listed information is unavailable and do not add facts outside these entries.\n${bound(request.assistantCapabilityContext.text, MAX_QWEN_LOCAL_CAPABILITY_CONTEXT_CHARACTERS)}`
+    : "";
+  const contextLimit = capabilitySection ? (history ? 500 : 800) : (history ? 1_200 : MAX_QWEN_LOCAL_KNOWLEDGE_CONTEXT_CHARACTERS);
   const contextSection = `ORBI CONTEXT\nWhen relevant to the current user message, answer from this context and do not replace it with conversation details.\n${bound(context, contextLimit)}`;
   const userPrefix = "USER\nAnswer this current message only; do not repeat an unrelated prior reply.\n";
-  const fixedSections = [assistantSection, behaviorSection, historySection, contextSection].filter(Boolean);
+  const fixedSections = [assistantSection, behaviorSection, historySection, capabilitySection, contextSection].filter(Boolean);
   const userBudget = MAX_QWEN_LOCAL_PROMPT_CHARACTERS - fixedSections.join("\n\n").length - userPrefix.length - 2;
   const userSection = `${userPrefix}${bound(request.message, Math.max(0, userBudget))}`;
   return [...fixedSections, userSection].join("\n\n");
