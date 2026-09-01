@@ -19,6 +19,8 @@ ORBI ChatBox IA Core es una aplicación frontend modular para atención conversa
 - 0K-19A.3: los turnos recientes previos entran acotados al runtime del provider; el mensaje actual no se duplica y los intercambios se guardan sólo tras generación exitosa. El historial no es grounding, no añade fuentes y permanece aislado por `conversationId`.
 - 0K-19A FAMILY: CLOSED
 - 0K-19B.1: CLOSED — continuidad efímera endurecida: máximo 8 turnos/6000 caracteres en store, ventana provider de 6 turnos/2500 caracteres, FIFO, aislamiento estricto y fallos sin contaminación. No existe memoria persistente ni entre sesiones.
+- 0K-20 — Controlled Tool & Capability Boundary: ACTIVE
+- 0K-20A.1 — Capability Contract & Registry: las capacidades son descriptores explícitos y controlados. El registry distingue `enabled`, `disabled` y `unavailable`; en esta etapa sólo capacidades internas de lectura pueden estar habilitadas. No existe ejecución, llamadas de herramientas, agentes ni acciones externas, y el provider no puede ejecutar herramientas directamente.
 
 - Versión: v0.13.0-functional-mvp-demo
 - Estado: PASS — MVP funcional demo/sandbox
