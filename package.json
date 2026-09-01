@@ -46,7 +46,8 @@
                     "frontend:e2e:qa":  "tsx server/scripts/runFrontendEndToEndQa.ts",
                     "server:release-candidate:audit":  "tsx server/scripts/runReleaseCandidateAuditQa.ts",
                     "server:functional-mvp:e2e":  "tsx server/scripts/runFunctionalMvpFinalE2eQa.ts",
-                    "server:functional-mvp:release":  "tsx server/scripts/runFunctionalMvpReleaseQa.ts"
+                    "server:functional-mvp:release":  "tsx server/scripts/runFunctionalMvpReleaseQa.ts",
+                    "server:post-mvp-baseline:qa":  "tsx server/scripts/runPostMvpBaselineQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",

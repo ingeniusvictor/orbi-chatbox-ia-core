@@ -1,0 +1,5 @@
+import { existsSync, readFileSync } from "node:fs";
+import { DEFAULT_AI_PROVIDER } from "../src/config/aiProviderSelection.js";
+import { QWEN_LOCAL_RUNTIME_CONFIG } from "../src/config/qwenLocal.js";
+import { getCapabilities } from "../src/services/capabilityRegistry.js";
+const assert=(v:unknown,m:string)=>{if(!v)throw new Error(m)};const main=()=>{const readme=readFileSync(new URL("../../README.md",import.meta.url),"utf8");assert(existsSync(new URL("../../MVP_RELEASE.md",import.meta.url))&&existsSync(new URL("../../POST_MVP_ROADMAP.md",import.meta.url)),"documents");assert(readme.includes("v0.22.0-functional-mvp")&&readme.includes("POST-MVP DEVELOPMENT: ACTIVE"),"status");assert(DEFAULT_AI_PROVIDER==="mock"&&QWEN_LOCAL_RUNTIME_CONFIG.model==="qwen3:1.7b","profile");assert(getCapabilities().filter(c=>c.id==="knowledge-search"&&c.status==="enabled").length===1,"capability");console.info("Post-MVP Baseline QA: PASS")};try{main()}catch(e){console.error(e instanceof Error?e.message:"Baseline QA failed");process.exit(1)}
