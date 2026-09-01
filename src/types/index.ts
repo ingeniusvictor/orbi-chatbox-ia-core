@@ -5,3 +5,4 @@ export * from "./registry";
 export * from "./premiumUx";
 export * from "./installableWidgetConfig";
 export * from "./chatBackend";
+export * from "./lumiRuntimeState";

@@ -6,7 +6,7 @@ const main = (): void => {
   const passed = !isSendableChatMessage("") && !isSendableChatMessage("  ") && isSendableChatMessage("Hola")
     && source.includes("LUMI está lista para conversar") && source.includes(">LUMI</span>")
     && source.includes("e.key === \"Enter\" && !e.shiftKey") && source.includes("disabled={!inputText.trim() || isTyping}")
-    && source.includes("ORBI IA está escribiendo respuesta") && source.includes("role=\"alert\"") && source.includes("Reintentar")
+    && source.includes('getLumiRuntimeStateMessage("processing")') && source.includes("role=\"alert\"") && source.includes("Reintentar")
     && source.includes("msg.backend.provider") && source.includes("Con conocimiento ORBI")
     && !source.includes("localStorage") && !source.includes("sourceEntryIds.join") && !source.includes("conversationId}</");
   assert(passed, "Frontend Conversation UX QA: FAIL");

@@ -38,7 +38,8 @@ import {
   sendMessageToBackendReceiver,
 } from "../../services/backendReceiverClient";
 import { appendRuntimeMessage, createBackendAssistantMessage, isSendableChatMessage, type RuntimeChatMessage } from "../../services/chatRuntimeState";
-import type { ChatBackendMetadata } from "../../types";
+import { classifyLumiRuntimeState, getLumiRuntimeStateLabel, getLumiRuntimeStateMessage } from "../../services/lumiRuntimeState";
+import type { LumiRuntimeState } from "../../types";
 
 interface ChatStudioWorkspaceProps {
   companyProfile: CompanyProfile;
@@ -75,7 +76,7 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
   const [copiedHandoff, setCopiedHandoff] = useState(false);
   const [responseMode, setResponseMode] = useState<ResponseMode>("demo");
   const [conversationId, setConversationId] = useState<string | undefined>();
-  const [backendError, setBackendError] = useState<string | undefined>();
+  const [runtimeState, setRuntimeState] = useState<LumiRuntimeState>("ready");
   const [lastFailedMessage, setLastFailedMessage] = useState<string | undefined>();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -87,7 +88,6 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
   const handleSendMessage = async (textToSend?: string, retry = false) => {
     const text = (textToSend || inputText).trim();
     if (!isSendableChatMessage(text) || isTyping) return;
-    setBackendError(undefined);
     setLastFailedMessage(undefined);
 
     const userMsg: RuntimeChatMessage = {
@@ -103,6 +103,7 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
 
     if (responseMode === "backend") {
       setIsTyping(true);
+      setRuntimeState("processing");
       const result = await sendMessageToBackendReceiver({
         message: text,
         channel: "web_demo",
@@ -112,6 +113,7 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
       });
       if (result.ok === true) {
         setConversationId(result.body.conversationId);
+        setRuntimeState("ready");
         const sandboxAnalysis: LeadAnalysis = {
           ...EMPTY_ANALYSIS,
           mainNeed: "Validación del backend sandbox local.",
@@ -139,7 +141,7 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
         });
       }
       if (result.ok === true) setMessages((prev) => appendRuntimeMessage(prev, createBackendAssistantMessage(`msg-backend-${Date.now()}`, new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }), result.body)));
-      else { setBackendError(result.message); setLastFailedMessage(text); }
+      else { setRuntimeState(classifyLumiRuntimeState(result)); setLastFailedMessage(text); }
       setIsTyping(false);
       return;
     }
@@ -170,6 +172,7 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
 
     // Simulate Bot response with knowledge & context
     setIsTyping(true);
+    setRuntimeState("processing");
     setTimeout(() => {
       const botReplyText = generateAssistantReply(analysis, companyProfile);
       const botMsg: Message = {
@@ -180,6 +183,7 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
       };
       setMessages((prev) => [...prev, botMsg]);
       setIsTyping(false);
+      setRuntimeState("ready");
     }, 600);
   };
 
@@ -188,7 +192,7 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
     setCurrentAnalysis(EMPTY_ANALYSIS);
     setCurrentContact({});
     setConversationId(undefined);
-    setBackendError(undefined);
+    setRuntimeState("ready");
     setLastFailedMessage(undefined);
   };
 
@@ -240,10 +244,11 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
           {/* Top Chat Bar */}
           <div className="px-4 py-3 bg-slate-950/70 border-b border-slate-800/80 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
+              <div className={`w-3 h-3 rounded-full ${runtimeState === "ready" ? "bg-emerald-500 animate-pulse" : "bg-amber-400"}`} />
               <span className="text-xs font-bold text-slate-200">
-                {companyProfile.assistantName || companyProfile.companyName} (IA Online)
+                {companyProfile.assistantName || companyProfile.companyName}
               </span>
+              <span className="text-[10px] font-mono text-slate-400">{getLumiRuntimeStateLabel(runtimeState)}</span>
             </div>
             <span className="text-[11px] font-mono text-slate-400">
               Canal: {responseMode === "demo" ? "Web Demo Sandbox" : "Backend Receiver Sandbox"}
@@ -307,12 +312,12 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
             {isTyping && (
               <div className="flex items-center gap-2 text-slate-400 text-xs font-mono">
                 <Bot className="w-4 h-4 text-cyan-400 animate-spin" />
-                <span>ORBI IA está escribiendo respuesta...</span>
+                <span>{getLumiRuntimeStateMessage("processing")}</span>
               </div>
             )}
-            {backendError && (
+            {runtimeState !== "ready" && runtimeState !== "processing" && (
               <div role="alert" className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
-                <p>LUMI no puede conectarse al servicio local en este momento. {backendError}</p>
+                <p>{getLumiRuntimeStateMessage(runtimeState)}</p>
                 {lastFailedMessage && (
                   <button type="button" onClick={() => void handleSendMessage(lastFailedMessage, true)} className="mt-2 rounded border border-amber-300/50 px-2 py-1 font-semibold text-amber-100 hover:bg-amber-500/10">
                     Reintentar

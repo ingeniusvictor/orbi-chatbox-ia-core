@@ -15,7 +15,7 @@ const main = (): void => {
     && first.length === 1 && second.length === 2 && first !== second
     && assistant.text === response.message && assistant.backend?.provider === "mock" && assistant.backend?.grounded === true && assistant.backend?.sourceEntryIds.join(",") === "core-assistant-overview"
     && source.includes("conversationId,") && source.includes("setConversationId(result.body.conversationId)")
-    && source.includes("setBackendError(result.message)") && source.includes("disabled={!inputText.trim() || isTyping}")
+    && source.includes("classifyLumiRuntimeState(result)") && source.includes("disabled={!inputText.trim() || isTyping}")
     && !source.includes("localStorage") && !source.includes("Provider selector") && !source.includes("generateAssistantReply(result");
   assert(passed, "Frontend Chat Runtime Contract QA: FAIL");
   console.info("Frontend Chat Runtime Contract QA: PASS (runtime conversation state, metadata, controlled errors, no frontend fallback or persistence)");
