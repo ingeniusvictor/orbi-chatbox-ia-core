@@ -40,7 +40,8 @@
                     "server:capability-executor:qa":  "tsx server/scripts/runInternalCapabilityExecutorQa.ts",
                     "server:capability-invocation:qa":  "tsx server/scripts/runControlledCapabilityInvocationQa.ts",
                     "server:capability-boundary:qa":  "tsx server/scripts/runCapabilityBoundaryFinalQa.ts",
-                    "frontend:chat-runtime:qa":  "tsx server/scripts/runFrontendChatRuntimeContractQa.ts"
+                    "frontend:chat-runtime:qa":  "tsx server/scripts/runFrontendChatRuntimeContractQa.ts",
+                    "frontend:conversation-ux:qa":  "tsx server/scripts/runFrontendConversationUxQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",
