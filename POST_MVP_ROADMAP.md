@@ -1,7 +1,7 @@
 # ORBI ChatBox IA Core — Post-MVP Roadmap
 
-Baseline: `v0.22.0-functional-mvp`  
-Commit: `a9c17ab`  
+Baseline: `v0.22.0-functional-mvp`
+Commit: `a9c17ab`
 Status: **FUNCTIONAL MVP — CLOSED / VALIDATED**
 
 The MVP baseline remains reproducible and untouched. Next version: TBD.
