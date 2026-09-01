@@ -26,6 +26,8 @@ ORBI ChatBox IA Core es una aplicación frontend modular para atención conversa
 - 0K-20B.2: CLOSED — una política determinista del Core puede invocar `knowledge-search` sólo ante solicitudes explícitas sobre ORBI. LUMI/provider recibe contexto acotado y no selecciona ni ejecuta tools.
 - 0K-20B FAMILY: CLOSED
 - 0K-20C.1: CLOSED — validación final de whitelist, límites, grounding, continuidad y aislamiento del provider. El boundary final contiene contrato/registry explícitos, solicitudes declarativas, evaluación controlada y una sola ejecución interna segura: `knowledge-search`. No hay tool calling autónomo, acciones externas ni agentes.
+- 0K-21 — Frontend Chat UX Finalization: ACTIVE
+- 0K-21A.1 — Frontend Runtime State & Backend Contract Alignment: Chat Studio consume el contrato público actual del backend; conserva `conversationId`, provider, grounding y source IDs sólo en estado runtime. Maneja pending/error controlado sin selector de provider, fallback frontend ni persistencia de conversación. No incluye rediseño visual.
 
 - Versión: v0.13.0-functional-mvp-demo
 - Estado: PASS — MVP funcional demo/sandbox

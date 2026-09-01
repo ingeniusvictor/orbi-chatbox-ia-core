@@ -10,13 +10,14 @@ export type BackendReceiverSendInput = {
   channel?: BackendReceiverChannel;
   visitorId?: string;
   pageUrl?: string;
+  conversationId?: string;
 };
 
 export type BackendReceiverSendResult =
   | {
       ok: true;
       status: number;
-      body: unknown;
+      body: Readonly<ChatBackendSuccessResponse>;
       received: true;
       leadCreated: false;
       normalizedChannel?: string;
@@ -79,6 +80,7 @@ export const sendMessageToBackendReceiver = async (
           visitorId: input.visitorId ?? "local-sandbox-visitor",
           message: input.message,
           pageUrl: input.pageUrl ?? "http://localhost:3000",
+          conversationId: input.conversationId,
           consentAccepted: true,
           timestamp: new Date().toISOString(),
         }),
@@ -87,21 +89,22 @@ export const sendMessageToBackendReceiver = async (
     const body = await readResponseBody(response);
 
     if (!response.ok) {
+      const error = parseErrorResponse(body, `El receiver respondió HTTP ${response.status}.`);
       return {
         ok: false,
         status: response.status,
-        errorCode: isRecord(body) && typeof body.errorCode === "string" ? body.errorCode : undefined,
-        message: isRecord(body) && typeof body.message === "string"
-          ? body.message
-          : `El receiver respondió HTTP ${response.status}.`,
+        errorCode: error.errorCode,
+        message: error.message,
         body,
       };
     }
 
+    const success = parseSuccessResponse(body);
+    if (!success) return { ok: false, status: response.status, errorCode: "INVALID_BACKEND_RESPONSE", message: "El backend sandbox respondió un contrato no válido.", body };
     return {
       ok: true,
       status: response.status,
-      body,
+      body: success,
       received: true,
       leadCreated: false,
       normalizedChannel: isRecord(body) && typeof body.normalizedChannel === "string"
@@ -117,3 +120,14 @@ export const sendMessageToBackendReceiver = async (
     };
   }
 };
+import type { ChatBackendErrorResponse, ChatBackendRequest, ChatBackendSuccessResponse } from "../types/chatBackend";
+const parseSuccessResponse = (body: unknown): ChatBackendSuccessResponse | undefined => {
+  if (!isRecord(body) || body.ok !== true || typeof body.message !== "string" || typeof body.conversationId !== "string" || (body.provider !== "mock" && body.provider !== "qwen-local") || typeof body.grounded !== "boolean" || !Array.isArray(body.sourceEntryIds) || !body.sourceEntryIds.every((id) => typeof id === "string")) return undefined;
+  return { ok: true, message: body.message, conversationId: body.conversationId, provider: body.provider, grounded: body.grounded, sourceEntryIds: Object.freeze([...body.sourceEntryIds]) };
+};
+
+const parseErrorResponse = (body: unknown, fallback: string): ChatBackendErrorResponse => ({
+  ok: false,
+  errorCode: isRecord(body) && typeof body.errorCode === "string" ? body.errorCode : undefined,
+  message: isRecord(body) && typeof body.message === "string" ? body.message : fallback,
+});

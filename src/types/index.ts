@@ -4,3 +4,4 @@ export * from "./backend";
 export * from "./registry";
 export * from "./premiumUx";
 export * from "./installableWidgetConfig";
+export * from "./chatBackend";

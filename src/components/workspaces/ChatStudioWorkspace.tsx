@@ -37,6 +37,8 @@ import {
   DEFAULT_RECEIVER_URL,
   sendMessageToBackendReceiver,
 } from "../../services/backendReceiverClient";
+import { appendRuntimeMessage, createBackendAssistantMessage, isSendableChatMessage, type RuntimeChatMessage } from "../../services/chatRuntimeState";
+import type { ChatBackendMetadata } from "../../types";
 
 interface ChatStudioWorkspaceProps {
   companyProfile: CompanyProfile;
@@ -65,13 +67,15 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
   leads,
   onAddLead,
 }) => {
-  const [messages, setMessages] = useState<Message[]>([DEFAULT_WELCOME_MESSAGE]);
+  const [messages, setMessages] = useState<RuntimeChatMessage[]>([DEFAULT_WELCOME_MESSAGE]);
   const [inputText, setInputText] = useState("");
   const [currentAnalysis, setCurrentAnalysis] = useState<LeadAnalysis>(EMPTY_ANALYSIS);
   const [currentContact, setCurrentContact] = useState<ContactExtraction>({});
   const [isTyping, setIsTyping] = useState(false);
   const [copiedHandoff, setCopiedHandoff] = useState(false);
   const [responseMode, setResponseMode] = useState<ResponseMode>("demo");
+  const [conversationId, setConversationId] = useState<string | undefined>();
+  const [backendError, setBackendError] = useState<string | undefined>();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -81,7 +85,8 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
 
   const handleSendMessage = async (textToSend?: string) => {
     const text = (textToSend || inputText).trim();
-    if (!text) return;
+    if (!isSendableChatMessage(text) || isTyping) return;
+    setBackendError(undefined);
 
     const userMsg: Message = {
       id: `msg-${Date.now()}`,
@@ -90,7 +95,7 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
 
-    const newMessages = [...messages, userMsg];
+    const newMessages = appendRuntimeMessage(messages, userMsg);
     setMessages(newMessages);
     if (!textToSend) setInputText("");
 
@@ -101,11 +106,10 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
         channel: "web_demo",
         visitorId: "local-sandbox-visitor",
         pageUrl: "http://localhost:3000",
+        conversationId,
       });
-      const detail = result.ok === true
-        ? `HTTP ${result.status}${result.normalizedChannel ? ` · channel: ${result.normalizedChannel}` : ""}${result.processedAt ? ` · ${result.processedAt}` : ""}`
-        : result.errorCode || result.message;
       if (result.ok === true) {
+        setConversationId(result.body.conversationId);
         const sandboxAnalysis: LeadAnalysis = {
           ...EMPTY_ANALYSIS,
           mainNeed: "Validación del backend sandbox local.",
@@ -132,15 +136,8 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
           },
         });
       }
-      const botMsg: Message = {
-        id: `msg-backend-${Date.now()}`,
-        sender: "bot",
-        text: result.ok
-          ? `Mensaje validado por backend sandbox. No se creó lead real ni automatización productiva.\nLead sandbox registrado en Lead Intelligence.\n${detail}`
-          : `El backend sandbox respondió con error controlado: ${detail}`,
-        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      };
-      setMessages((prev) => [...prev, botMsg]);
+      if (result.ok === true) setMessages((prev) => appendRuntimeMessage(prev, createBackendAssistantMessage(`msg-backend-${Date.now()}`, new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }), result.body)));
+      else setBackendError(result.message);
       setIsTyping(false);
       return;
     }
@@ -188,6 +185,8 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
     setMessages([DEFAULT_WELCOME_MESSAGE]);
     setCurrentAnalysis(EMPTY_ANALYSIS);
     setCurrentContact({});
+    setConversationId(undefined);
+    setBackendError(undefined);
   };
 
   const handleCopyHandoff = async () => {
@@ -295,6 +294,11 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
               <div className="flex items-center gap-2 text-slate-400 text-xs font-mono">
                 <Bot className="w-4 h-4 text-cyan-400 animate-spin" />
                 <span>ORBI IA está escribiendo respuesta...</span>
+              </div>
+            )}
+            {backendError && (
+              <div role="alert" className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
+                LUMI no puede conectarse al servicio local en este momento. {backendError}
               </div>
             )}
             <div ref={messagesEndRef} />
