@@ -19,11 +19,13 @@ ORBI ChatBox IA Core es una aplicación frontend modular para atención conversa
 - 0K-19A.3: los turnos recientes previos entran acotados al runtime del provider; el mensaje actual no se duplica y los intercambios se guardan sólo tras generación exitosa. El historial no es grounding, no añade fuentes y permanece aislado por `conversationId`.
 - 0K-19A FAMILY: CLOSED
 - 0K-19B.1: CLOSED — continuidad efímera endurecida: máximo 8 turnos/6000 caracteres en store, ventana provider de 6 turnos/2500 caracteres, FIFO, aislamiento estricto y fallos sin contaminación. No existe memoria persistente ni entre sesiones.
-- 0K-20 — Controlled Tool & Capability Boundary: ACTIVE
+- 0K-20 — Controlled Tool & Capability Boundary: CLOSED
 - 0K-20A.1: CLOSED — contrato y registry de capacidades explícitas y controladas, con estados `enabled`, `disabled` y `unavailable`.
 - 0K-20A.2: CLOSED — solicitudes declarativas y efímeras; estado, riesgo y modo de ejecución determinan elegibilidad, sin tool calling desde el provider.
 - 0K-20B.1: CLOSED — `knowledge-search` es la única capacidad ejecutable, local, interna y de sólo lectura; el resto permanece bloqueado o no disponible.
-- 0K-20B.2 — Controlled LUMI Capability Invocation: una política determinista del Core puede invocar `knowledge-search` sólo ante solicitudes explícitas sobre ORBI. LUMI/provider recibe un contexto acotado de resultado y no selecciona ni ejecuta tools. `KnowledgeContext` mantiene la autoridad de grounding; no hay acciones externas, agentes ni tool calling autónomo.
+- 0K-20B.2: CLOSED — una política determinista del Core puede invocar `knowledge-search` sólo ante solicitudes explícitas sobre ORBI. LUMI/provider recibe contexto acotado y no selecciona ni ejecuta tools.
+- 0K-20B FAMILY: CLOSED
+- 0K-20C.1: CLOSED — validación final de whitelist, límites, grounding, continuidad y aislamiento del provider. El boundary final contiene contrato/registry explícitos, solicitudes declarativas, evaluación controlada y una sola ejecución interna segura: `knowledge-search`. No hay tool calling autónomo, acciones externas ni agentes.
 
 - Versión: v0.13.0-functional-mvp-demo
 - Estado: PASS — MVP funcional demo/sandbox

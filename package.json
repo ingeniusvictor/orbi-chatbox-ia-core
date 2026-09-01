@@ -38,7 +38,8 @@
                     "server:capability:qa":  "tsx server/scripts/runCapabilityContractQa.ts",
                     "server:capability-request:qa":  "tsx server/scripts/runCapabilityRequestContractQa.ts",
                     "server:capability-executor:qa":  "tsx server/scripts/runInternalCapabilityExecutorQa.ts",
-                    "server:capability-invocation:qa":  "tsx server/scripts/runControlledCapabilityInvocationQa.ts"
+                    "server:capability-invocation:qa":  "tsx server/scripts/runControlledCapabilityInvocationQa.ts",
+                    "server:capability-boundary:qa":  "tsx server/scripts/runCapabilityBoundaryFinalQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",
