@@ -32,6 +32,7 @@ ORBI ChatBox IA Core es una aplicación frontend modular para atención conversa
 - 0K-21B.1 — LUMI Runtime States & Error Experience: clasifica resultados controlados del receiver entre backend local, motor de IA local, timeout y error. Se recupera después de una respuesta posterior exitosa; el frontend no llama Ollama, no hace polling ni fallback automático.
 - 0K-21C.1 — CLOSED: validación end-to-end del chat runtime-only, reutilización de `conversationId`, identidad y UX LUMI, pending/error/retry, grounding y respuesta qwen-local. Sin historial persistente, selectores de provider/modelo ni integración web externa.
 - 0K-22 — Functional MVP Release Candidate & Final Validation: ACTIVE. Alcance MVP congelado; 0K-22A.1 es sólo auditoría/cleanup y la validación funcional final queda para 0K-22B.1. No agrega capabilities, providers ni features.
+- 0K-22B.1 — Final End-to-End Functional Validation: mock y qwen-local validados junto con LUMI, conocimiento, historia efímera, capability controlada y UX frontend. El alcance permanece congelado; sólo queda el cierre final de versión.
 
 - Versión: v0.13.0-functional-mvp-demo
 - Estado: PASS — MVP funcional demo/sandbox
