@@ -1,0 +1,6 @@
+import { readFileSync } from "node:fs";
+import { DEFAULT_AI_PROVIDER } from "../src/config/aiProviderSelection.js";
+import { QWEN_LOCAL_RUNTIME_CONFIG } from "../src/config/qwenLocal.js";
+import { getCapabilities } from "../src/services/capabilityRegistry.js";
+const assert=(v:unknown,m:string)=>{if(!v)throw new Error(m)};
+const main=()=>{const pkg=JSON.parse(readFileSync(new URL("../../package.json",import.meta.url),"utf8")) as {version:string;scripts:Record<string,string>};const readme=readFileSync(new URL("../../README.md",import.meta.url),"utf8");const release=readFileSync(new URL("../../MVP_RELEASE.md",import.meta.url),"utf8");assert(pkg.version==="0.22.0-functional-mvp","version");assert(readme.includes("0K-22 — Functional MVP Release Candidate & Final Validation: CLOSED"),"README");assert(release.includes("not production")&&release.includes("qwen3:1.7b"),"release document");assert(DEFAULT_AI_PROVIDER==="mock"&&QWEN_LOCAL_RUNTIME_CONFIG.model==="qwen3:1.7b","profile");assert(getCapabilities().filter(c=>c.id==="knowledge-search"&&c.status==="enabled").length===1,"capability");assert(pkg.scripts["server:release-candidate:audit"]&&pkg.scripts["server:functional-mvp:e2e"],"critical QA");console.info("Functional MVP Release QA: PASS")};try{main()}catch(e){console.error(e instanceof Error?e.message:"Release QA failed");process.exit(1)}

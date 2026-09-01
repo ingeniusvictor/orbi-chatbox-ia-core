@@ -1,7 +1,7 @@
 {
     "name":  "orbi-chatbox-ia-core",
     "private":  true,
-    "version":  "0.0.0",
+    "version":  "0.22.0-functional-mvp",
     "type":  "module",
     "scripts":  {
                     "dev":  "vite --port=3000 --host=0.0.0.0",
@@ -45,7 +45,8 @@
                     "frontend:lumi-runtime:qa":  "tsx server/scripts/runFrontendLumiRuntimeStateQa.ts",
                     "frontend:e2e:qa":  "tsx server/scripts/runFrontendEndToEndQa.ts",
                     "server:release-candidate:audit":  "tsx server/scripts/runReleaseCandidateAuditQa.ts",
-                    "server:functional-mvp:e2e":  "tsx server/scripts/runFunctionalMvpFinalE2eQa.ts"
+                    "server:functional-mvp:e2e":  "tsx server/scripts/runFunctionalMvpFinalE2eQa.ts",
+                    "server:functional-mvp:release":  "tsx server/scripts/runFunctionalMvpReleaseQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",
