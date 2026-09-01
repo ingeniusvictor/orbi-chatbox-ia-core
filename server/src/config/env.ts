@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { resolveConfiguredAiProvider } from "./aiProviderSelection.js";
+import { loadPostMvpRuntimeConfig } from "./runtimeConfig.js";
 import type { AiProviderMode } from "../types/aiProvider.js";
 
 export type ServerRuntimeEnv = {
@@ -48,5 +49,5 @@ export const loadServerRuntimeEnv = (): ServerRuntimeEnv => ({
     30,
   ),
   auditLogEnabled: (process.env.ORBI_AUDIT_LOG_ENABLED ?? "true").toLowerCase() === "true",
-  activeAiProvider: resolveConfiguredAiProvider(process.env.ORBI_AI_PROVIDER),
+  activeAiProvider: loadPostMvpRuntimeConfig().provider,
 });

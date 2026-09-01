@@ -1,9 +1,4 @@
-import type { LocalAiRuntimeConfig } from "../types/localAiRuntime.js";
+import { DEFAULT_POST_MVP_RUNTIME_CONFIG } from "./runtimeConfig.js";
 
 /** Compile-time development configuration. No model installation or pull is performed. */
-export const QWEN_LOCAL_RUNTIME_CONFIG: Readonly<LocalAiRuntimeConfig> = Object.freeze({
-  runtimeId: "qwen-local-ollama",
-  endpoint: "http://127.0.0.1:11434",
-  model: "qwen3:1.7b",
-  timeoutMs: 30_000,
-});
+export const QWEN_LOCAL_RUNTIME_CONFIG = DEFAULT_POST_MVP_RUNTIME_CONFIG.localAi;
