@@ -36,7 +36,8 @@
                     "server:conversation-runtime:qa":  "tsx server/scripts/runConversationRuntimeIntegrationQa.ts",
                     "server:conversation-continuity:qa":  "tsx server/scripts/runConversationContinuityFinalQa.ts",
                     "server:capability:qa":  "tsx server/scripts/runCapabilityContractQa.ts",
-                    "server:capability-request:qa":  "tsx server/scripts/runCapabilityRequestContractQa.ts"
+                    "server:capability-request:qa":  "tsx server/scripts/runCapabilityRequestContractQa.ts",
+                    "server:capability-executor:qa":  "tsx server/scripts/runInternalCapabilityExecutorQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",
