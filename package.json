@@ -43,7 +43,8 @@
                     "frontend:chat-runtime:qa":  "tsx server/scripts/runFrontendChatRuntimeContractQa.ts",
                     "frontend:conversation-ux:qa":  "tsx server/scripts/runFrontendConversationUxQa.ts",
                     "frontend:lumi-runtime:qa":  "tsx server/scripts/runFrontendLumiRuntimeStateQa.ts",
-                    "frontend:e2e:qa":  "tsx server/scripts/runFrontendEndToEndQa.ts"
+                    "frontend:e2e:qa":  "tsx server/scripts/runFrontendEndToEndQa.ts",
+                    "server:release-candidate:audit":  "tsx server/scripts/runReleaseCandidateAuditQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",
