@@ -54,7 +54,7 @@ const main = async (): Promise<void> => {
       && afterSecond.turns.filter((turn) => turn.content === "synthetic assistant 2").length === 1
       && isolatedResponse.status === 200 && afterIsolated.turnCount === 2 && captured[2]?.conversationHistory?.turns.length === 0
       && failedResponse.status === 503 && getConversationHistory(failedConversation).turnCount === 0
-      && promptWithHistory.includes("CONVERSATION\nUse prior turns to answer details") && promptWithHistory.includes("User: Mi nombre es Pedro.") && !promptWithoutHistory.includes("CONVERSATION")
+      && promptWithHistory.includes("CONVERSATION\nUse prior turns only for relevant details") && promptWithHistory.includes("User: Mi nombre es Pedro.") && !promptWithoutHistory.includes("CONVERSATION")
       && (historyWindow?.turns.length ?? 0) <= 6 && (historyWindow?.turns.reduce((total, turn) => total + turn.content.length, 0) ?? 0) <= 2_500
       && firstBody.grounded === false && Array.isArray(firstBody.sourceEntryIds) && firstBody.sourceEntryIds.length === 0
       && secondBody.grounded === false && Array.isArray(secondBody.sourceEntryIds) && secondBody.sourceEntryIds.length === 0
