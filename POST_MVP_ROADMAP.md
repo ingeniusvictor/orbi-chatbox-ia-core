@@ -24,6 +24,12 @@ These are roadmap candidates only; none are implemented here.
 
 ## 0K-23 — CLOSED
 
+## 0K-24 — ACTIVE
+
+Current module: **0K-24A.1 — Voice I/O Contract & Runtime Boundary**.
+
+Voice architecture: audio → STT → ORBI ChatBox Core → LUMI → TTS → audio. The contracts are provider-neutral and preserve the existing conversation, grounding, and capability boundaries. Real STT, TTS, microphone capture, audio playback, external services, and WhatsApp integration are not active.
+
 ## Next P0 roadmap
 
 - 0K-24 — Voice Interaction Foundation
@@ -37,4 +43,4 @@ WhatsApp targets only: WhatsApp inbound → channel adapter → ORBI ChatBox Cor
 
 ## Recommended next module
 
-**0K-23A.2 — Post-MVP Runtime Configuration Boundary**: prepare configuration structure without persistence, authentication, or external providers.
+**0K-24A.2 — Speech-to-Text Foundation**: future adapter work only after the Voice I/O contracts are validated.

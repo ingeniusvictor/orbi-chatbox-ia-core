@@ -49,7 +49,8 @@
                     "server:functional-mvp:release":  "tsx server/scripts/runFunctionalMvpReleaseQa.ts",
                     "server:post-mvp-baseline:qa":  "tsx server/scripts/runPostMvpBaselineQa.ts",
                     "server:post-mvp-runtime-config:qa": "tsx server/scripts/runPostMvpRuntimeConfigQa.ts",
-                    "server:post-mvp-foundation:qa": "tsx server/scripts/runPostMvpFoundationCloseQa.ts"
+                    "server:post-mvp-foundation:qa": "tsx server/scripts/runPostMvpFoundationCloseQa.ts",
+                    "server:voice-contract:qa": "tsx server/scripts/runVoiceContractQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",
