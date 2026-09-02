@@ -26,7 +26,9 @@ These are roadmap candidates only; none are implemented here.
 
 ## 0K-24 — ACTIVE
 
-Current module: **0K-24A.1 — Voice I/O Contract & Runtime Boundary**.
+0K-24A.1 — Voice I/O Contract & Runtime Boundary: **CLOSED**.
+
+Current module: **0K-24A.2 — Speech-to-Text Local Foundation**. It uses local CPU `whisper.cpp` with the multilingual `base` model, Spanish and validated WAV input only. STT output remains bounded text for the existing Core; microphone, TTS, playback, WhatsApp and external services are not active.
 
 Voice architecture: audio → STT → ORBI ChatBox Core → LUMI → TTS → audio. The contracts are provider-neutral and preserve the existing conversation, grounding, and capability boundaries. Real STT, TTS, microphone capture, audio playback, external services, and WhatsApp integration are not active.
 
