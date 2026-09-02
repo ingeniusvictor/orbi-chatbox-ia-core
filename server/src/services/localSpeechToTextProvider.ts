@@ -42,7 +42,7 @@ export class LocalSpeechToTextProvider implements SpeechToTextProvider {
     try {
       await writeFile(audioPath, audio);
       try {
-        await runFile(this.config.command, ["-m", this.config.modelPath, "-f", audioPath, "-l", this.config.language, "-nt", "-otxt", "-of", outputPrefix], { timeout: this.config.timeoutMs, maxBuffer: 16_384, windowsHide: true });
+        await runFile(this.config.command, ["-m", this.config.modelPath, "-f", audioPath, "-l", this.config.language, "--prompt", this.config.initialPrompt, "-nt", "-otxt", "-of", outputPrefix], { timeout: this.config.timeoutMs, maxBuffer: 16_384, windowsHide: true });
       } catch (error) {
         const code = error && typeof error === "object" && "code" in error ? String(error.code) : "";
         if (code === "ENOENT") fail("VOICE_STT_UNAVAILABLE", "Local STT runtime is unavailable.");

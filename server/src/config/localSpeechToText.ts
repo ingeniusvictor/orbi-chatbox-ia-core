@@ -1,4 +1,5 @@
 import { resolve } from "node:path";
+import { ORBI_SPEECH_INITIAL_PROMPT } from "../data/orbiSpeechVocabulary.js";
 import type { VoiceInputFormat } from "../types/voiceInput.js";
 
 export type LocalSpeechToTextRuntimeConfig = Readonly<{
@@ -8,6 +9,7 @@ export type LocalSpeechToTextRuntimeConfig = Readonly<{
   language: "es";
   timeoutMs: number;
   supportedFormats: readonly VoiceInputFormat[];
+  initialPrompt: string;
 }>;
 
 const runtimeRoot = resolve(process.cwd(), ".local-runtime", "whisper.cpp");
@@ -22,4 +24,5 @@ export const loadLocalSpeechToTextRuntimeConfig = (
   language: "es",
   timeoutMs: 30_000,
   supportedFormats: Object.freeze(["wav"] as const),
+  initialPrompt: ORBI_SPEECH_INITIAL_PROMPT,
 });
