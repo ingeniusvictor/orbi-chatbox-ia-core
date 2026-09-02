@@ -30,9 +30,11 @@ These are roadmap candidates only; none are implemented here.
 
 0K-24A FAMILY — **CLOSED**. STT uses local CPU `whisper.cpp` with the multilingual `base` model, Spanish and validated WAV input only.
 
-Current module: **0K-24B.1 — Text-to-Speech Local Foundation**. It uses local Windows SAPI with Spanish voice `Microsoft Helena Desktop` and validated WAV output only. TTS receives bounded assistant text and returns in-memory audio; microphone/audio UX, WhatsApp and external services are not active.
+0K-24B.1 — Text-to-Speech Local Foundation: **CLOSED**. It uses local Windows SAPI with Spanish voice `Microsoft Helena Desktop` and validated WAV output only.
 
-Voice architecture: audio → STT → ORBI ChatBox Core → LUMI → TTS → audio. The contracts are provider-neutral and preserve the existing conversation, grounding, and capability boundaries. Real STT, TTS, microphone capture, audio playback, external services, and WhatsApp integration are not active.
+Current module: **0K-24B.2 — Frontend Voice UX**. A user-triggered one-turn push-to-talk flow reuses the existing Core and conversation ID: mic → temporary WebM → local STT → LUMI/Core → local TTS → native WAV playback. It has no wake word, continuous listening, persistent audio, WhatsApp, or cloud speech service.
+
+Voice architecture: audio → STT → ORBI ChatBox Core → LUMI → TTS → audio. The contracts preserve the existing conversation, grounding, and capability boundaries. Local one-turn browser capture and playback are active; external services, persistent audio, continuous listening, and WhatsApp integration remain blocked.
 
 ## Next P0 roadmap
 

@@ -13,6 +13,8 @@ import {
   Building2,
   Clock,
   ShieldCheck,
+  Mic,
+  Square,
 } from "lucide-react";
 import {
   CompanyProfile,
@@ -37,9 +39,11 @@ import {
   DEFAULT_RECEIVER_URL,
   sendMessageToBackendReceiver,
 } from "../../services/backendReceiverClient";
+import { synthesizeVoiceText, transcribeVoiceAudio } from "../../services/voiceReceiverClient";
 import { appendRuntimeMessage, createBackendAssistantMessage, isSendableChatMessage, type RuntimeChatMessage } from "../../services/chatRuntimeState";
 import { classifyLumiRuntimeState, getLumiRuntimeStateLabel, getLumiRuntimeStateMessage } from "../../services/lumiRuntimeState";
 import type { LumiRuntimeState } from "../../types";
+import type { VoiceRuntimeState } from "../../types";
 
 interface ChatStudioWorkspaceProps {
   companyProfile: CompanyProfile;
@@ -78,14 +82,47 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
   const [conversationId, setConversationId] = useState<string | undefined>();
   const [runtimeState, setRuntimeState] = useState<LumiRuntimeState>("ready");
   const [lastFailedMessage, setLastFailedMessage] = useState<string | undefined>();
+  const [voiceState, setVoiceState] = useState<VoiceRuntimeState>("idle");
+  const [voiceError, setVoiceError] = useState<string | undefined>();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioUrlRef = useRef<string | null>(null);
+  const voiceChunksRef = useRef<Blob[]>([]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
-  const handleSendMessage = async (textToSend?: string, retry = false) => {
+  const stopVoicePlayback = () => {
+    const audio = audioRef.current;
+    if (audio) { audio.pause(); audio.src = ""; audioRef.current = null; }
+    if (audioUrlRef.current) { URL.revokeObjectURL(audioUrlRef.current); audioUrlRef.current = null; }
+  };
+
+  const playVoiceAudio = (voiceAudio: Blob) => {
+    stopVoicePlayback();
+    try {
+      const url = URL.createObjectURL(voiceAudio);
+      const audio = new Audio(url);
+      audioUrlRef.current = url;
+      audioRef.current = audio;
+      audio.onended = () => { stopVoicePlayback(); setVoiceState("idle"); };
+      audio.onerror = () => { stopVoicePlayback(); setVoiceError("No se pudo reproducir el audio de LUMI."); setVoiceState("error"); };
+      setVoiceState("speaking");
+      void audio.play().catch(() => { stopVoicePlayback(); setVoiceError("El navegador bloqueó la reproducción de audio."); setVoiceState("error"); });
+    } catch { setVoiceError("No se pudo preparar el audio de LUMI."); setVoiceState("error"); }
+  };
+
+  useEffect(() => () => {
+    mediaRecorderRef.current?.stop();
+    mediaStreamRef.current?.getTracks().forEach((track) => track.stop());
+    stopVoicePlayback();
+  }, []);
+
+  const handleSendMessage = async (textToSend?: string, retry = false, voiceTurn = false) => {
     const text = (textToSend || inputText).trim();
     if (!isSendableChatMessage(text) || isTyping) return;
     setLastFailedMessage(undefined);
@@ -104,6 +141,7 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
     if (responseMode === "backend") {
       setIsTyping(true);
       setRuntimeState("processing");
+      if (voiceTurn) setVoiceState("thinking");
       const result = await sendMessageToBackendReceiver({
         message: text,
         channel: "web_demo",
@@ -140,8 +178,19 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
           },
         });
       }
-      if (result.ok === true) setMessages((prev) => appendRuntimeMessage(prev, createBackendAssistantMessage(`msg-backend-${Date.now()}`, new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }), result.body)));
-      else { setRuntimeState(classifyLumiRuntimeState(result)); setLastFailedMessage(text); }
+      if (result.ok === true) {
+        setMessages((prev) => appendRuntimeMessage(prev, createBackendAssistantMessage(`msg-backend-${Date.now()}`, new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }), result.body)));
+        if (voiceTurn) {
+          setVoiceState("synthesizing");
+          const synthesis = await synthesizeVoiceText(result.body.message);
+          if (synthesis.ok) playVoiceAudio(synthesis.audio);
+          else { setVoiceError("LUMI respondió en texto, pero no se pudo generar su audio."); setVoiceState("error"); }
+        }
+      }
+      else {
+        setRuntimeState(classifyLumiRuntimeState(result)); setLastFailedMessage(text);
+        if (voiceTurn) { setVoiceError("La transcripción se mostró, pero LUMI no pudo responder por voz."); setVoiceState("error"); }
+      }
       setIsTyping(false);
       return;
     }
@@ -187,6 +236,44 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
     }, 600);
   };
 
+  const stopVoiceCapture = () => {
+    const recorder = mediaRecorderRef.current;
+    if (recorder && recorder.state !== "inactive") { setVoiceState("capturing"); recorder.stop(); }
+  };
+
+  const startVoiceTurn = async () => {
+    if (isTyping) return;
+    if (responseMode !== "backend") { setVoiceError("Selecciona Backend sandbox para usar voz local."); setVoiceState("error"); return; }
+    stopVoicePlayback();
+    setVoiceError(undefined);
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") { setVoiceError("Este navegador no admite captura de micrófono."); setVoiceState("error"); return; }
+    setVoiceState("listening");
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream;
+      const recorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = recorder;
+      voiceChunksRef.current = [];
+      recorder.ondataavailable = (event) => { if (event.data.size > 0) voiceChunksRef.current.push(event.data); };
+      recorder.onerror = () => { setVoiceError("No se pudo capturar el audio del micrófono."); setVoiceState("error"); };
+      recorder.onstop = () => {
+        stream.getTracks().forEach((track) => track.stop());
+        mediaStreamRef.current = null; mediaRecorderRef.current = null;
+        void (async () => {
+          const audio = new Blob(voiceChunksRef.current, { type: recorder.mimeType || "audio/webm" });
+          if (audio.size === 0 || audio.size > 5 * 1024 * 1024) { setVoiceError("La grabación debe pesar menos de 5 MiB."); setVoiceState("error"); return; }
+          setVoiceState("transcribing");
+          const transcription = await transcribeVoiceAudio(audio);
+          if (!transcription.ok) { setVoiceError("No se pudo transcribir el audio local."); setVoiceState("error"); return; }
+          setInputText(transcription.text);
+          await handleSendMessage(transcription.text, false, true);
+        })();
+      };
+      recorder.start();
+      setVoiceState("capturing");
+    } catch { setVoiceError("No se concedió acceso al micrófono. Puedes seguir escribiendo mensajes."); setVoiceState("error"); }
+  };
+
   const handleClearChat = () => {
     setMessages([DEFAULT_WELCOME_MESSAGE]);
     setCurrentAnalysis(EMPTY_ANALYSIS);
@@ -194,6 +281,9 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
     setConversationId(undefined);
     setRuntimeState("ready");
     setLastFailedMessage(undefined);
+    setVoiceError(undefined);
+    setVoiceState("idle");
+    stopVoicePlayback();
   };
 
   const handleCopyHandoff = async () => {
@@ -253,6 +343,7 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
             <span className="text-[11px] font-mono text-slate-400">
               Canal: {responseMode === "demo" ? "Web Demo Sandbox" : "Backend Receiver Sandbox"}
             </span>
+            {voiceState !== "idle" && <span className="text-[10px] font-mono text-violet-300">Voz: {voiceState}</span>}
           </div>
 
           {/* Messages Feed */}
@@ -325,6 +416,11 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
                 )}
               </div>
             )}
+            {voiceError && (
+              <div role="alert" className="rounded-lg border border-violet-500/40 bg-violet-500/10 px-3 py-2 text-xs text-violet-100">
+                {voiceError}
+              </div>
+            )}
             <div ref={messagesEndRef} />
           </div>
 
@@ -361,6 +457,16 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
               rows={1}
               className="flex-1 resize-none bg-slate-900 border border-slate-700 focus:border-cyan-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none transition"
             />
+            <button
+              type="button"
+              onClick={() => { if (voiceState === "capturing" || voiceState === "listening") stopVoiceCapture(); else void startVoiceTurn(); }}
+              disabled={isTyping || (responseMode !== "backend" && voiceState !== "capturing")}
+              aria-label={voiceState === "capturing" || voiceState === "listening" ? "Detener grabación de voz" : "Iniciar mensaje de voz para LUMI"}
+              title={responseMode === "backend" ? "Mensaje de voz local" : "La voz requiere Backend sandbox"}
+              className="px-3 py-2.5 rounded-xl border border-violet-500/50 bg-violet-500/15 hover:bg-violet-500/25 disabled:opacity-40 text-violet-100 transition flex items-center"
+            >
+              {voiceState === "capturing" || voiceState === "listening" ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            </button>
             <button
               type="submit"
               disabled={!inputText.trim() || isTyping}

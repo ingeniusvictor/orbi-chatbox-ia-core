@@ -6,3 +6,4 @@ export * from "./premiumUx";
 export * from "./installableWidgetConfig";
 export * from "./chatBackend";
 export * from "./lumiRuntimeState";
+export * from "./voiceRuntimeState";

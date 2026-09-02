@@ -5,6 +5,7 @@ import { createCorsGuard } from "./middleware/corsGuard.js";
 import { createRateLimitGuard } from "./middleware/rateLimitGuard.js";
 import { healthRouter } from "./routes/health.js";
 import { createWidgetMessageRouter } from "./routes/widgetMessage.js";
+import { createVoiceRouter } from "./routes/voice.js";
 import { createSandboxError } from "./security/errorResponses.js";
 
 export const createApp = (runtimeEnv: ServerRuntimeEnv): express.Express => {
@@ -18,6 +19,7 @@ export const createApp = (runtimeEnv: ServerRuntimeEnv): express.Express => {
   );
   app.use(createAuditLog(runtimeEnv.auditLogEnabled));
   app.use(healthRouter);
+  app.use(createVoiceRouter());
   app.use(createWidgetMessageRouter(runtimeEnv.demoWidgetPublicKey, runtimeEnv.activeAiProvider));
 
   const notFoundHandler: RequestHandler = (_request, response) => {

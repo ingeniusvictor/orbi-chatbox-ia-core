@@ -52,7 +52,8 @@
                     "server:post-mvp-foundation:qa": "tsx server/scripts/runPostMvpFoundationCloseQa.ts",
                     "server:voice-contract:qa": "tsx server/scripts/runVoiceContractQa.ts",
                     "server:voice-stt:qa": "tsx server/scripts/runLocalSpeechToTextQa.ts",
-                    "server:voice-tts:qa": "tsx server/scripts/runLocalTextToSpeechQa.ts"
+                    "server:voice-tts:qa": "tsx server/scripts/runLocalTextToSpeechQa.ts",
+                    "frontend:voice-ux:qa": "tsx server/scripts/runFrontendVoiceUxQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",
