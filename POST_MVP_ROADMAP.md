@@ -22,6 +22,19 @@ Every post-MVP feature must establish necessity, reuse, security/data/external e
 
 These are roadmap candidates only; none are implemented here.
 
+## 0K-23 — CLOSED
+
+## Next P0 roadmap
+
+- 0K-24 — Voice Interaction Foundation
+- 0K-25 — Multi-Channel Messaging Foundation
+- 0K-26 — WhatsApp Business Integration
+- 0K-27 — WhatsApp Voice Messages
+- 0K-28 — Staging / Production Readiness
+
+Voice target only: microphone/audio → STT → ORBI ChatBox Core → LUMI → TTS → audio playback.
+WhatsApp targets only: WhatsApp inbound → channel adapter → ORBI ChatBox Core → LUMI → WhatsApp outbound; WhatsApp audio → media adapter → STT → Core → LUMI → TTS → WhatsApp audio response. Each remains subject to validation.
+
 ## Recommended next module
 
 **0K-23A.2 — Post-MVP Runtime Configuration Boundary**: prepare configuration structure without persistence, authentication, or external providers.
