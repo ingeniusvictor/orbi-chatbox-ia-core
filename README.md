@@ -37,7 +37,8 @@ ORBI ChatBox IA Core es una aplicación frontend modular para atención conversa
 - POST-MVP DEVELOPMENT: ACTIVE — 0K-23 Post-MVP Productization Foundation / 0K-23A.1. La baseline `v0.22.0-functional-mvp` permanece etiquetada e inmutable.
 - 0K-23 — Post-MVP Productization Foundation: CLOSED.
 - 0K-24A.1 — Voice I/O Contract & Runtime Boundary: CLOSED.
-- 0K-24 — Voice Interaction Foundation: ACTIVE. Módulo actual 0K-24A.2 añade STT local `whisper.cpp` con modelo multilingüe `base`, español y WAV validado; no activa micrófono, TTS, reproducción de audio, WhatsApp ni servicios externos.
+- 0K-24A FAMILY — CLOSED.
+- 0K-24 — Voice Interaction Foundation: ACTIVE. Módulo actual 0K-24B.1 añade TTS local Windows SAPI con voz española `Microsoft Helena Desktop` y WAV validado. STT `whisper.cpp` continúa local; no hay UX de micrófono/audio, WhatsApp ni servicios externos.
 
 - Versión: v0.13.0-functional-mvp-demo
 - Estado: PASS — MVP funcional demo/sandbox

@@ -51,7 +51,8 @@
                     "server:post-mvp-runtime-config:qa": "tsx server/scripts/runPostMvpRuntimeConfigQa.ts",
                     "server:post-mvp-foundation:qa": "tsx server/scripts/runPostMvpFoundationCloseQa.ts",
                     "server:voice-contract:qa": "tsx server/scripts/runVoiceContractQa.ts",
-                    "server:voice-stt:qa": "tsx server/scripts/runLocalSpeechToTextQa.ts"
+                    "server:voice-stt:qa": "tsx server/scripts/runLocalSpeechToTextQa.ts",
+                    "server:voice-tts:qa": "tsx server/scripts/runLocalTextToSpeechQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",

@@ -14,7 +14,7 @@ export type TextToSpeechRequest = Readonly<{
 /** A future adapter may return a reference or bounded binary metadata; no audio is persisted by this contract. */
 export type TextToSpeechAudio =
   | Readonly<{ kind: "reference"; value: string }>
-  | Readonly<{ kind: "buffer"; byteLength: number }>;
+  | Readonly<{ kind: "buffer"; bytes: Uint8Array; byteLength: number }>;
 
 export type TextToSpeechResult = Readonly<{
   requestId: string;
