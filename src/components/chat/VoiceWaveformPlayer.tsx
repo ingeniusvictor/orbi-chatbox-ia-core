@@ -1,0 +1,11 @@
+import { Pause, Play, RotateCcw, Volume2 } from "lucide-react";
+
+const waveform = [4, 7, 12, 18, 9, 15, 22, 11, 6, 16, 25, 13, 20, 8, 17, 28, 11, 7, 19, 14, 24, 9, 15, 6, 12, 21, 10, 17, 5, 13, 8, 4];
+
+export const VoiceWaveformPlayer = ({ playing, progress, duration, onToggle, onReplay }: { playing: boolean; progress: number; duration: string; onToggle: () => void; onReplay: () => void }) => (
+  <div className={`lumi-voice-player mt-4 flex min-w-0 items-center gap-3 rounded-2xl border px-3 py-3 transition duration-200 ${playing ? "is-playing border-emerald-300/25" : "border-cyan-200/10"}`}>
+    <button type="button" onClick={onToggle} title={playing ? "Detener voz de LUMI" : "Reproducir voz de LUMI"} className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-emerald-200/20 bg-gradient-to-br from-emerald-400/25 to-cyan-400/10 text-emerald-100 shadow-[0_0_24px_rgba(16,185,129,0.16)] transition hover:scale-[1.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300" aria-label={playing ? "Detener voz de LUMI" : "Reproducir voz de LUMI"}>{playing ? <Pause className="h-4 w-4" /> : <Play className="ml-0.5 h-4 w-4" />}</button>
+    <div className="min-w-0 flex-1"><div className="mb-1.5 flex items-center justify-between text-[9px] font-semibold uppercase tracking-[0.13em] text-cyan-100/60"><span className="flex items-center gap-1"><Volume2 className="h-3 w-3" />Voz LUMI</span><span className="tabular-nums">{duration}</span></div><div className="lumi-waveform-track flex h-8 items-center gap-[2px] overflow-hidden" aria-hidden="true">{waveform.map((height, index) => <i key={`${height}-${index}`} className={`min-w-0 flex-1 max-w-[4px] rounded-full transition-[background-color,opacity,transform] duration-150 ${((index + 1) / waveform.length) * 100 <= progress ? "bg-emerald-300" : "bg-cyan-200/20"} ${playing ? "lumi-wave-bar" : ""}`} style={{ height }} />)}</div></div>
+    <button type="button" onClick={onReplay} title="Reproducir nuevamente la voz de LUMI" className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-slate-700 text-slate-400 transition hover:border-cyan-300/30 hover:text-cyan-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300" aria-label="Reproducir nuevamente la voz de LUMI"><RotateCcw className="h-3.5 w-3.5" /></button>
+  </div>
+);

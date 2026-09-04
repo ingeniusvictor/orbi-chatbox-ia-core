@@ -25,7 +25,9 @@ export const synthesizeVoiceText = async (text: string, receiverUrl?: string): P
   try {
     const response = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text, language: "es" }) });
     if (!response.ok) return { ok: false, message: await errorMessage(response, "No se pudo sintetizar la respuesta local." ) };
-    const audio = await response.blob();
-    return audio.size > 44 && audio.type.includes("audio") ? { ok: true, audio } : { ok: false, message: "El audio local no es válido." };
+    const mimeType = response.headers.get("content-type")?.split(";", 1)[0]?.trim().toLowerCase();
+    const bytes = await response.arrayBuffer();
+    const audio = new Blob([bytes], { type: "audio/wav" });
+    return mimeType === "audio/wav" && audio.size > 44 ? { ok: true, audio } : { ok: false, message: "El audio local no es válido." };
   } catch { return { ok: false, message: "El servicio local de voz no está disponible." }; }
 };

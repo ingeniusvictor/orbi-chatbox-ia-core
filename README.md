@@ -39,7 +39,7 @@ ORBI ChatBox IA Core es una aplicación frontend modular para atención conversa
 - 0K-24A.1 — Voice I/O Contract & Runtime Boundary: CLOSED.
 - 0K-24A FAMILY — CLOSED.
 - 0K-24B.1 — Text-to-Speech Local Foundation: CLOSED.
-- 0K-24 — Voice Interaction Foundation: ACTIVE. 0K-24B.2 integra un turno push-to-talk local: micrófono → WebM temporal → STT `whisper.cpp` base → LUMI/Core existente → TTS Windows SAPI → reproducción WAV. El STT usa un contexto estático y acotado de vocabulario ORBI, sin fuzzy grounding ni nube. La validación de micrófono humano sigue siendo manual; no hay wake word, escucha continua, persistencia de audio ni WhatsApp.
+- 0K-24 — Voice Interaction Foundation: CLOSED. Push-to-talk local: micrófono → WebM temporal → STT `whisper.cpp` base → LUMI/Core existente → TTS `kokoro-local` (`ef_dora`) → reproducción WAV; Windows SAPI `Microsoft Helena Desktop` queda como fallback controlado. El español usa Misaki/EspeakG2P con fonemas explícitos y el proceso Python usa stdin/stdout UTF-8 explícito. No hay wake word, escucha continua, persistencia de audio, nube ni WhatsApp. Aceptación humana de voz y UX: PASS.
 
 - Versión: v0.13.0-functional-mvp-demo
 - Estado: PASS — MVP funcional demo/sandbox
@@ -319,6 +319,10 @@ npm run server:qa
 
 ## Limitaciones conocidas
 
+## Voice quality status
+
+Human microphone/STT/Core/TTS and flagship Chat Studio validation passed locally. `kokoro-local` with `ef_dora` is the primary local WAV runtime; Windows SAPI with `Microsoft Helena Desktop` remains the controlled local fallback. Spanish synthesis uses explicit Misaki/EspeakG2P phonemes and UTF-8 Python I/O. No cloud TTS, API key, persistent audio, or external speech service is used. Module 0K-24 is closed. A future non-blocking enhancement is improving LUMI voice naturalness / human likeness.
+
 - No es producción ni tiene login o multiempresa real.
 - No tiene WhatsApp real, voz, base de datos real ni IA externa conectada.
 - El Web Widget bridge solo está disponible para el sandbox local; no es un embed productivo.
@@ -326,12 +330,10 @@ npm run server:qa
 
 ## Próximas fases, sin implementar ahora
 
-1. Web ORBI embed controlado.
-2. WhatsApp Business bajo volumen.
-3. IA real con Knowledge Base ORBI.
-4. Voz oficial ORBI.
-5. Base de datos real.
-6. Escalamiento para mayor volumen.
+1. 0K-25 — Multi-Channel Messaging Foundation.
+2. 0K-26 — WhatsApp Business Integration.
+3. 0K-27 — WhatsApp Voice Messages.
+4. 0K-28 — Staging / Production Readiness.
 
 ## Arquitectura actual
 

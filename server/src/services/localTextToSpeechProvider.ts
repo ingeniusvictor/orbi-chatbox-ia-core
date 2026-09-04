@@ -15,7 +15,7 @@ export class LocalTextToSpeechError extends Error {
   constructor(readonly code: LocalTextToSpeechErrorCode, message: string) { super(message); this.name = "LocalTextToSpeechError"; }
 }
 
-type WavMetadata = Readonly<{ durationMs: number; sampleRate: number; channels: number }>;
+type WavMetadata = Readonly<{ durationMs: number; sampleRate: number; channels: number; bitsPerSample: number }>;
 const fail = (code: LocalTextToSpeechErrorCode, message: string): never => { throw new LocalTextToSpeechError(code, message); };
 const quote = (value: string): string => value.replace(/'/g, "''");
 
@@ -23,16 +23,16 @@ const parseWav = (bytes: Uint8Array): WavMetadata => {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const chunk = (offset: number): string => String.fromCharCode(...bytes.slice(offset, offset + 4));
   if (bytes.byteLength < 44 || chunk(0) !== "RIFF" || chunk(8) !== "WAVE") fail("VOICE_TTS_FAILED", "Local TTS returned invalid audio.");
-  let offset = 12; let sampleRate = 0; let channels = 0; let byteRate = 0; let dataBytes = 0;
+  let offset = 12; let formatCode = 0; let sampleRate = 0; let channels = 0; let byteRate = 0; let bitsPerSample = 0; let dataBytes = 0;
   while (offset + 8 <= bytes.byteLength) {
     const id = chunk(offset); const size = view.getUint32(offset + 4, true); const body = offset + 8;
     if (body + size > bytes.byteLength) break;
-    if (id === "fmt " && size >= 16) { channels = view.getUint16(body + 2, true); sampleRate = view.getUint32(body + 4, true); byteRate = view.getUint32(body + 8, true); }
+    if (id === "fmt " && size >= 16) { formatCode = view.getUint16(body, true); channels = view.getUint16(body + 2, true); sampleRate = view.getUint32(body + 4, true); byteRate = view.getUint32(body + 8, true); bitsPerSample = view.getUint16(body + 14, true); }
     if (id === "data") { dataBytes = size; break; }
     offset = body + size + (size % 2);
   }
-  if (!sampleRate || !channels || !byteRate || !dataBytes) fail("VOICE_TTS_FAILED", "Local TTS returned invalid audio.");
-  return Object.freeze({ durationMs: Math.round((dataBytes / byteRate) * 1000), sampleRate, channels });
+  if (formatCode !== 1 || !sampleRate || !channels || !byteRate || !bitsPerSample || !dataBytes) fail("VOICE_TTS_FAILED", "Local TTS returned invalid PCM WAV audio.");
+  return Object.freeze({ durationMs: Math.round((dataBytes / byteRate) * 1000), sampleRate, channels, bitsPerSample });
 };
 
 export class LocalTextToSpeechProvider implements TextToSpeechProvider {

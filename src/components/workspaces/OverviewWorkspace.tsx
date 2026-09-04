@@ -14,8 +14,6 @@ import {
   ORBI_PREMIUM_WORKSPACE_LABELS,
   ORBI_PREMIUM_WORKSPACE_DESCRIPTIONS,
   ORBI_PREMIUM_WORKSPACES_ORDER,
-  ORBI_CHATBOX_MODULE_REGISTRY,
-  buildOrbiModuleRegistrySummary,
   MVP_SECURITY_GATE_BASE_ITEMS,
   buildMvpSecurityGateBaseSummary,
   MVP_ROADMAP_PHASES,
@@ -32,10 +30,6 @@ export const OverviewWorkspace: React.FC<OverviewWorkspaceProps> = ({
   leads,
   setActiveWorkspace,
 }) => {
-  const moduleSummary = React.useMemo(
-    () => buildOrbiModuleRegistrySummary(ORBI_CHATBOX_MODULE_REGISTRY),
-    []
-  );
   const securityGateSummary = React.useMemo(
     () => buildMvpSecurityGateBaseSummary(MVP_SECURITY_GATE_BASE_ITEMS),
     []
@@ -101,13 +95,13 @@ export const OverviewWorkspace: React.FC<OverviewWorkspaceProps> = ({
 
         <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80 space-y-1">
           <span className="text-xs font-mono text-slate-400 uppercase tracking-wider block">
-            Módulos de Sistema
+            Roadmap Post-MVP
           </span>
           <p className="text-2xl sm:text-3xl font-extrabold text-cyan-400 font-mono">
-            {moduleSummary.completed}/{moduleSummary.total}
+            0K-24
           </p>
           <span className="text-[11px] text-slate-400 font-medium">
-            {Math.round((moduleSummary.completed / moduleSummary.total) * 100)}% Completitud Core
+            Cerrado · Siguiente: 0K-25
           </span>
         </div>
 

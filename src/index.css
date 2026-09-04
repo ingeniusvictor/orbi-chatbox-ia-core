@@ -6,3 +6,195 @@
   --font-display: "Space Grotesk", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
+
+:root {
+  --lumi-surface-base: #020713;
+  --lumi-surface-raised: rgba(7, 20, 35, 0.94);
+  --lumi-surface-glass: rgba(6, 24, 36, 0.72);
+  --lumi-accent-cyan: #22d3ee;
+  --lumi-accent-teal: #14b8a6;
+  --lumi-accent-green: #34d399;
+  --lumi-text-primary: #effcff;
+  --lumi-text-secondary: #8eb2bd;
+  --lumi-border-subtle: rgba(94, 234, 212, 0.15);
+  --lumi-glow-soft: rgba(20, 184, 166, 0.14);
+  --lumi-glow-active: rgba(52, 211, 153, 0.28);
+}
+
+.lumi-atmosphere {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 9% 35%, rgba(16, 185, 129, 0.16), transparent 29%),
+    radial-gradient(circle at 72% 16%, rgba(34, 211, 238, 0.13), transparent 34%),
+    radial-gradient(circle at 48% 78%, rgba(20, 184, 166, 0.06), transparent 32%),
+    linear-gradient(145deg, #020713 0%, #04111e 52%, #020711 100%);
+}
+
+.lumi-atmosphere::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.13;
+  background-image:
+    linear-gradient(rgba(94, 234, 212, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(94, 234, 212, 0.055) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(circle at 42% 45%, black, transparent 76%);
+}
+
+.lumi-atmosphere::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 1px rgba(207, 250, 254, 0.035), inset 0 -50px 90px rgba(1, 7, 19, 0.22);
+}
+
+.lumi-surface-raised {
+  background: linear-gradient(145deg, rgba(8, 26, 42, 0.96), rgba(2, 9, 22, 0.94));
+  border-color: var(--lumi-border-subtle);
+  box-shadow: inset 0 1px rgba(207, 250, 254, 0.035), 0 30px 80px rgba(1, 5, 16, 0.48);
+}
+
+.lumi-surface-glass {
+  background: linear-gradient(155deg, rgba(8, 33, 42, 0.76), rgba(2, 12, 27, 0.82));
+  border-color: var(--lumi-border-subtle);
+  box-shadow: inset 0 1px rgba(207, 250, 254, 0.04), 0 24px 60px rgba(0, 8, 20, 0.36);
+  backdrop-filter: blur(18px);
+}
+
+.lumi-avatar-orb {
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.2), rgba(8, 47, 73, 0.14) 58%, transparent 72%);
+  box-shadow: 0 0 42px var(--lumi-glow-soft), inset 0 0 24px rgba(34, 211, 238, 0.08);
+}
+
+.lumi-presence-rail .lumi-avatar-orb {
+  box-shadow: 0 0 48px rgba(20, 184, 166, 0.18), inset 0 0 28px rgba(34, 211, 238, 0.1);
+}
+
+.lumi-identity-contextual .lumi-avatar-orb {
+  opacity: 0.92;
+  box-shadow: 0 0 34px rgba(20, 184, 166, 0.13), inset 0 0 18px rgba(34, 211, 238, 0.08);
+}
+
+.lumi-status-card {
+  background: linear-gradient(145deg, rgba(9, 35, 43, 0.68), rgba(3, 15, 27, 0.78));
+  box-shadow: inset 0 1px rgba(207, 250, 254, 0.04), 0 12px 28px rgba(0, 8, 20, 0.22);
+}
+
+.lumi-workspace-header h2 {
+  text-shadow: 0 3px 22px rgba(34, 211, 238, 0.09);
+}
+
+.lumi-timeline {
+  background:
+    radial-gradient(circle at 14% 20%, rgba(16, 185, 129, 0.055), transparent 25%),
+    radial-gradient(circle at 82% 64%, rgba(34, 211, 238, 0.04), transparent 28%);
+  scrollbar-color: rgba(45, 212, 191, 0.22) transparent;
+  scrollbar-width: thin;
+}
+
+.lumi-message-card > div:last-child {
+  position: relative;
+}
+
+.lumi-message-card > div:last-child::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(120deg, rgba(207, 250, 254, 0.025), transparent 35%);
+}
+
+.lumi-user-message > div:first-child {
+  box-shadow: inset 0 1px rgba(207, 250, 254, 0.07), 0 14px 32px rgba(1, 10, 25, 0.24);
+}
+
+.lumi-voice-player {
+  background: linear-gradient(135deg, rgba(8, 42, 51, 0.78), rgba(5, 22, 35, 0.88));
+  box-shadow: inset 0 1px rgba(207, 250, 254, 0.04);
+}
+
+.lumi-voice-player.is-playing {
+  background: linear-gradient(135deg, rgba(5, 58, 57, 0.78), rgba(4, 28, 39, 0.92));
+  box-shadow: inset 0 1px rgba(167, 243, 208, 0.06), 0 0 28px rgba(16, 185, 129, 0.08);
+}
+
+.lumi-waveform-track {
+  mask-image: linear-gradient(90deg, transparent, black 5%, black 95%, transparent);
+}
+
+.lumi-waveform-track i {
+  transform-origin: center;
+}
+
+.lumi-speaking .lumi-avatar-orb {
+  animation: lumi-speaking-halo 1.8s ease-in-out infinite;
+}
+
+.lumi-voice-dock {
+  box-shadow: 0 -20px 50px rgba(2, 12, 27, 0.32);
+}
+
+.lumi-voice-dock.is-active {
+  box-shadow: 0 -20px 55px rgba(16, 185, 129, 0.11);
+}
+
+.lumi-voice-dock[data-voice-state="listening"],
+.lumi-voice-dock[data-voice-state="capturing"] {
+  box-shadow: 0 -20px 55px rgba(52, 211, 153, 0.14);
+}
+
+.lumi-voice-dock[data-voice-state="thinking"],
+.lumi-voice-dock[data-voice-state="transcribing"] {
+  box-shadow: 0 -20px 55px rgba(34, 211, 238, 0.11);
+}
+
+.lumi-voice-dock[data-voice-state="speaking"] {
+  box-shadow: 0 -20px 60px rgba(16, 185, 129, 0.17);
+}
+
+.lumi-suggestion-card {
+  min-height: 94px;
+  box-shadow: inset 0 1px rgba(207, 250, 254, 0.025), 0 10px 22px rgba(0, 8, 20, 0.14);
+}
+
+.lumi-suggestion-card:hover {
+  box-shadow: inset 0 1px rgba(207, 250, 254, 0.05), 0 14px 30px rgba(0, 8, 20, 0.24), 0 0 20px rgba(16, 185, 129, 0.05);
+}
+
+.lumi-wave-bar {
+  animation: lumi-wave 1.1s ease-in-out infinite alternate;
+}
+
+.lumi-wave-bar:nth-child(3n + 2) { animation-delay: -0.35s; }
+.lumi-wave-bar:nth-child(4n) { animation-delay: -0.7s; }
+
+@keyframes lumi-wave {
+  from { transform: scaleY(0.45); opacity: 0.55; }
+  to { transform: scaleY(1); opacity: 1; }
+}
+
+@keyframes lumi-speaking-halo {
+  0%, 100% { filter: brightness(1); transform: scale(1); }
+  50% { filter: brightness(1.12); transform: scale(1.035); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lumi-atmosphere *, .lumi-atmosphere *::before, .lumi-atmosphere *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .lumi-status-card { min-width: 0; }
+  .lumi-suggestion-card { min-height: 88px; }
+}

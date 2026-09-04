@@ -6,6 +6,7 @@ export type RuntimeChatMessage = {
   readonly text: string;
   readonly timestamp: string;
   readonly backend?: ChatBackendMetadata;
+  readonly voiceOrigin?: "voice";
 };
 
 export const isSendableChatMessage = (value: string): boolean => value.trim().length > 0;

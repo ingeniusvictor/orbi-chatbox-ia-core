@@ -9670,12 +9670,14 @@ export type OrbiModuleRegistryItem = {
   nextStep: string;
 };
 
-export const ORBI_CHATBOX_APP_VERSION = "0.12.1-premium-ux-refresh";
-export const ORBI_CHATBOX_ACTIVE_BLOCK = "0L-1 — ORBI Premium UX Refresh";
-export const ORBI_CHATBOX_ACTIVE_MODULE = "0L-1C.1";
+// This legacy registry preserves its historical items. Current post-MVP state is
+// intentionally expressed by these metadata labels rather than by its old count.
+export const ORBI_CHATBOX_APP_VERSION = "0.24.0-voice-foundation";
+export const ORBI_CHATBOX_ACTIVE_BLOCK = "0K-25 — Multi-Channel Messaging Foundation";
+export const ORBI_CHATBOX_ACTIVE_MODULE = "PLANNED";
 export const ORBI_CHATBOX_ACTIVE_MODULE_TITLE =
-  "Motion, Demo Polish & Export-Ready Visual QA";
-export const ORBI_CHATBOX_ACTIVE_MODULE_STATUS: OrbiModuleRegistryStatus = "active";
+  "Next authorized block — not implemented";
+export const ORBI_CHATBOX_ACTIVE_MODULE_STATUS: OrbiModuleRegistryStatus = "planned";
 
 export const ORBI_MODULE_REGISTRY_STATUS_LABELS: Record<
   OrbiModuleRegistryStatus,
@@ -10340,5 +10342,4 @@ export const ORBI_CHATBOX_MODULE_REGISTRY: OrbiModuleRegistryItem[] = [
       "Listo para exportación de paquete ZIP limpio y posterior migración controlada a GitHub.",
   },
 ];
-
 

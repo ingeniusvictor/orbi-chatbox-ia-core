@@ -1,9 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
   MessageSquare,
-  Send,
   Sparkles,
-  Bot,
   User,
   Trash2,
   Copy,
@@ -13,9 +11,17 @@ import {
   Building2,
   Clock,
   ShieldCheck,
-  Mic,
-  Square,
+  Settings2,
 } from "lucide-react";
+import { LumiPresenceRail } from "../chat/LumiPresenceRail";
+import { ChatDiagnosticsDrawer } from "../chat/ChatDiagnosticsDrawer";
+import { LumiRuntimeStatus } from "../chat/LumiRuntimeStatus";
+import { LumiMessageCard } from "../chat/LumiMessageCard";
+import { UserMessageCard } from "../chat/UserMessageCard";
+import { LumiWelcomeState } from "../chat/LumiWelcomeState";
+import { LumiSuggestionGrid } from "../chat/LumiSuggestionGrid";
+import { LumiVoiceComposer } from "../chat/LumiVoiceComposer";
+import { LumiVisualIdentity } from "../chat/LumiVisualIdentity";
 import {
   CompanyProfile,
   LeadRecord,
@@ -41,7 +47,7 @@ import {
 } from "../../services/backendReceiverClient";
 import { synthesizeVoiceText, transcribeVoiceAudio } from "../../services/voiceReceiverClient";
 import { appendRuntimeMessage, createBackendAssistantMessage, isSendableChatMessage, type RuntimeChatMessage } from "../../services/chatRuntimeState";
-import { classifyLumiRuntimeState, getLumiRuntimeStateLabel, getLumiRuntimeStateMessage } from "../../services/lumiRuntimeState";
+import { classifyLumiRuntimeState, getLumiRuntimeStateMessage } from "../../services/lumiRuntimeState";
 import type { LumiRuntimeState } from "../../types";
 import type { VoiceRuntimeState } from "../../types";
 
@@ -54,18 +60,30 @@ interface ChatStudioWorkspaceProps {
 const DEFAULT_WELCOME_MESSAGE: Message = {
   id: "msg-welcome",
   sender: "bot",
-  text: "¡Hola! Bienvenido a nuestro asistente virtual inteligente. ¿En qué podemos ayudarte hoy? Cuéntanos qué servicio o solución necesitas.",
+  text: "Hola, soy LUMI. Estoy lista para explorar ideas, resolver dudas y convertir tu próxima conversación en una acción clara para ORBI.",
   timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
 };
 
-const SUGGESTED_QUESTIONS = [
-  "Hola, me interesa una cotización de desarrollo web para mi empresa.",
-  "Quiero automatizar la atención a clientes por WhatsApp con IA.",
-  "¿Cuáles son sus planes de precios y tiempos de entrega?",
-  "Necesito soporte urgente para integrar mi pasarela de pago.",
-];
-
 type ResponseMode = "demo" | "backend";
+type VoiceInputOption = { deviceId: string; label: string };
+type VoiceCaptureDiagnostics = {
+  trackLabel: string;
+  trackEnabled: boolean;
+  trackMuted: boolean;
+  trackReadyState: MediaStreamTrackState;
+  recorderMimeType: string;
+  blobSize: number;
+  recordingDurationMs: number;
+  inputSignal: "active" | "silent";
+  peakInputLevel: number;
+};
+type AssistantVoiceMetadata = { durationSeconds?: number };
+
+const formatAudioDuration = (durationSeconds?: number): string => {
+  if (!durationSeconds || !Number.isFinite(durationSeconds)) return "Audio local";
+  const totalSeconds = Math.max(0, Math.round(durationSeconds));
+  return `${Math.floor(totalSeconds / 60)}:${String(totalSeconds % 60).padStart(2, "0")}`;
+};
 
 export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
   companyProfile,
@@ -84,42 +102,135 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
   const [lastFailedMessage, setLastFailedMessage] = useState<string | undefined>();
   const [voiceState, setVoiceState] = useState<VoiceRuntimeState>("idle");
   const [voiceError, setVoiceError] = useState<string | undefined>();
+  const [voiceInputs, setVoiceInputs] = useState<VoiceInputOption[]>([]);
+  const [selectedVoiceInputId, setSelectedVoiceInputId] = useState("");
+  const [voiceDiagnostics, setVoiceDiagnostics] = useState<VoiceCaptureDiagnostics | undefined>();
+  const [voicePlaybackReady, setVoicePlaybackReady] = useState(false);
+  const [assistantVoiceMetadata, setAssistantVoiceMetadata] = useState<Record<string, AssistantVoiceMetadata>>({});
+  const [activeAssistantVoiceId, setActiveAssistantVoiceId] = useState<string | undefined>();
+  const [activeAssistantVoiceProgress, setActiveAssistantVoiceProgress] = useState(0);
+  const [diagnosticsOpen, setDiagnosticsOpen] = useState(false);
+  const [presenceRailCollapsed, setPresenceRailCollapsed] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const timelineRef = useRef<HTMLDivElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioUrlRef = useRef<string | null>(null);
   const voiceChunksRef = useRef<Blob[]>([]);
+  const voiceRecordingStartedAtRef = useRef<number | null>(null);
+  const voiceInputPeakRef = useRef(0);
+  const voiceInputFrameRef = useRef<number | null>(null);
+  const voiceInputContextRef = useRef<AudioContext | null>(null);
+  const pendingVoiceAudioRef = useRef<Blob | null>(null);
+  const assistantVoiceAudioRef = useRef(new Map<string, Blob>());
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const hasConversation = messages.some((message) => message.id !== "msg-welcome");
+    if (hasConversation || isTyping) messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    else timelineRef.current?.scrollTo({ top: 0, behavior: "auto" });
   }, [messages, isTyping]);
 
   const stopVoicePlayback = () => {
     const audio = audioRef.current;
-    if (audio) { audio.pause(); audio.src = ""; audioRef.current = null; }
+    if (audio) { audio.onended = null; audio.onerror = null; audio.onloadedmetadata = null; audio.ontimeupdate = null; audio.pause(); audio.src = ""; audioRef.current = null; }
     if (audioUrlRef.current) { URL.revokeObjectURL(audioUrlRef.current); audioUrlRef.current = null; }
+    setActiveAssistantVoiceId(undefined);
+    setActiveAssistantVoiceProgress(0);
   };
 
-  const playVoiceAudio = (voiceAudio: Blob) => {
+  const stopVoiceSignalMonitor = () => {
+    if (voiceInputFrameRef.current !== null) { cancelAnimationFrame(voiceInputFrameRef.current); voiceInputFrameRef.current = null; }
+    const context = voiceInputContextRef.current;
+    voiceInputContextRef.current = null;
+    if (context && context.state !== "closed") void context.close();
+  };
+
+  const offerManualVoicePlayback = (voiceAudio: Blob, reason: string) => {
     stopVoicePlayback();
+    pendingVoiceAudioRef.current = voiceAudio;
+    setVoicePlaybackReady(true);
+    setVoiceError(reason);
+    setVoiceState("idle");
+  };
+
+  const playVoiceAudio = (voiceAudio: Blob, automatic = true, messageId?: string) => {
+    stopVoicePlayback();
+    setVoicePlaybackReady(false);
     try {
       const url = URL.createObjectURL(voiceAudio);
       const audio = new Audio(url);
       audioUrlRef.current = url;
       audioRef.current = audio;
+      audio.onloadedmetadata = () => {
+        if (messageId && Number.isFinite(audio.duration)) {
+          setAssistantVoiceMetadata((current) => ({ ...current, [messageId]: { durationSeconds: audio.duration } }));
+        }
+      };
+      audio.ontimeupdate = () => {
+        const progress = audio.duration > 0 ? Math.min(100, (audio.currentTime / audio.duration) * 100) : 0;
+        setActiveAssistantVoiceProgress(progress);
+      };
       audio.onended = () => { stopVoicePlayback(); setVoiceState("idle"); };
-      audio.onerror = () => { stopVoicePlayback(); setVoiceError("No se pudo reproducir el audio de LUMI."); setVoiceState("error"); };
+      audio.onerror = () => {
+        if (automatic) offerManualVoicePlayback(voiceAudio, "Respuesta de LUMI lista. Pulsa Reproducir voz.");
+        else { stopVoicePlayback(); setVoiceError("No se pudo reproducir el audio de LUMI en este navegador."); setVoiceState("error"); }
+      };
+      if (messageId) setActiveAssistantVoiceId(messageId);
       setVoiceState("speaking");
-      void audio.play().catch(() => { stopVoicePlayback(); setVoiceError("El navegador bloqueó la reproducción de audio."); setVoiceState("error"); });
+      void audio.play().catch((error: unknown) => {
+        const name = error instanceof DOMException ? error.name : "PlaybackError";
+        console.info("ORBI local voice playback diagnostic", { name, automatic });
+        if (automatic) offerManualVoicePlayback(voiceAudio, "Respuesta de LUMI lista. Pulsa Reproducir voz.");
+        else { stopVoicePlayback(); setVoiceError("No se pudo reproducir el audio de LUMI en este navegador."); setVoiceState("error"); }
+      });
     } catch { setVoiceError("No se pudo preparar el audio de LUMI."); setVoiceState("error"); }
+  };
+
+  const playPendingVoiceAudio = () => {
+    const pending = pendingVoiceAudioRef.current;
+    if (!pending) return;
+    pendingVoiceAudioRef.current = null;
+    setVoiceError(undefined);
+    playVoiceAudio(pending, false);
+  };
+
+  const playAssistantVoice = (messageId: string) => {
+    const audio = assistantVoiceAudioRef.current.get(messageId);
+    if (!audio) {
+      setVoiceError("El audio de esta respuesta ya no está disponible en esta sesión.");
+      return;
+    }
+    setVoiceError(undefined);
+    if (activeAssistantVoiceId === messageId) {
+      stopVoicePlayback();
+      setVoiceState("idle");
+      return;
+    }
+    playVoiceAudio(audio, false, messageId);
+  };
+
+  const replayAssistantVoice = (messageId: string) => {
+    const audio = assistantVoiceAudioRef.current.get(messageId);
+    if (!audio) { setVoiceError("El audio de esta respuesta ya no está disponible en esta sesión."); return; }
+    setVoiceError(undefined);
+    playVoiceAudio(audio, false, messageId);
+  };
+
+  const clearAssistantVoiceAudio = () => {
+    assistantVoiceAudioRef.current.clear();
+    pendingVoiceAudioRef.current = null;
+    setAssistantVoiceMetadata({});
+    setVoicePlaybackReady(false);
   };
 
   useEffect(() => () => {
     mediaRecorderRef.current?.stop();
     mediaStreamRef.current?.getTracks().forEach((track) => track.stop());
+    stopVoiceSignalMonitor();
     stopVoicePlayback();
+    assistantVoiceAudioRef.current.clear();
   }, []);
 
   const handleSendMessage = async (textToSend?: string, retry = false, voiceTurn = false) => {
@@ -132,6 +243,7 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
       sender: "user",
       text,
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      voiceOrigin: voiceTurn ? "voice" : undefined,
     };
 
     const newMessages = retry ? messages : appendRuntimeMessage(messages, userMsg);
@@ -179,11 +291,16 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
         });
       }
       if (result.ok === true) {
-        setMessages((prev) => appendRuntimeMessage(prev, createBackendAssistantMessage(`msg-backend-${Date.now()}`, new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }), result.body)));
+        const assistantMessageId = `msg-backend-${Date.now()}`;
+        setMessages((prev) => appendRuntimeMessage(prev, createBackendAssistantMessage(assistantMessageId, new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }), result.body)));
         if (voiceTurn) {
           setVoiceState("synthesizing");
           const synthesis = await synthesizeVoiceText(result.body.message);
-          if (synthesis.ok) playVoiceAudio(synthesis.audio);
+          if (synthesis.ok) {
+            assistantVoiceAudioRef.current.set(assistantMessageId, synthesis.audio);
+            setAssistantVoiceMetadata((current) => ({ ...current, [assistantMessageId]: {} }));
+            playVoiceAudio(synthesis.audio, true, assistantMessageId);
+          }
           else { setVoiceError("LUMI respondió en texto, pero no se pudo generar su audio."); setVoiceState("error"); }
         }
       }
@@ -249,18 +366,80 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
     if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") { setVoiceError("Este navegador no admite captura de micrófono."); setVoiceState("error"); return; }
     setVoiceState("listening");
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const audioConstraints: MediaTrackConstraints = {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+        channelCount: 1,
+      };
+      if (selectedVoiceInputId) audioConstraints.deviceId = { exact: selectedVoiceInputId };
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
       mediaStreamRef.current = stream;
+      const track = stream.getAudioTracks()[0];
+      const devices = (await navigator.mediaDevices.enumerateDevices())
+        .filter((device) => device.kind === "audioinput")
+        .map((device, index) => ({ deviceId: device.deviceId, label: device.label || `Entrada de audio ${index + 1}` }));
+      setVoiceInputs(devices);
+      if (!selectedVoiceInputId && track?.getSettings().deviceId) setSelectedVoiceInputId(track.getSettings().deviceId);
       const recorder = new MediaRecorder(stream);
       mediaRecorderRef.current = recorder;
       voiceChunksRef.current = [];
+      voiceRecordingStartedAtRef.current = Date.now();
+      voiceInputPeakRef.current = 0;
+      stopVoiceSignalMonitor();
+      const audioContext = new AudioContext();
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 2048;
+      const source = audioContext.createMediaStreamSource(stream);
+      source.connect(analyser);
+      voiceInputContextRef.current = audioContext;
+      const samples = new Uint8Array(analyser.fftSize);
+      const measureInput = () => {
+        analyser.getByteTimeDomainData(samples);
+        let squared = 0;
+        for (const sample of samples) { const normalized = (sample - 128) / 128; squared += normalized * normalized; }
+        voiceInputPeakRef.current = Math.max(voiceInputPeakRef.current, Math.sqrt(squared / samples.length));
+        voiceInputFrameRef.current = requestAnimationFrame(measureInput);
+      };
+      void audioContext.resume().then(measureInput).catch(() => { setVoiceError("No se pudo verificar la señal del micrófono."); });
+      const stopForUnavailableInput = (message: string) => {
+        setVoiceError(message);
+        setVoiceState("error");
+        if (recorder.state !== "inactive") recorder.stop();
+      };
+      if (track) {
+        track.onmute = () => stopForUnavailableInput("El micrófono seleccionado no está entregando audio. Revisa que no esté silenciado en Windows o en el dispositivo.");
+        track.onunmute = () => { setVoiceError(undefined); };
+        track.onended = () => stopForUnavailableInput("El micrófono seleccionado dejó de estar disponible.");
+      }
       recorder.ondataavailable = (event) => { if (event.data.size > 0) voiceChunksRef.current.push(event.data); };
       recorder.onerror = () => { setVoiceError("No se pudo capturar el audio del micrófono."); setVoiceState("error"); };
       recorder.onstop = () => {
+        const trackSnapshot = {
+          trackLabel: track?.label || "Sin etiqueta",
+          trackEnabled: track?.enabled ?? false,
+          trackMuted: track?.muted ?? false,
+          trackReadyState: track?.readyState ?? "ended" as MediaStreamTrackState,
+        };
+        stopVoiceSignalMonitor();
+        if (track) { track.onmute = null; track.onunmute = null; track.onended = null; }
         stream.getTracks().forEach((track) => track.stop());
         mediaStreamRef.current = null; mediaRecorderRef.current = null;
         void (async () => {
           const audio = new Blob(voiceChunksRef.current, { type: recorder.mimeType || "audio/webm" });
+          const diagnostics: VoiceCaptureDiagnostics = {
+            ...trackSnapshot,
+            recorderMimeType: recorder.mimeType || "audio/webm",
+            blobSize: audio.size,
+            recordingDurationMs: Math.max(0, Date.now() - (voiceRecordingStartedAtRef.current ?? Date.now())),
+            inputSignal: voiceInputPeakRef.current >= 0.01 ? "active" : "silent",
+            peakInputLevel: Number(voiceInputPeakRef.current.toFixed(4)),
+          };
+          voiceRecordingStartedAtRef.current = null;
+          setVoiceDiagnostics(diagnostics);
+          console.info("ORBI local voice capture diagnostics", diagnostics);
+          if (!diagnostics.trackEnabled || diagnostics.trackMuted || diagnostics.trackReadyState !== "live") { setVoiceError("El micrófono seleccionado no está entregando audio. Revisa que no esté silenciado en Windows o en el dispositivo."); setVoiceState("error"); return; }
+          if (diagnostics.inputSignal !== "active") { setVoiceError("No se detectó señal de voz en el micrófono seleccionado. Revisa el nivel de entrada y vuelve a intentarlo."); setVoiceState("error"); return; }
           if (audio.size === 0 || audio.size > 5 * 1024 * 1024) { setVoiceError("La grabación debe pesar menos de 5 MiB."); setVoiceState("error"); return; }
           setVoiceState("transcribing");
           const transcription = await transcribeVoiceAudio(audio);
@@ -284,6 +463,7 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
     setVoiceError(undefined);
     setVoiceState("idle");
     stopVoicePlayback();
+    clearAssistantVoiceAudio();
   };
 
   const handleCopyHandoff = async () => {
@@ -305,106 +485,47 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="lumi-atmosphere -m-3 min-h-[760px] overflow-hidden rounded-[34px] border border-teal-200/10 p-4 sm:-m-4 sm:p-6 space-y-6 animate-in fade-in duration-300">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-800 gap-3">
+      <div className="lumi-workspace-header flex flex-col justify-between gap-3 border-b border-cyan-500/15 pb-4 sm:flex-row sm:items-center">
         <div>
           <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
-            <MessageSquare className="w-6 h-6 text-cyan-400" />
-            <span>Chat Studio &bull; Simulador Inteligente</span>
+            <span className="grid h-8 w-8 place-items-center rounded-xl border border-cyan-400/30 bg-cyan-400/10 shadow-[0_0_28px_rgba(34,211,238,0.18)]"><MessageSquare className="w-4 h-4 text-cyan-300" /></span>
+            <span>Chat Studio <span className="text-cyan-300">· LUMI</span></span>
           </h2>
           <p className="text-xs sm:text-sm text-slate-400">
-            Prueba en tiempo real el flujo conversacional y la extracción automática de datos para {companyProfile.companyName}.
+            Conversación local con una presencia de voz diseñada para el ecosistema {companyProfile.companyName}.
           </p>
         </div>
 
-        <button
-          onClick={handleClearChat}
-          className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-mono text-slate-400 hover:text-rose-400 transition flex items-center gap-1.5 self-start sm:self-auto"
-        >
-          <Trash2 className="w-3.5 h-3.5" />
-          <span>Reiniciar Conversación</span>
-        </button>
+        <div className="flex items-center gap-2 self-start sm:self-auto"><button type="button" onClick={() => setDiagnosticsOpen((open) => !open)} className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-slate-300 transition hover:border-cyan-400/40 hover:text-cyan-100"><Settings2 className="h-3.5 w-3.5" />Diagnostics</button><button onClick={handleClearChat} className="flex items-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 text-xs font-mono text-slate-400 transition hover:text-rose-400"><Trash2 className="h-3.5 w-3.5" /><span>Reiniciar</span></button></div>
       </div>
 
-      {/* Main Grid: Chat Panel + AI Live Analysis */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* LUMI presence, dominant conversation, and on-demand development diagnostics. */}
+      <div className="relative flex min-w-0 gap-4">
+        <LumiPresenceRail assistantName={companyProfile.assistantName || "LUMI"} runtimeState={runtimeState} voiceState={voiceState} responseMode={responseMode} collapsed={presenceRailCollapsed} onToggle={() => setPresenceRailCollapsed((value) => !value)} />
+        <div className="min-w-0 flex-1">
         {/* Chat Box Panel */}
-        <div className="lg:col-span-2 flex flex-col h-[600px] rounded-2xl bg-slate-900/60 border border-slate-800 shadow-xl overflow-hidden">
+          <div className="lumi-surface-raised flex h-[680px] flex-col overflow-hidden rounded-[30px] border">
           {/* Top Chat Bar */}
-          <div className="px-4 py-3 bg-slate-950/70 border-b border-slate-800/80 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className={`w-3 h-3 rounded-full ${runtimeState === "ready" ? "bg-emerald-500 animate-pulse" : "bg-amber-400"}`} />
-              <span className="text-xs font-bold text-slate-200">
-                {companyProfile.assistantName || companyProfile.companyName}
-              </span>
-              <span className="text-[10px] font-mono text-slate-400">{getLumiRuntimeStateLabel(runtimeState)}</span>
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-cyan-300/10 bg-slate-950/45 px-4 py-3 backdrop-blur-sm">
+            <div className="flex items-center gap-3">
+              <LumiVisualIdentity compact ready={runtimeState === "ready"} />
+              <div>
+                <span className="block font-display text-base font-semibold tracking-tight text-slate-50">Chat Studio <span className="text-emerald-300">· LUMI</span></span>
+                <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-cyan-100/55">ORBI Intelligent Companion</span>
+              </div>
             </div>
-            <span className="text-[11px] font-mono text-slate-400">
-              Canal: {responseMode === "demo" ? "Web Demo Sandbox" : "Backend Receiver Sandbox"}
-            </span>
-            {voiceState !== "idle" && <span className="text-[10px] font-mono text-violet-300">Voz: {voiceState}</span>}
+            <LumiRuntimeStatus runtimeState={runtimeState} backendMode={responseMode === "backend"} />
           </div>
 
           {/* Messages Feed */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.length === 0 && (
-              <div className="rounded-xl border border-slate-800 bg-slate-950/50 px-4 py-3 text-sm text-slate-400">
-                <span className="font-semibold text-slate-200">LUMI está lista para conversar.</span> Pregunta sobre ORBI o continúa una conversación activa.
-              </div>
-            )}
-            {messages.map((msg) => {
-              const isBot = msg.sender === "bot";
-              return (
-                <div
-                  key={msg.id}
-                  className={`flex items-start gap-2.5 ${
-                    isBot ? "justify-start" : "justify-end"
-                  }`}
-                >
-                  {isBot && (
-                    <div className="w-8 h-8 rounded-lg bg-cyan-600/30 border border-cyan-500/40 flex items-center justify-center text-cyan-400 flex-shrink-0">
-                      <Bot className="w-4 h-4" />
-                    </div>
-                  )}
-
-                  <div
-                    className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                      isBot
-                        ? "bg-slate-800/90 text-slate-200 border border-slate-700/60 rounded-tl-none"
-                        : "bg-cyan-600 text-white rounded-tr-none shadow-md"
-                    }`}
-                  >
-                    {isBot && <span className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-cyan-300">LUMI</span>}
-                    <p className="whitespace-pre-wrap">{msg.text}</p>
-                    {isBot && msg.backend && (
-                      <span className="mt-1 block text-[10px] text-slate-400">
-                        LUMI · {msg.backend.provider}{msg.backend.grounded ? " · Con conocimiento ORBI" : ""}
-                      </span>
-                    )}
-                    <span
-                      className={`text-[10px] font-mono mt-1 block ${
-                        isBot ? "text-slate-400" : "text-cyan-100"
-                      }`}
-                    >
-                      {msg.timestamp}
-                    </span>
-                  </div>
-
-                  {!isBot && (
-                    <div className="w-8 h-8 rounded-lg bg-indigo-600/40 border border-indigo-500/40 flex items-center justify-center text-indigo-300 flex-shrink-0">
-                      <User className="w-4 h-4" />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+          <div ref={timelineRef} className="lumi-timeline flex-1 space-y-5 overflow-y-auto p-4 sm:p-6">
+            {messages.length === 1 && messages[0]?.id === "msg-welcome" ? <LumiWelcomeState /> : null}
+            {messages.filter((message) => message.id !== "msg-welcome").map((message) => message.sender === "bot" ? <LumiMessageCard key={message.id} message={message} hasAudio={Boolean(assistantVoiceMetadata[message.id])} playing={activeAssistantVoiceId === message.id} progress={activeAssistantVoiceId === message.id ? activeAssistantVoiceProgress : 0} duration={formatAudioDuration(assistantVoiceMetadata[message.id]?.durationSeconds)} onTogglePlayback={() => playAssistantVoice(message.id)} onReplay={() => replayAssistantVoice(message.id)} /> : <UserMessageCard key={message.id} message={message} />)}
 
             {isTyping && (
-              <div className="flex items-center gap-2 text-slate-400 text-xs font-mono">
-                <Bot className="w-4 h-4 text-cyan-400 animate-spin" />
-                <span>{getLumiRuntimeStateMessage("processing")}</span>
-              </div>
+              <div className="flex items-center gap-3 pl-14 text-xs text-cyan-100/65"><span className="flex gap-1"><i className="h-1.5 w-1.5 rounded-full bg-emerald-300 animate-pulse" /><i className="h-1.5 w-1.5 rounded-full bg-cyan-300 animate-pulse [animation-delay:120ms]" /><i className="h-1.5 w-1.5 rounded-full bg-teal-300 animate-pulse [animation-delay:240ms]" /></span><span>{getLumiRuntimeStateMessage("processing")}</span></div>
             )}
             {runtimeState !== "ready" && runtimeState !== "processing" && (
               <div role="alert" className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
@@ -419,66 +540,22 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
             {voiceError && (
               <div role="alert" className="rounded-lg border border-violet-500/40 bg-violet-500/10 px-3 py-2 text-xs text-violet-100">
                 {voiceError}
+                {voicePlaybackReady && (
+                  <button type="button" onClick={playPendingVoiceAudio} className="ml-2 rounded border border-violet-300/60 px-2 py-1 font-semibold text-violet-50 hover:bg-violet-500/20">
+                    ▶ Reproducir voz
+                  </button>
+                )}
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Prompt Suggestions */}
-          <div className="px-4 py-2 bg-slate-950/40 border-t border-slate-800/60 overflow-x-auto no-scrollbar flex items-center gap-2">
-            <span className="text-[10px] font-mono text-slate-500 uppercase flex-shrink-0">
-              Sugerencias:
-            </span>
-            {SUGGESTED_QUESTIONS.map((q, idx) => (
-              <button
-                key={idx}
-                onClick={() => void handleSendMessage(q)}
-                className="px-2.5 py-1 rounded-full text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 whitespace-nowrap transition"
-              >
-                {q}
-              </button>
-            ))}
-          </div>
-
-          {/* Input Area */}
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              void handleSendMessage();
-            }}
-            className="p-3 bg-slate-950/80 border-t border-slate-800 flex items-center gap-2"
-          >
-            <textarea
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void handleSendMessage(); } }}
-              aria-label="Mensaje para LUMI"
-              placeholder="Escribe un mensaje de prueba (ej: Me llamo Carlos, mi correo es carlos@empresa.com y busco cotización)..."
-              rows={1}
-              className="flex-1 resize-none bg-slate-900 border border-slate-700 focus:border-cyan-500 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none transition"
-            />
-            <button
-              type="button"
-              onClick={() => { if (voiceState === "capturing" || voiceState === "listening") stopVoiceCapture(); else void startVoiceTurn(); }}
-              disabled={isTyping || (responseMode !== "backend" && voiceState !== "capturing")}
-              aria-label={voiceState === "capturing" || voiceState === "listening" ? "Detener grabación de voz" : "Iniciar mensaje de voz para LUMI"}
-              title={responseMode === "backend" ? "Mensaje de voz local" : "La voz requiere Backend sandbox"}
-              className="px-3 py-2.5 rounded-xl border border-violet-500/50 bg-violet-500/15 hover:bg-violet-500/25 disabled:opacity-40 text-violet-100 transition flex items-center"
-            >
-              {voiceState === "capturing" || voiceState === "listening" ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-            </button>
-            <button
-              type="submit"
-              disabled={!inputText.trim() || isTyping}
-              aria-label="Enviar mensaje a LUMI"
-              className="px-4 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 disabled:opacity-40 disabled:hover:bg-cyan-600 text-white font-medium transition flex items-center gap-1.5"
-            >
-              <Send className="w-4 h-4" />
-            </button>
-          </form>
+          <LumiSuggestionGrid onSelect={(prompt) => void handleSendMessage(prompt)} />
+          <LumiVoiceComposer value={inputText} onChange={setInputText} onSend={() => void handleSendMessage()} onVoiceAction={() => { if (voiceState === "capturing" || voiceState === "listening") stopVoiceCapture(); else void startVoiceTurn(); }} voiceState={voiceState} backendMode={responseMode === "backend"} disabled={isTyping} />
+        </div>
         </div>
 
-        {/* Real-time AI Lead Extraction Card */}
+        <ChatDiagnosticsDrawer open={diagnosticsOpen} onClose={() => setDiagnosticsOpen(false)}>
         <div className="space-y-4">
           <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-3">
             <div>
@@ -508,6 +585,27 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
               <p>Receiver URL: <span className="text-white">{DEFAULT_RECEIVER_URL}</span></p>
               <p>Public key: <span className="text-white">{DEFAULT_PUBLIC_KEY}</span></p>
             </div>
+            {responseMode === "backend" && (
+              <label className="block text-xs font-semibold text-slate-300">
+                Micrófono local
+                <select
+                  value={selectedVoiceInputId}
+                  onChange={(event) => setSelectedVoiceInputId(event.target.value)}
+                  className="mt-1.5 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-white outline-none focus:border-violet-400"
+                >
+                  <option value="">Predeterminado del navegador</option>
+                  {voiceInputs.map((input) => <option key={input.deviceId} value={input.deviceId}>{input.label}</option>)}
+                </select>
+                <span className="mt-1 block text-[10px] font-normal text-slate-500">Al iniciar una captura se muestran las entradas disponibles. Elige el micrófono físico, no Stereo Mix ni una entrada virtual.</span>
+              </label>
+            )}
+            {voiceDiagnostics && (
+              <div className="space-y-1 rounded-xl border border-violet-500/30 bg-violet-500/5 p-3 font-mono text-[10px] text-violet-100">
+                <p>Voice capture diagnostic (solo metadatos)</p>
+                <p>Track: {voiceDiagnostics.trackLabel} · enabled {String(voiceDiagnostics.trackEnabled)} · muted {String(voiceDiagnostics.trackMuted)} · {voiceDiagnostics.trackReadyState}</p>
+                <p>Recorder: {voiceDiagnostics.recorderMimeType} · {voiceDiagnostics.blobSize} bytes · {(voiceDiagnostics.recordingDurationMs / 1000).toFixed(1)} s</p>
+              </div>
+            )}
             <ul className="space-y-1 text-[11px] text-amber-100">
               <li>• Local sandbox only</li>
               <li>• No WhatsApp real · No real DB</li>
@@ -617,6 +715,7 @@ export const ChatStudioWorkspace: React.FC<ChatStudioWorkspaceProps> = ({
             </button>
           </div>
         </div>
+        </ChatDiagnosticsDrawer>
       </div>
     </div>
   );

@@ -24,21 +24,16 @@ These are roadmap candidates only; none are implemented here.
 
 ## 0K-23 — CLOSED
 
-## 0K-24 — ACTIVE
+## 0K-24 — CLOSED
 
-0K-24A.1 — Voice I/O Contract & Runtime Boundary: **CLOSED**.
+0K-24 delivers a controlled local voice foundation: browser push-to-talk → temporary WebM → local CPU `whisper.cpp` (multilingual `base` model with a bounded ORBI vocabulary prompt) → existing ORBI ChatBox Core/LUMI conversation → local TTS → browser WAV playback. Conversation continuity, grounding and capability boundaries remain unchanged.
 
-0K-24A FAMILY — **CLOSED**. STT uses local CPU `whisper.cpp` with the multilingual `base` model, Spanish and validated WAV input only.
+TTS primary is `kokoro-local` with voice `ef_dora`. Spanish text follows `Misaki` / `EspeakG2P(language="es")` → explicit phonemes → Kokoro `is_phonemes=true`. Python stdin/stdout are explicitly UTF-8. Windows SAPI with `Microsoft Helena Desktop` is a controlled local fallback. No cloud speech, API keys, persistent audio, wake word, continuous listening, WhatsApp or production endpoint is enabled.
 
-0K-24B.1 — Text-to-Speech Local Foundation: **CLOSED**. It uses local Windows SAPI with Spanish voice `Microsoft Helena Desktop` and validated WAV output only.
-
-Current module: **0K-24B.2 — Frontend Voice UX**. A user-triggered one-turn push-to-talk flow reuses the existing Core and conversation ID: mic → temporary WebM → local STT → LUMI/Core → local TTS → native WAV playback. `whisper.cpp` base receives a small static ORBI vocabulary prompt only for recognition; it does not alter grounding, capabilities, conversations, or chat text. Human microphone validation remains manual. There is no wake word, continuous listening, persistent audio, WhatsApp, or cloud speech service.
-
-Voice architecture: audio → STT → ORBI ChatBox Core → LUMI → TTS → audio. The contracts preserve the existing conversation, grounding, and capability boundaries. Local one-turn browser capture and playback are active; external services, persistent audio, continuous listening, and WhatsApp integration remain blocked.
+The Chat Studio includes runtime-only assistant-audio replay, responsive voice states and the approved flagship LUMI visual experience. Human voice acceptance: **PASS**. Human visual acceptance: **PASS**. Future enhancement (non-blocking): improve LUMI voice naturalness / human likeness.
 
 ## Next P0 roadmap
 
-- 0K-24 — Voice Interaction Foundation
 - 0K-25 — Multi-Channel Messaging Foundation
 - 0K-26 — WhatsApp Business Integration
 - 0K-27 — WhatsApp Voice Messages
@@ -49,4 +44,4 @@ WhatsApp targets only: WhatsApp inbound → channel adapter → ORBI ChatBox Cor
 
 ## Recommended next module
 
-**0K-24A.2 — Speech-to-Text Foundation**: future adapter work only after the Voice I/O contracts are validated.
+**0K-25 — Multi-Channel Messaging Foundation**. This remains planned only; it does not implement real WhatsApp, Meta credentials, webhooks, external messaging or production deployment.

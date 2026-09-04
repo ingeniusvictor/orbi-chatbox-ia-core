@@ -2,6 +2,7 @@
 export type AssistantBehaviorPolicy = {
   readonly languageBehavior: string;
   readonly verbosityBehavior: string;
+  readonly acknowledgementBehavior: string;
   readonly identityBehavior: string;
   readonly uncertaintyBehavior: string;
   readonly groundingBehavior: string;

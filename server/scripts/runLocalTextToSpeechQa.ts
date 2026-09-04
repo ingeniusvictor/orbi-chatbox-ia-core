@@ -21,8 +21,9 @@ try {
   try { await provider.synthesize(oversized); throw new Error("Oversized TTS text was accepted."); } catch (error) { assert(error instanceof LocalTextToSpeechError && error.code === "VOICE_TTS_INVALID_TEXT", "Oversized TTS text requires a controlled error."); }
   const unsupported: TextToSpeechRequest = { requestId: "format", text: "Texto", language: "es", format: "mp3" };
   try { await provider.synthesize(unsupported); throw new Error("Unsupported TTS format was accepted."); } catch (error) { assert(error instanceof LocalTextToSpeechError && error.code === "VOICE_TTS_UNSUPPORTED_FORMAT", "Unsupported format requires a controlled error."); }
-  const first = await synthesize("tts-one", "Hola, soy LUMI. Esta es una prueba de voz.");
-  const second = await synthesize("tts-two", "ORBI Academy ofrece conocimiento y aprendizaje.");
-  assert(first.durationMs > 0 && second.durationMs > 0, "Generated WAV duration is required.");
-  console.info(`Local Text-to-Speech QA: PASS\nTest 1: ${first.byteLength} bytes, ${first.durationMs} ms, ${first.latencyMs} ms\nTest 2: ${second.byteLength} bytes, ${second.durationMs} ms, ${second.latencyMs} ms`);
+  const first = await synthesize("tts-one", "Hola, soy LUMI. Te escucho correctamente.");
+  const second = await synthesize("tts-two", "ORBI Academy transforma conocimiento técnico en aprendizaje claro y práctico.");
+  const third = await synthesize("tts-three", "Perfecto. La conversación por voz está funcionando.");
+  assert(first.durationMs > 0 && second.durationMs > 0 && third.durationMs > 0, "Generated WAV duration is required.");
+  console.info(`Local Text-to-Speech QA: PASS\nTest A: ${first.byteLength} bytes, ${first.durationMs} ms, ${first.latencyMs} ms\nTest B: ${second.byteLength} bytes, ${second.durationMs} ms, ${second.latencyMs} ms\nTest C: ${third.byteLength} bytes, ${third.durationMs} ms, ${third.latencyMs} ms`);
 } catch (error) { console.error(error); process.exit(1); }

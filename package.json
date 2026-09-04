@@ -54,7 +54,15 @@
                     "server:voice-stt:qa": "tsx server/scripts/runLocalSpeechToTextQa.ts",
                     "server:voice-tts:qa": "tsx server/scripts/runLocalTextToSpeechQa.ts",
                     "frontend:voice-ux:qa": "tsx server/scripts/runFrontendVoiceUxQa.ts",
-                    "server:voice-vocabulary:qa": "tsx server/scripts/runVoiceVocabularyQa.ts"
+                    "frontend:voice-replay:qa": "tsx server/scripts/runFrontendVoiceReplayQa.ts",
+                    "frontend:premium-chat:qa": "tsx server/scripts/runFrontendPremiumChatQa.ts",
+                    "frontend:lumi-north-star:qa": "tsx server/scripts/runLumiNorthStarFoundationQa.ts",
+                    "frontend:lumi-flagship:qa": "tsx server/scripts/runLumiFlagshipUiQa.ts",
+                    "server:voice-vocabulary:qa": "tsx server/scripts/runVoiceVocabularyQa.ts",
+                    "server:voice-quality:qa": "tsx server/scripts/runVoiceQualityQa.ts",
+                    "server:voice-kokoro:qa": "tsx server/scripts/runKokoroTextToSpeechQa.ts",
+                    "server:voice-kokoro-utf8:qa": "tsx server/scripts/runKokoroUtf8BoundaryQa.ts",
+                    "server:voice-e2e:qa": "tsx server/scripts/runVoiceEndToEndFinalQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",

@@ -5,5 +5,10 @@ coverage/
 .DS_Store
 *.log
 .local-runtime/
+server/runtime/kokoro/.venv/
+server/runtime/kokoro/models/
+server/runtime/kokoro/*.wav
+server/runtime/kokoro/comparisons/*.wav
+server/runtime/kokoro/diagnostics/
 .env*
 !.env.example

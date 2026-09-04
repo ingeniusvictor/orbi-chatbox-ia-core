@@ -2,7 +2,8 @@ import express, { Router, type ErrorRequestHandler } from "express";
 import { createSandboxError } from "../security/errorResponses.js";
 import { convertVoiceAudioToWav } from "../services/localVoiceMediaConverter.js";
 import { LocalSpeechToTextError, LocalSpeechToTextProvider } from "../services/localSpeechToTextProvider.js";
-import { LocalTextToSpeechError, LocalTextToSpeechProvider } from "../services/localTextToSpeechProvider.js";
+import { LocalTextToSpeechError } from "../services/localTextToSpeechProvider.js";
+import { createTextToSpeechProvider } from "../services/createTextToSpeechProvider.js";
 import type { VoiceInputFormat } from "../types/voiceInput.js";
 
 const audioFormat = (contentType: string | undefined): VoiceInputFormat | undefined => {
@@ -45,7 +46,7 @@ export const createVoiceRouter = (): Router => {
   router.post("/api/voice/synthesize", async (request, response, next) => {
     try {
       const body = request.body as { text?: unknown; language?: unknown };
-      const result = await new LocalTextToSpeechProvider().synthesize({ requestId: crypto.randomUUID(), text: typeof body?.text === "string" ? body.text : "", language: typeof body?.language === "string" ? body.language : "es", format: "wav" });
+      const result = await createTextToSpeechProvider().synthesize({ requestId: crypto.randomUUID(), text: typeof body?.text === "string" ? body.text : "", language: typeof body?.language === "string" ? body.language : "es", format: "wav" });
       if (result.audio.kind !== "buffer") throw new LocalTextToSpeechError("VOICE_TTS_FAILED", "Local TTS returned no audio buffer.");
       response.type(result.mimeType).setHeader("Content-Length", String(result.audio.byteLength)).send(Buffer.from(result.audio.bytes));
     } catch (error) {

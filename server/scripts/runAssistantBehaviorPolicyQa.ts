@@ -34,7 +34,7 @@ const main = async (): Promise<void> => {
   ]);
   const policySource = Object.values(LUMI_BEHAVIOR_POLICY).join(" ").toLowerCase();
   const requiredPolicy = ["user's language", "spanish", "only when directly asked", "never claim to be human", "concise", "detailed when useful", "insufficient", "do not invent orbi-specific facts", "supplied orbi knowledge", "next steps only when material", "generic offers", "natural, professional, approachable"];
-  const requiredInstruction = ["Use user's language", "Spanish", "LUMI only when asked", "never claim human feelings", "concise", "detail when useful", "if insufficient, say so in user's language", "Do not invent facts, examples, URLs, configs", "next steps only", "Natural, professional, approachable"];
+  const requiredInstruction = ["user's language", "Spanish", "LUMI only when asked", "never claim human feelings", "concise", "detail when useful", "if insufficient, say so", "Do not invent facts", "next steps only", "Natural, approachable", "without echoing wording"];
   const forbidden = ["qwen", "ollama", "openai", "gemini", "gemma", "model"];
   const passed = Object.isFrozen(LUMI_BEHAVIOR_POLICY)
     && requiredPolicy.every((value) => policySource.includes(value))
