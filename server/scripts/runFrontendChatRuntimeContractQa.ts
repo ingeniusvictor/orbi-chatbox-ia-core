@@ -11,11 +11,12 @@ const main = (): void => {
   const first = appendRuntimeMessage([], user);
   const second = appendRuntimeMessage(first, assistant);
   const source = readFileSync(new URL("../../src/components/workspaces/ChatStudioWorkspace.tsx", import.meta.url), "utf8");
+  const composerSource = readFileSync(new URL("../../src/components/chat/LumiVoiceComposer.tsx", import.meta.url), "utf8");
   const passed = !isSendableChatMessage("   ") && isSendableChatMessage("Hola")
     && first.length === 1 && second.length === 2 && first !== second
     && assistant.text === response.message && assistant.backend?.provider === "mock" && assistant.backend?.grounded === true && assistant.backend?.sourceEntryIds.join(",") === "core-assistant-overview"
     && source.includes("conversationId,") && source.includes("setConversationId(result.body.conversationId)")
-    && source.includes("classifyLumiRuntimeState(result)") && source.includes("disabled={!inputText.trim() || isTyping}")
+    && source.includes("classifyLumiRuntimeState(result)") && composerSource.includes("disabled={!value.trim() || disabled}")
     && !source.includes("localStorage") && !source.includes("Provider selector") && !source.includes("generateAssistantReply(result");
   assert(passed, "Frontend Chat Runtime Contract QA: FAIL");
   console.info("Frontend Chat Runtime Contract QA: PASS (runtime conversation state, metadata, controlled errors, no frontend fallback or persistence)");

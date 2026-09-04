@@ -1,32 +1,9 @@
 import { Router } from "express";
-import { resolveAiProvider } from "../providers/aiProviderRegistry.js";
 import { QwenLocalProviderError } from "../providers/qwenLocalProvider.js";
 import { createSandboxError } from "../security/errorResponses.js";
-import { buildConversationEnvelope } from "../services/conversationEnvelope.js";
-import { getAssistantIdentity } from "../services/assistantIdentity.js";
-import { composeAssistantInstruction } from "../services/assistantInstructionComposer.js";
-import { composeCompactAssistantRuntimeInstruction } from "../services/assistantRuntimeInstructionComposer.js";
-import { composeAssistantBehaviorInstruction } from "../services/assistantBehaviorPolicyComposer.js";
-import { LUMI_BEHAVIOR_POLICY } from "../data/lumiBehaviorPolicy.js";
-import { buildKnowledgeContext } from "../services/knowledgeContextBuilder.js";
-import { buildAssistantConversationHistory } from "../services/assistantConversationHistoryBuilder.js";
-import { appendConversationTurn, getConversationHistory } from "../services/ephemeralConversationHistory.js";
-import { createConversationTurn } from "../services/conversationTurn.js";
-import { processValidatedWidgetMessage } from "../services/widgetMessageProcessor.js";
-import { createControlledKnowledgeSearchRequest } from "../services/capabilityInvocationPolicy.js";
-import { executeInternalCapability } from "../services/internalCapabilityExecutor.js";
-import { buildAssistantCapabilityContext } from "../services/assistantCapabilityContextBuilder.js";
-import type { AiProvider, AiProviderMode, AiProviderRequest } from "../types/aiProvider.js";
-import type { WidgetMessageResponse } from "../types/widget.js";
+import { ControlledChannelRouter } from "../services/controlledChannelRouter.js";
+import type { AiProvider, AiProviderMode } from "../types/aiProvider.js";
 import { validateWidgetMessagePayload } from "../validation/widgetPayload.js";
-
-const SANDBOX_GUARDRAILS = [
-  "Sandbox local",
-  "Sin WhatsApp real",
-  "Sin datos reales",
-  "Sin base de datos",
-  "Sin IA externa",
-];
 
 export const createWidgetMessageRouter = (
   demoWidgetPublicKey: string,
@@ -34,6 +11,7 @@ export const createWidgetMessageRouter = (
   providerOverride?: AiProvider,
 ): Router => {
   const router = Router();
+  const channelRouter = new ControlledChannelRouter();
 
   router.post("/api/public/widget/:publicKey/message", async (request, response, next) => {
     try {
@@ -54,63 +32,56 @@ export const createWidgetMessageRouter = (
         return;
       }
 
-      const processed = processValidatedWidgetMessage(validation.payload);
-      const knowledgeContext = buildKnowledgeContext(processed.normalizedMessage);
-      const envelope = buildConversationEnvelope(validation.payload, processed, knowledgeContext);
-      const previousHistory = getConversationHistory(envelope.conversationId);
-      const assistantInstruction = composeAssistantInstruction(getAssistantIdentity());
-      const assistantRuntimeInstruction = composeCompactAssistantRuntimeInstruction(assistantInstruction);
-      const assistantBehaviorInstruction = composeAssistantBehaviorInstruction(LUMI_BEHAVIOR_POLICY, assistantInstruction.assistantId);
-      const capabilityRequest = createControlledKnowledgeSearchRequest(envelope.message.text);
-      const assistantCapabilityContext = capabilityRequest
-        ? buildAssistantCapabilityContext(executeInternalCapability(capabilityRequest))
-        : undefined;
-      const providerRequest: Readonly<AiProviderRequest> = Object.freeze({
-        requestId: envelope.requestId,
-        conversationId: envelope.conversationId,
-        message: envelope.message.text,
-        conversationHistory: buildAssistantConversationHistory(previousHistory),
-        knowledgeContext: envelope.knowledgeContext,
-        assistantInstruction,
-        assistantRuntimeInstruction,
-        assistantBehaviorInstruction,
-        assistantCapabilityContext,
+      const routed = await channelRouter.route({
+        channel: "web",
+        rawInput: {
+          text: validation.payload.message,
+          externalUserId: validation.payload.visitorId,
+          receivedAt: validation.payload.timestamp,
+          pageUrl: validation.payload.pageUrl,
+        },
+        activeProviderMode,
+        providerOverride,
+        // This field is an existing ORBI conversation ID from the local client, never an external ID.
+        orbiConversationId: validation.payload.conversationId,
       });
-      const provider = providerOverride ?? resolveAiProvider(activeProviderMode);
-      const providerResponse = await provider.generate(providerRequest);
-      const userTurn = createConversationTurn({ conversationId: envelope.conversationId, role: "user", content: envelope.message.text, sequence: previousHistory.turnCount === 0 ? 1 : previousHistory.turns[previousHistory.turnCount - 1]!.sequence + 1 });
-      const assistantTurn = createConversationTurn({ conversationId: envelope.conversationId, role: "assistant", content: providerResponse.text, sequence: userTurn.sequence + 1 });
-      appendConversationTurn(userTurn);
-      appendConversationTurn(assistantTurn);
-      const payload: WidgetMessageResponse = {
+      if (routed.ok === false) {
+        const error = createSandboxError(
+          routed.errorCode === "CHANNEL_NORMALIZATION_FAILED" ? 400 : 503,
+          routed.errorCode === "CHANNEL_NORMALIZATION_FAILED" ? "INVALID_MESSAGE" : "INTERNAL_SANDBOX_ERROR",
+          routed.errorCode === "CHANNEL_NORMALIZATION_FAILED" ? "Channel message is invalid." : "Channel routing is unavailable in this local sandbox.",
+        );
+        response.status(error.statusCode).json(error.body);
+        return;
+      }
+      const metadata = routed.outbound.metadata;
+      response.json({
         ok: true,
         mode: "sandbox",
         received: true,
         leadCreated: false,
         handoffRecommended: false,
-        message: providerResponse.text,
-        responseMode: providerResponse.provider === "mock" ? "provider-mock" : "provider-qwen-local",
-        provider: providerResponse.provider,
-        grounded: providerResponse.grounded,
-        sourceEntryIds: providerResponse.sourceEntryIds,
-        guardrails: SANDBOX_GUARDRAILS,
-        processedAt: envelope.runtime.receivedAt,
-        normalizedChannel: envelope.source.channel,
-        requestId: envelope.requestId,
-        conversationId: envelope.conversationId,
-        normalizedMessage: envelope.message.text,
-        messageLength: envelope.message.length,
-        processingMode: envelope.runtime.mode,
-        intent: envelope.runtime.intent,
+        message: routed.outbound.text,
+        responseMode: metadata?.provider === "qwen-local" ? "provider-qwen-local" : "provider-mock",
+        provider: metadata?.provider ?? "mock",
+        grounded: metadata?.grounded ?? false,
+        sourceEntryIds: metadata?.sourceEntryIds ?? [],
+        guardrails: ["Sandbox local", "Sin WhatsApp real", "Sin datos reales", "Sin base de datos", "Sin IA externa"],
+        processedAt: routed.outbound.createdAt,
+        normalizedChannel: validation.payload.channel,
+        requestId: metadata?.requestId ?? "channel-routing-request",
+        conversationId: routed.outbound.conversationId,
+        normalizedMessage: metadata?.normalizedMessage ?? validation.payload.message,
+        messageLength: metadata?.messageLength ?? validation.payload.message.length,
+        processingMode: metadata?.processingMode ?? "sandbox",
+        intent: metadata?.intent ?? "unclassified",
         knowledge: {
-          source: envelope.knowledgeContext.source,
-          matchCount: envelope.knowledgeContext.matchCount,
-          entryIds: envelope.knowledgeContext.entries.map((entry) => entry.id),
-          truncated: envelope.knowledgeContext.truncated,
+          source: metadata?.knowledge?.source ?? "local-static",
+          matchCount: metadata?.knowledge?.matchCount ?? 0,
+          entryIds: metadata?.sourceEntryIds ?? [],
+          truncated: metadata?.knowledge?.truncated ?? false,
         },
-      };
-
-      response.json(payload);
+      });
     } catch (error) {
       if (error instanceof QwenLocalProviderError) {
         const providerError = createSandboxError(

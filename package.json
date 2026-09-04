@@ -62,7 +62,12 @@
                     "server:voice-quality:qa": "tsx server/scripts/runVoiceQualityQa.ts",
                     "server:voice-kokoro:qa": "tsx server/scripts/runKokoroTextToSpeechQa.ts",
                     "server:voice-kokoro-utf8:qa": "tsx server/scripts/runKokoroUtf8BoundaryQa.ts",
-                    "server:voice-e2e:qa": "tsx server/scripts/runVoiceEndToEndFinalQa.ts"
+                    "server:voice-e2e:qa": "tsx server/scripts/runVoiceEndToEndFinalQa.ts",
+                    "server:channel-contract:qa": "tsx server/scripts/runChannelContractQa.ts",
+                    "server:channel-adapter:qa": "tsx server/scripts/runChannelAdapterBoundaryQa.ts",
+                    "server:channel-registry:qa": "tsx server/scripts/runChannelAdapterRegistryQa.ts",
+                    "server:channel-routing:qa": "tsx server/scripts/runControlledChannelRoutingQa.ts",
+                    "server:channel-routing-integration:qa": "tsx server/scripts/runChannelRoutingIntegrationQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",

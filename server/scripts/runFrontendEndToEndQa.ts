@@ -7,6 +7,8 @@ const assert = (value: unknown, message: string): void => { if (!value) throw ne
 
 const main = (): void => {
   const chatSource = readFileSync(new URL("../../src/components/workspaces/ChatStudioWorkspace.tsx", import.meta.url), "utf8");
+  const lumiMessageSource = readFileSync(new URL("../../src/components/chat/LumiMessageCard.tsx", import.meta.url), "utf8");
+  const composerSource = readFileSync(new URL("../../src/components/chat/LumiVoiceComposer.tsx", import.meta.url), "utf8");
   const clientSource = readFileSync(new URL("../../src/services/backendReceiverClient.ts", import.meta.url), "utf8");
   const response: ChatBackendSuccessResponse = Object.freeze({
     ok: true,
@@ -29,8 +31,10 @@ const main = (): void => {
     ["conversation capture", chatSource.includes("conversationId,") && chatSource.includes("setConversationId(result.body.conversationId)")],
     ["message append/retry", userMessages.length === 1 && retryMessages.length === 1 && completeMessages.length === 2 && completeMessages[1]?.text === response.message],
     ["grounding metadata", assistant.backend?.grounded === true && assistant.backend?.sourceEntryIds.length === 1],
-    ["safe LUMI/grounding UI", chatSource.includes(">LUMI</span>") && chatSource.includes("Con conocimiento ORBI") && !chatSource.includes("sourceEntryIds.join")],
-    ["input UX", chatSource.includes('e.key === "Enter" && !e.shiftKey') && chatSource.includes("disabled={!inputText.trim() || isTyping}") && !isSendableChatMessage(" ")],
+    // D.3 composes the LUMI identity inside the premium header instead of the
+    // former standalone span; keep this check behavioral rather than markup-specific.
+    ["safe LUMI/grounding UI", chatSource.includes("· LUMI") && lumiMessageSource.includes("Con conocimiento ORBI") && !chatSource.includes("sourceEntryIds.join")],
+    ["input UX", composerSource.includes('event.key === "Enter" && !event.shiftKey') && composerSource.includes("disabled={!value.trim() || disabled}") && !isSendableChatMessage(" ")],
     ["pending/retry", chatSource.includes('setRuntimeState("processing")') && chatSource.includes('setRuntimeState("ready")') && chatSource.includes("role=\"alert\"") && chatSource.includes("handleSendMessage(lastFailedMessage, true)")],
     ["safe timeout", errorState === "timeout" && !getLumiRuntimeStateMessage(errorState).includes("LOCAL_AI_") && !getLumiRuntimeStateMessage(errorState).includes("http")],
     ["no frontend runtime leak", chatSource.includes("getLumiRuntimeStateMessage(runtimeState)") && !chatSource.includes("localStorage") && !chatSource.includes("indexedDB") && !chatSource.includes("ollama") && !chatSource.includes("setInterval")],
