@@ -8,13 +8,25 @@ import { createChannelAdapterRegistry } from "../services/channelAdapterRegistry
 import { ControlledChannelRouter } from "../services/controlledChannelRouter.js";
 import { createSandboxError } from "../security/errorResponses.js";
 import type { AiProvider, AiProviderMode } from "../types/aiProvider.js";
+import type { ChannelDeliveryAdapter } from "../types/channelDeliveryAdapter.js";
+import type { WhatsAppInboundTextEvent } from "../channels/whatsapp/whatsappInboundText.js";
 
 const verifyMode = "subscribe";
 const webhookReady = (config: WhatsAppRuntimeConfig): boolean => config.readiness === "ready-for-webhook" || config.readiness === "ready-for-api";
 const rawBody = (value: unknown): Buffer | undefined => Buffer.isBuffer(value) ? value : undefined;
 
+/** Explicit test/local composition only. Absent by default, so webhook ACKs never send outbound traffic. */
+export type WhatsAppOutboundDeliveryIntegration = Readonly<{
+  createDeliveryAdapter: (event: Readonly<WhatsAppInboundTextEvent>) => ChannelDeliveryAdapter;
+}>;
+
 /** Development/test-only webhook boundary. It acknowledges inbound text but never sends Meta replies. */
-export const createWhatsAppWebhookRouter = (config: WhatsAppRuntimeConfig, activeProviderMode: AiProviderMode = "mock", providerOverride?: AiProvider): Router => {
+export const createWhatsAppWebhookRouter = (
+  config: WhatsAppRuntimeConfig,
+  activeProviderMode: AiProviderMode = "mock",
+  providerOverride?: AiProvider,
+  outboundIntegration?: Readonly<WhatsAppOutboundDeliveryIntegration>,
+): Router => {
   const router = Router();
   const routerService = new ControlledChannelRouter(createChannelAdapterRegistry(config));
   const deduplication = new InMemoryWhatsAppInboundDeduplicationStore();
@@ -69,7 +81,9 @@ export const createWhatsAppWebhookRouter = (config: WhatsAppRuntimeConfig, activ
       const reservation = deduplication.reserve(event.event.providerMessageId);
       if (reservation === "duplicate") { duplicate += 1; continue; }
       if (reservation === "capacity") { rejected += 1; continue; }
-      const routed = await routerService.routeInboundOnly({ channel: "whatsapp", rawInput: event.event, activeProviderMode, providerOverride });
+      const routed = outboundIntegration
+        ? await routerService.routeInboundWithDelivery({ channel: "whatsapp", rawInput: event.event, activeProviderMode, providerOverride }, outboundIntegration.createDeliveryAdapter(event.event))
+        : await routerService.routeInboundOnly({ channel: "whatsapp", rawInput: event.event, activeProviderMode, providerOverride });
       if (routed.ok) processed += 1;
       else { deduplication.release(event.event.providerMessageId); rejected += 1; }
     }

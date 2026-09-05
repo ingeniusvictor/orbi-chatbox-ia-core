@@ -1,8 +1,10 @@
 export type WhatsAppRuntimeReadiness = "disabled" | "missing-config" | "ready-for-webhook" | "ready-for-api" | "invalid-config";
+export type WhatsAppOutboundReadiness = "disabled" | "missing-config" | "ready-for-outbound" | "invalid-config";
 
 export type WhatsAppRuntimeConfig = Readonly<{
   enabled: boolean;
   readiness: WhatsAppRuntimeReadiness;
+  outboundReadiness: WhatsAppOutboundReadiness;
   verifyToken?: string;
   appSecret?: string;
   accessToken?: string;
@@ -17,6 +19,7 @@ const parseEnabled = (value: string | undefined): boolean | "invalid" => {
   return value.trim().toLowerCase() === "true" ? true : "invalid";
 };
 const validGraphVersion = (value: string | undefined): boolean => value === undefined || /^v\d+\.\d+$/.test(value);
+const validBoundaryId = (value: string | undefined): boolean => value === undefined || /^[A-Za-z0-9_-]{1,120}$/.test(value);
 
 /**
  * Development/test configuration only. Secrets stay in process environment and
@@ -32,23 +35,31 @@ export const loadWhatsAppRuntimeConfig = (
   const phoneNumberId = trim(env.WHATSAPP_PHONE_NUMBER_ID);
   const businessAccountId = trim(env.WHATSAPP_BUSINESS_ACCOUNT_ID);
   const graphApiVersion = trim(env.WHATSAPP_GRAPH_API_VERSION);
-  const apiValues = [accessToken, phoneNumberId, businessAccountId, graphApiVersion];
-  const hasAnyApiValue = apiValues.some(Boolean);
-  const hasCompleteApiConfig = apiValues.every(Boolean) && validGraphVersion(graphApiVersion);
-  const invalid = enabled === "invalid" || !validGraphVersion(graphApiVersion) || (hasAnyApiValue && !hasCompleteApiConfig);
+  const outboundValues = [accessToken, phoneNumberId, graphApiVersion];
+  const hasAnyOutboundValue = outboundValues.some(Boolean);
+  const hasCompleteOutboundConfig = outboundValues.every(Boolean) && validGraphVersion(graphApiVersion);
+  const invalid = enabled === "invalid" || !validGraphVersion(graphApiVersion) || !validBoundaryId(phoneNumberId) || !validBoundaryId(businessAccountId) || (hasAnyOutboundValue && !hasCompleteOutboundConfig);
   const readiness: WhatsAppRuntimeReadiness = invalid
     ? "invalid-config"
     : enabled === false
       ? "disabled"
       : !verifyToken
         ? "missing-config"
-        : hasCompleteApiConfig
+        : hasCompleteOutboundConfig
           ? "ready-for-api"
           : "ready-for-webhook";
+  const outboundReadiness: WhatsAppOutboundReadiness = invalid
+    ? "invalid-config"
+    : enabled === false
+      ? "disabled"
+      : hasCompleteOutboundConfig
+        ? "ready-for-outbound"
+        : "missing-config";
 
   return Object.freeze({
     enabled: enabled === true,
     readiness,
+    outboundReadiness,
     ...(verifyToken ? { verifyToken } : {}),
     ...(appSecret ? { appSecret } : {}),
     ...(accessToken ? { accessToken } : {}),

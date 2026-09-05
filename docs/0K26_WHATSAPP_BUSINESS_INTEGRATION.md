@@ -49,7 +49,7 @@ The process-local deduplication store holds at most 100 provider message IDs, ha
 
 Webhook acknowledgement is independent of future delivery. Internal test processing produces a neutral response but returns neither that response nor a Meta-delivery claim to the webhook caller. No Graph API send, outbound delivery result, receipt mapping, media, template, retry, queue, persistence, or database exists.
 
-Manual configuration requirements are deliberately separated: GET verification needs `WHATSAPP_ENABLED` and `WHATSAPP_VERIFY_TOKEN`; signed POST reception also needs `WHATSAPP_APP_SECRET`; future outbound additionally needs `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_BUSINESS_ACCOUNT_ID`, and `WHATSAPP_GRAPH_API_VERSION`. Static local QA passes. A real Meta test remains blocked until a public HTTPS callback and real development credentials are intentionally supplied; no tunnel is installed by this project.
+Manual configuration requirements are deliberately separated: GET verification needs `WHATSAPP_ENABLED` and `WHATSAPP_VERIFY_TOKEN`; signed POST reception also needs `WHATSAPP_APP_SECRET`; current text outbound needs `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, and `WHATSAPP_GRAPH_API_VERSION`. `WHATSAPP_BUSINESS_ACCOUNT_ID` remains optional future/admin metadata. Static local QA passes. A real Meta test remains blocked until a public HTTPS callback and real development credentials are intentionally supplied; no tunnel is installed by this project.
 
 ## 0K-26A: CLOSED
 
@@ -60,3 +60,63 @@ Manual configuration requirements are deliberately separated: GET verification n
 The completed scope is text inbound only. There is no outbound Meta send, media support, real Meta test, or full channel availability. The process-local deduplication capacity is 100 provider message IDs, with no eviction or persistence. The operational gap for a real Meta test remains a deliberately supplied public HTTPS callback and real development configuration. `whatsapp:<external sender>` remains an external correlation boundary only.
 
 **0K-26A is CLOSED.** WhatsApp remains `inbound-foundation`, configuration-dependent, and not fully available because real outbound sending is not implemented. **Next: 0K-26B — WhatsApp Outbound Text Delivery.**
+
+## 0K-26B.1: Meta Graph outbound text client foundation
+
+This module adds a text-only, provider-boundary client foundation; it does **not** send a real message. Outbound readiness is evaluated separately as `disabled`, `missing-config`, `ready-for-outbound`, or `invalid-config` from the existing environment-only access token, phone-number ID, business-account ID, and Graph API version. Being configured does not claim a successful connection or a fully available WhatsApp channel.
+
+`WhatsAppGraphClient` alone constructs the official messages endpoint from validated configuration, creates the provider-specific text payload, and adds the authorization header. The recipient is supplied only through a WhatsApp-specific delivery context and never enters `OutboundChannelResponse`, Core, LUMI, knowledge, or internal identity. The native transport is bounded and exists for a later explicitly authorized live test; B.1 QA injects deterministic fake transports only.
+
+Provider success is normalized to an accepted boundary result. A provider message ID, if returned, stays provider-local. Authentication, rejection, rate-limit, timeout, network, and invalid-response failures are normalized without raw provider payloads, tokens, recipients, URLs, or stacks. `WhatsAppDeliveryAdapter` reuses the existing neutral `ChannelDeliveryAdapter` and `ChannelDeliveryService` lifecycle, preserving the ORBI delivery ID. `delivered` means provider API acceptance/handoff only, never end-user read. There are no retries, templates, media, or live Meta sends.
+
+**Next B.2 goal:** controlled outbound integration review and an explicitly authorized live-test gate; full WhatsApp availability remains unavailable until a real end-to-end Meta test is approved and succeeds.
+
+## 0K-26B.2: controlled outbound integration review
+
+The signed text webhook can be composed with an explicitly injected WhatsApp delivery adapter for local deterministic QA. The normal webhook composition remains ACK-only and does not create a Graph client send. During the controlled loop, the inbound sender is retained only inside the WhatsApp delivery-adapter composition; Core, LUMI, neutral responses, correlation identity, and webhook acknowledgements remain recipient-unaware.
+
+The existing delivery lifecycle creates a pending record and records `delivered` only when the provider accepts the send request. This is provider acceptance, not handset delivery, read, or receipt state. Duplicate inbound provider IDs are acknowledged without a second Core execution or outbound send. Adapter failures terminally fail only the delivery record; they do not reprocess Core and retries remain deferred. Sender-specific correlation and recipient context are isolated per inbound event.
+
+All B.2 QA uses injected fake transport. `LIVE_META_SEND: NOT_RUN`. WhatsApp remains `TEXT_PIPELINE_FOUNDATION_COMPLETE`, `CONFIG_DEPENDENT`, and not fully available until a separately authorized real Meta inbound/outbound test.
+
+## 0K-26B.3: local certification and live-test readiness
+
+The canonical local text loop is certified with signed fixtures and injected fake Graph transport: webhook raw-body signature verification → classification → inbound deduplication → WhatsApp adapter normalization → correlation → Core/LUMI → neutral outbound response → existing delivery lifecycle → WhatsApp delivery adapter → fake provider acceptance. It has one inbound path, one recipient-context path at the WhatsApp boundary, one correlation path, and one delivery lifecycle. There is no bypass around signature verification, deduplication, or controlled delivery.
+
+`delivered` means that Meta accepts the outbound request, not handset receipt, user read, or a delivery-status webhook. A duplicate provider message ID is acknowledged without a second Core execution, delivery record, or fake send. A provider failure terminally marks the delivery failed without changing correlation, exposing provider data, or retrying/reprocessing Core. Sender-specific correlation, recipient context, and internal conversations remain isolated.
+
+### Live configuration matrix
+
+| Variable | Purpose | Required for | Secret |
+| --- | --- | --- | --- |
+| `WHATSAPP_ENABLED` | Explicit channel enablement | webhook and outbound runtime | No |
+| `WHATSAPP_VERIFY_TOKEN` | Meta subscription challenge comparison | GET verification | Yes |
+| `WHATSAPP_APP_SECRET` | HMAC signature verification | signed POST webhook | Yes |
+| `WHATSAPP_ACCESS_TOKEN` | Graph authorization header | outbound text send | Yes |
+| `WHATSAPP_PHONE_NUMBER_ID` | Trusted Graph messages endpoint component | outbound text send | No |
+| `WHATSAPP_BUSINESS_ACCOUNT_ID` | Future/admin account metadata | not required by current text endpoint | No |
+| `WHATSAPP_GRAPH_API_VERSION` | Trusted Graph endpoint version component | outbound text send | No |
+
+The Graph API version is config-driven. Before a real test, the operator must verify the currently supported version in Meta Developer; this project does not choose or hardcode a new version.
+
+### First real development test checklist
+
+- Meta Developer account and a Meta App with the WhatsApp product enabled.
+- Development or business phone-number setup, plus a permitted test recipient when development mode requires it.
+- Runtime-only access token, phone-number ID, app secret, and Graph API version; a locally chosen verify token.
+- A public HTTPS callback at `https://<PUBLIC_HOST>/api/channels/whatsapp/webhook` for both GET verification and POST events, with the corresponding Meta webhook subscription configured.
+- A clean, reviewed working tree; no committed secrets; harmless test text; a confirmed intended recipient; trusted config endpoint construction; active timeout; disabled retries; and redacted logs.
+
+Public HTTPS may be an existing staging host or a temporary development tunnel. This repository does not select, install, deploy, or configure either option. A small adapter-side `WHATSAPP_TEST_RECIPIENT_ALLOWLIST` guard is **RECOMMENDED_BEFORE_LIVE_TEST** so the first live send is restricted to the explicitly confirmed test recipient; it must not become Core logic.
+
+Native Graph transport is not called on startup, health checks, fixture QA, or normal ACK-only webhook handling. It executes only if a future explicit live composition invokes it with valid runtime configuration. `LIVE_META_SEND: NOT_RUN`.
+
+## 0K-26B: CLOSED
+
+- **B.1:** Meta Graph client boundary and text-only provider contract.
+- **B.2:** Complete local signed inbound-to-outbound loop through the existing delivery lifecycle.
+- **B.3:** Final text-pipeline certification and explicit live-test readiness requirements.
+
+The family is closed with fake/injected transport only. No real Meta request, media, voice, queue, retry worker, persistent delivery storage, or production channel availability was introduced. The Graph version is config-driven; `WHATSAPP_BUSINESS_ACCOUNT_ID` is not required for the current message-send endpoint; public HTTPS and real development configuration remain operational prerequisites. A boundary-only test-recipient allowlist is recommended before the separately authorized live test.
+
+**0K-26B is CLOSED. Next: 0K-26C — Controlled WhatsApp Live Text Test Preparation.**

@@ -12,6 +12,10 @@ try {
   assert(missing.readiness === "missing-config", "Enabled webhook without verify token must be controlled.");
   assert(webhook.readiness === "ready-for-webhook" && webhook.verifyToken !== webhook.accessToken, "Verify token must be separate from an access token.");
   assert(api.readiness === "ready-for-api", "Complete development config must report API readiness without connecting.");
+  assert(api.outboundReadiness === "ready-for-outbound", "Complete API fields must report outbound readiness without connecting.");
+  const outboundWithoutBusinessAccount = loadWhatsAppRuntimeConfig({ WHATSAPP_ENABLED: "true", WHATSAPP_VERIFY_TOKEN: "development-verify-token", WHATSAPP_ACCESS_TOKEN: "development-access-token", WHATSAPP_PHONE_NUMBER_ID: "phone-id", WHATSAPP_GRAPH_API_VERSION: "v99.0" });
+  assert(outboundWithoutBusinessAccount.outboundReadiness === "ready-for-outbound", "Business account ID must remain optional for the current text-send endpoint.");
+  assert(webhook.outboundReadiness === "missing-config" && disabled.outboundReadiness === "disabled", "Outbound readiness must be separate from webhook readiness.");
   assert(invalid.readiness === "invalid-config", "Partial API config must be invalid, not ready.");
   assert(api.appSecret !== api.accessToken && api.appSecret !== api.verifyToken, "App, access and verify secrets must remain separate.");
   console.info("WhatsApp Config QA: PASS (env-only config, controlled readiness, separate verification token)");

@@ -52,13 +52,17 @@ Outbound Delivery Contract & Controlled Delivery Lifecycle: neutral delivery con
 
 WhatsApp Inbound Text Foundation: environment-only configuration, local webhook verification, route-local raw-body HMAC verification, text-only event normalization, bounded process-local deduplication (100 provider message IDs), correlation reuse, and Core isolation. It has no real outbound Meta delivery, media support, persistent storage, or production availability. A future real Meta test remains operationally blocked until an intentionally supplied public HTTPS callback and development configuration exist.
 
-### 0K-26B — NEXT
+### 0K-26B — CLOSED
 
-WhatsApp Outbound Text Delivery: official Meta Graph API send boundary, safe outbound text payload, provider response normalization, and a real delivery adapter. No voice work is included.
+WhatsApp Outbound Text Delivery Foundation: config-driven Graph boundary, text-only payload/response normalization, local deterministic inbound-to-outbound pipeline, correlation and lifecycle reuse, and live-test readiness documentation. No real Meta send, media, voice, retry worker, queue, or full channel availability is included.
+
+### 0K-26C — NEXT
+
+Controlled WhatsApp Live Text Test Preparation: boundary-only development recipient allowlist, exact env/config readiness, public HTTPS strategy, Meta Developer asset setup, live-send guard, and first authorized inbound/outbound procedure. No live Meta test is part of this roadmap update.
 
 ## Next P0 roadmap
 
-- 0K-26 — WhatsApp Business Integration (**ACTIVE; A CLOSED, B NEXT**)
+- 0K-26 — WhatsApp Business Integration (**ACTIVE; A CLOSED, B CLOSED, C NEXT**)
 - 0K-27 — WhatsApp Voice Messages
 - 0K-28 — Staging / Production Readiness
 
@@ -67,4 +71,4 @@ WhatsApp targets only: WhatsApp inbound → channel adapter → ORBI ChatBox Cor
 
 ## Recommended next module
 
-**0K-26B — WhatsApp Outbound Text Delivery**. 0K-26A closes the secure inbound text foundation; outbound integration remains intentionally unimplemented.
+**0K-26C — Controlled WhatsApp Live Text Test Preparation**. 0K-26B closes the local outbound-text delivery foundation; real Meta testing remains an explicit, human-authorized operational step.

@@ -85,6 +85,12 @@
                     ,"server:whatsapp-inbound-normalization:qa": "tsx server/scripts/runWhatsAppInboundNormalizationQa.ts"
                     ,"server:whatsapp-inbound-boundary:qa": "tsx server/scripts/runWhatsAppInboundBoundaryQa.ts"
                     ,"server:whatsapp-inbound-integration:qa": "tsx server/scripts/runWhatsAppInboundIntegrationQa.ts"
+                    ,"server:whatsapp-outbound-contract:qa": "tsx server/scripts/runWhatsAppOutboundContractQa.ts"
+                    ,"server:whatsapp-graph-client:qa": "tsx server/scripts/runWhatsAppGraphClientQa.ts"
+                    ,"server:whatsapp-delivery-adapter:qa": "tsx server/scripts/runWhatsAppDeliveryAdapterQa.ts"
+                    ,"server:whatsapp-outbound-integration:qa": "tsx server/scripts/runWhatsAppOutboundIntegrationQa.ts"
+                    ,"server:whatsapp-text-loop:qa": "tsx server/scripts/runWhatsAppTextLoopQa.ts"
+                    ,"server:whatsapp-text-pipeline-certification:qa": "tsx server/scripts/runWhatsAppTextPipelineCertificationQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",
