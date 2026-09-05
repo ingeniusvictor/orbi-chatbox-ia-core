@@ -98,10 +98,10 @@ export const OverviewWorkspace: React.FC<OverviewWorkspaceProps> = ({
             Roadmap Post-MVP
           </span>
           <p className="text-2xl sm:text-3xl font-extrabold text-cyan-400 font-mono">
-            0K-24
+            0K-25
           </p>
           <span className="text-[11px] text-slate-400 font-medium">
-            Cerrado · Siguiente: 0K-25
+            Cerrado · Siguiente: 0K-26
           </span>
         </div>
 

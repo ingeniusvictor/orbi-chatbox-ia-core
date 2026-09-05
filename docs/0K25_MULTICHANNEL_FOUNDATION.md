@@ -105,6 +105,16 @@ Correlation and delivery are separate process-local stores. Delivery failure is 
 
 0K-25C is complete and ready for the final 0K-25 closure certification. WhatsApp remains planned/unavailable; any future adapter preserves the neutral inbound, correlation and outbound delivery boundaries.
 
+## 0K-25 — CLOSED
+
+- **A — Routing foundation:** neutral channel contracts, the static registry, controlled routing and the compatible web/widget reference path.
+- **B — External correlation:** channel-aware external identity isolation, opaque internal conversation IDs and a bounded ephemeral correlation lifecycle.
+- **C — Outbound delivery lifecycle:** neutral delivery contracts, local reference handoff, bounded terminal state and local idempotency.
+
+**Final architectural principles:** **ORBI Core does not know or care which channel originated the message.** **External channel identity is correlation data, not ORBI identity.** **LUMI generates responses; channel delivery remains outside Core.**
+
+Persistent correlation/delivery state, production queues, automatic retries, authentication, real users, Meta API/webhooks, WhatsApp media, provider receipts and production deployment remain deliberately deferred. They are not blockers for this foundation closure. Next: **0K-26 — WhatsApp Business Integration**.
+
 ## A.3 live route integration
 
 The existing local HTTP receiver (`POST /api/public/widget/:publicKey/message`) now validates its compatible public payload, then invokes `ControlledChannelRouter` with the web adapter. Its single canonical path is HTTP route → controlled router → web adapter → normalized contract → bridge → existing Core/LUMI → normalized response → web adapter → compatible HTTP response.

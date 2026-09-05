@@ -32,7 +32,7 @@ TTS primary is `kokoro-local` with voice `ef_dora`. Spanish text follows `Misaki
 
 The Chat Studio includes runtime-only assistant-audio replay, responsive voice states and the approved flagship LUMI visual experience. Human voice acceptance: **PASS**. Human visual acceptance: **PASS**. Future enhancement (non-blocking): improve LUMI voice naturalness / human likeness.
 
-## 0K-25 — ACTIVE
+## 0K-25 — CLOSED
 
 ### 0K-25A — CLOSED
 
@@ -42,13 +42,12 @@ Channel-neutral message contracts, the static adapter registry, controlled routi
 
 External Conversation Correlation & Channel Identity Boundary. It establishes an ephemeral, channel-aware mapping boundary with explicit release and a fixed 100-entry per-process cap; no persistence, auth or external identity system exists.
 
-### 0K-25C — NEXT
+### 0K-25C — CLOSED
 
-Outbound Delivery Contract & Controlled Delivery Lifecycle.
+Outbound Delivery Contract & Controlled Delivery Lifecycle: neutral delivery contracts, bounded process-local lifecycle, idempotency and controlled web reference delivery.
 
 ## Next P0 roadmap
 
-- 0K-25C — Outbound Delivery Contract & Controlled Delivery Lifecycle
 - 0K-26 — WhatsApp Business Integration
 - 0K-27 — WhatsApp Voice Messages
 - 0K-28 — Staging / Production Readiness
@@ -58,4 +57,4 @@ WhatsApp targets only: WhatsApp inbound → channel adapter → ORBI ChatBox Cor
 
 ## Recommended next module
 
-**0K-25C — Outbound Delivery Contract & Controlled Delivery Lifecycle**. 0K-25 remains active; it does not implement real WhatsApp, Meta credentials, webhooks, external messaging or production deployment.
+**0K-26 — WhatsApp Business Integration**. It begins in controlled test/development mode using the official WhatsApp Business Cloud API path; 0K-25 does not implement real WhatsApp, Meta credentials, webhooks, external messaging or production deployment.
