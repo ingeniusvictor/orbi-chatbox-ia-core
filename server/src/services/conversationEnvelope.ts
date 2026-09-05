@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { createInternalConversationRef } from "./internalConversationIdentity.js";
 import type { ConversationEnvelope } from "../types/conversation.js";
 import type { KnowledgeContext } from "../types/knowledge.js";
 import type {
@@ -12,7 +12,7 @@ export const buildConversationEnvelope = (
   knowledgeContext: Readonly<KnowledgeContext>,
 ): ConversationEnvelope => ({
   requestId: processed.requestId,
-  conversationId: input.conversationId ?? randomUUID(),
+  conversationId: input.conversationId ?? createInternalConversationRef().conversationId,
   source: {
     visitorId: input.visitorId,
     channel: processed.channel,

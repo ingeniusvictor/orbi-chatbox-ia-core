@@ -67,7 +67,12 @@
                     "server:channel-adapter:qa": "tsx server/scripts/runChannelAdapterBoundaryQa.ts",
                     "server:channel-registry:qa": "tsx server/scripts/runChannelAdapterRegistryQa.ts",
                     "server:channel-routing:qa": "tsx server/scripts/runControlledChannelRoutingQa.ts",
-                    "server:channel-routing-integration:qa": "tsx server/scripts/runChannelRoutingIntegrationQa.ts"
+                    "server:channel-routing-integration:qa": "tsx server/scripts/runChannelRoutingIntegrationQa.ts",
+                    "server:conversation-correlation:qa": "tsx server/scripts/runConversationCorrelationQa.ts",
+                    "server:channel-identity-boundary:qa": "tsx server/scripts/runChannelIdentityBoundaryQa.ts",
+                    "server:correlation-lifecycle:qa": "tsx server/scripts/runCorrelationLifecycleQa.ts",
+                    "server:correlation-capacity:qa": "tsx server/scripts/runCorrelationCapacityQa.ts",
+                    "server:correlation-integration:qa": "tsx server/scripts/runCorrelationIntegrationQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",

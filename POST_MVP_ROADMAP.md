@@ -38,13 +38,17 @@ The Chat Studio includes runtime-only assistant-audio replay, responsive voice s
 
 Channel-neutral message contracts, the static adapter registry, controlled routing, and integration of the existing local widget receiver are complete. Web is implemented/available; widget reuses the web adapter; WhatsApp remains planned/unavailable; internal remains disabled. No real WhatsApp, Meta integration, external messaging, credentials, webhooks or production behavior is included.
 
-### 0K-25B — NEXT
+### 0K-25B — CLOSED
 
-External Conversation Correlation & Channel Identity Boundary.
+External Conversation Correlation & Channel Identity Boundary. It establishes an ephemeral, channel-aware mapping boundary with explicit release and a fixed 100-entry per-process cap; no persistence, auth or external identity system exists.
+
+### 0K-25C — NEXT
+
+Outbound Delivery Contract & Controlled Delivery Lifecycle.
 
 ## Next P0 roadmap
 
-- 0K-25B — External Conversation Correlation & Channel Identity Boundary
+- 0K-25C — Outbound Delivery Contract & Controlled Delivery Lifecycle
 - 0K-26 — WhatsApp Business Integration
 - 0K-27 — WhatsApp Voice Messages
 - 0K-28 — Staging / Production Readiness
@@ -54,4 +58,4 @@ WhatsApp targets only: WhatsApp inbound → channel adapter → ORBI ChatBox Cor
 
 ## Recommended next module
 
-**0K-25B — External Conversation Correlation & Channel Identity Boundary**. 0K-25 remains active; it does not implement real WhatsApp, Meta credentials, webhooks, external messaging or production deployment.
+**0K-25C — Outbound Delivery Contract & Controlled Delivery Lifecycle**. 0K-25 remains active; it does not implement real WhatsApp, Meta credentials, webhooks, external messaging or production deployment.

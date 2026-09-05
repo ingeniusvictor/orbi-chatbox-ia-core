@@ -1,9 +1,10 @@
 import type { AiProvider, AiProviderMode } from "../types/aiProvider.js";
 import type { NormalizedWidgetMessageRequest } from "../types/widget.js";
 import { processCoreWidgetMessage } from "./coreWidgetMessageProcessor.js";
+import { ChannelConversationCorrelator } from "./channelConversationCorrelator.js";
 import { validateInboundChannelMessage, validateOutboundChannelResponse, type InboundChannelMessage, type OutboundChannelResponse } from "../types/channelMessage.js";
 
-export type ChannelBridgeOptions = Readonly<{ activeProviderMode: AiProviderMode; providerOverride?: AiProvider; orbiConversationId?: string }>;
+export type ChannelBridgeOptions = Readonly<{ activeProviderMode: AiProviderMode; providerOverride?: AiProvider; orbiConversationId?: string; correlator?: ChannelConversationCorrelator }>;
 
 /**
  * Maps one already-normalized message into the existing local Core. External
@@ -15,11 +16,13 @@ export const processInboundChannelMessage = async (
   options: Readonly<ChannelBridgeOptions>,
 ): Promise<Readonly<OutboundChannelResponse>> => {
   const message = validateInboundChannelMessage(inbound);
+  const correlation = (options.correlator ?? new ChannelConversationCorrelator()).correlate(message, options.orbiConversationId);
   const legacyInput: NormalizedWidgetMessageRequest = {
     // The current Core ingress is the local sandbox receiver, not the source channel.
     channel: "web_demo",
-    visitorId: message.externalUserId ?? "anonymous-channel-participant",
-    conversationId: options.orbiConversationId,
+    // External user IDs are correlation metadata, never Core visitor/user identity.
+    visitorId: "channel-adapter-local",
+    conversationId: correlation.internalRef?.conversationId,
     message: message.text,
     pageUrl: message.metadata?.pageUrl ?? "channel-adapter-local",
     consentAccepted: true,
