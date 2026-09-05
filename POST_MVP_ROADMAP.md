@@ -46,9 +46,19 @@ External Conversation Correlation & Channel Identity Boundary. It establishes an
 
 Outbound Delivery Contract & Controlled Delivery Lifecycle: neutral delivery contracts, bounded process-local lifecycle, idempotency and controlled web reference delivery.
 
+## 0K-26 — ACTIVE
+
+### 0K-26A — CLOSED
+
+WhatsApp Inbound Text Foundation: environment-only configuration, local webhook verification, route-local raw-body HMAC verification, text-only event normalization, bounded process-local deduplication (100 provider message IDs), correlation reuse, and Core isolation. It has no real outbound Meta delivery, media support, persistent storage, or production availability. A future real Meta test remains operationally blocked until an intentionally supplied public HTTPS callback and development configuration exist.
+
+### 0K-26B — NEXT
+
+WhatsApp Outbound Text Delivery: official Meta Graph API send boundary, safe outbound text payload, provider response normalization, and a real delivery adapter. No voice work is included.
+
 ## Next P0 roadmap
 
-- 0K-26 — WhatsApp Business Integration
+- 0K-26 — WhatsApp Business Integration (**ACTIVE; A CLOSED, B NEXT**)
 - 0K-27 — WhatsApp Voice Messages
 - 0K-28 — Staging / Production Readiness
 
@@ -57,4 +67,4 @@ WhatsApp targets only: WhatsApp inbound → channel adapter → ORBI ChatBox Cor
 
 ## Recommended next module
 
-**0K-26 — WhatsApp Business Integration**. It begins in controlled test/development mode using the official WhatsApp Business Cloud API path; 0K-25 does not implement real WhatsApp, Meta credentials, webhooks, external messaging or production deployment.
+**0K-26B — WhatsApp Outbound Text Delivery**. 0K-26A closes the secure inbound text foundation; outbound integration remains intentionally unimplemented.

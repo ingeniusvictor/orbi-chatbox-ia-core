@@ -6,11 +6,15 @@ import { createRateLimitGuard } from "./middleware/rateLimitGuard.js";
 import { healthRouter } from "./routes/health.js";
 import { createWidgetMessageRouter } from "./routes/widgetMessage.js";
 import { createVoiceRouter } from "./routes/voice.js";
+import { createWhatsAppWebhookRouter } from "./routes/whatsappWebhook.js";
+import { createWhatsAppWebhookRawBodyMiddleware } from "./middleware/whatsAppWebhookRawBody.js";
 import { createSandboxError } from "./security/errorResponses.js";
 
 export const createApp = (runtimeEnv: ServerRuntimeEnv): express.Express => {
   const app = express();
 
+  // Must precede global JSON parsing so the webhook HMAC sees its exact bytes.
+  app.use("/api/channels/whatsapp/webhook", createWhatsAppWebhookRawBodyMiddleware());
   app.use(express.json({ limit: "64kb" }));
   app.use(createCorsGuard(runtimeEnv.allowedOrigins));
   app.use(
@@ -20,6 +24,7 @@ export const createApp = (runtimeEnv: ServerRuntimeEnv): express.Express => {
   app.use(createAuditLog(runtimeEnv.auditLogEnabled));
   app.use(healthRouter);
   app.use(createVoiceRouter());
+  app.use(createWhatsAppWebhookRouter(runtimeEnv.whatsapp, runtimeEnv.activeAiProvider));
   app.use(createWidgetMessageRouter(runtimeEnv.demoWidgetPublicKey, runtimeEnv.activeAiProvider));
 
   const notFoundHandler: RequestHandler = (_request, response) => {

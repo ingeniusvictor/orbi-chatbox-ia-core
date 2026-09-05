@@ -11,9 +11,13 @@ import type { ChannelDeliveryAdapter } from "../types/channelDeliveryAdapter.js"
 import type { OutboundDeliveryResult } from "../types/outboundDelivery.js";
 
 export type ControlledChannelRouteInput = Readonly<{ channel: string; rawInput: unknown; activeProviderMode: AiProviderMode; providerOverride?: AiProvider; orbiConversationId?: string }>;
+export type ControlledInboundOnlyRouteInput = ControlledChannelRouteInput;
 export type ControlledChannelRouteResult<Formatted = unknown> =
   | Readonly<{ ok: true; channel: ChannelId; adapterChannel: ChannelId; outbound: import("../types/channelMessage.js").OutboundChannelResponse; output: Formatted; delivery: Readonly<OutboundDeliveryResult> }>
   | Readonly<{ ok: false; channel?: string; errorCode: "CHANNEL_UNKNOWN" | "CHANNEL_NOT_IMPLEMENTED" | "CHANNEL_DISABLED" | "CHANNEL_ADAPTER_UNAVAILABLE" | "CHANNEL_NORMALIZATION_FAILED" | "CHANNEL_CORRELATION_FAILED" | "CHANNEL_FORMAT_FAILED" | "CHANNEL_DELIVERY_FAILED" | "CHANNEL_CORE_FAILED" }>;
+export type ControlledInboundOnlyRouteResult =
+  | Readonly<{ ok: true; channel: ChannelId; adapterChannel: ChannelId; outbound: import("../types/channelMessage.js").OutboundChannelResponse }>
+  | Extract<ControlledChannelRouteResult, { ok: false }>;
 
 /** Provider raw input is normalized by the selected adapter before it reaches ORBI Core. */
 export class ControlledChannelRouter {
@@ -41,6 +45,25 @@ export class ControlledChannelRouter {
         if (delivery.status !== "delivered") return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "CHANNEL_DELIVERY_FAILED" });
         return Object.freeze({ ok: true, channel: resolution.channel, adapterChannel: resolution.adapterChannel, outbound, output, delivery });
       } catch { return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "CHANNEL_DELIVERY_FAILED" }); }
+    } catch (error) {
+      if (error instanceof ChannelMessageValidationError) return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "CHANNEL_NORMALIZATION_FAILED" });
+      if (error instanceof ConversationCorrelationError) return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "CHANNEL_CORRELATION_FAILED" });
+      return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "CHANNEL_CORE_FAILED" });
+    }
+  }
+
+  /**
+   * Controlled development ingress for an adapter with no outbound delivery
+   * implementation. It intentionally stops before formatting and delivery.
+   */
+  async routeInboundOnly(input: Readonly<ControlledInboundOnlyRouteInput>): Promise<ControlledInboundOnlyRouteResult> {
+    const resolution = this.registry.resolve(input.channel, { allowInboundFoundation: true });
+    if (resolution.ok === false) return Object.freeze({ ok: false, channel: resolution.channel, errorCode: resolution.errorCode });
+    try {
+      const normalized = resolution.adapter.normalizeInbound(input.rawInput);
+      const inbound = normalized.channel === resolution.channel ? normalized : Object.freeze({ ...normalized, channel: resolution.channel });
+      const outbound = await processInboundChannelMessage(inbound, { activeProviderMode: input.activeProviderMode, providerOverride: input.providerOverride, orbiConversationId: input.orbiConversationId, correlator: this.correlator });
+      return Object.freeze({ ok: true, channel: resolution.channel, adapterChannel: resolution.adapterChannel, outbound });
     } catch (error) {
       if (error instanceof ChannelMessageValidationError) return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "CHANNEL_NORMALIZATION_FAILED" });
       if (error instanceof ConversationCorrelationError) return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "CHANNEL_CORRELATION_FAILED" });

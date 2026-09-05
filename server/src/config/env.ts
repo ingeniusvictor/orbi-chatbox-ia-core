@@ -2,6 +2,7 @@ import "dotenv/config";
 import { resolveConfiguredAiProvider } from "./aiProviderSelection.js";
 import { loadPostMvpRuntimeConfig } from "./runtimeConfig.js";
 import type { AiProviderMode } from "../types/aiProvider.js";
+import { loadWhatsAppRuntimeConfig, type WhatsAppRuntimeConfig } from "./whatsappRuntimeConfig.js";
 
 export type ServerRuntimeEnv = {
   nodeEnv: string;
@@ -12,6 +13,7 @@ export type ServerRuntimeEnv = {
   rateLimitMaxRequests: number;
   auditLogEnabled: boolean;
   activeAiProvider: AiProviderMode;
+  whatsapp: WhatsAppRuntimeConfig;
 };
 
 const parsePositiveInteger = (value: string | undefined, fallback: number): number => {
@@ -50,4 +52,5 @@ export const loadServerRuntimeEnv = (): ServerRuntimeEnv => ({
   ),
   auditLogEnabled: (process.env.ORBI_AUDIT_LOG_ENABLED ?? "true").toLowerCase() === "true",
   activeAiProvider: loadPostMvpRuntimeConfig().provider,
+  whatsapp: loadWhatsAppRuntimeConfig(),
 });

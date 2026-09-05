@@ -78,6 +78,13 @@
                     "server:delivery-lifecycle:qa": "tsx server/scripts/runDeliveryLifecycleQa.ts",
                     "server:delivery-idempotency:qa": "tsx server/scripts/runDeliveryIdempotencyQa.ts",
                     "server:delivery-integration:qa": "tsx server/scripts/runDeliveryIntegrationQa.ts"
+                    ,"server:whatsapp-config:qa": "tsx server/scripts/runWhatsAppConfigQa.ts"
+                    ,"server:whatsapp-webhook:qa": "tsx server/scripts/runWhatsAppWebhookVerificationQa.ts"
+                    ,"server:whatsapp-boundary:qa": "tsx server/scripts/runWhatsAppBoundaryQa.ts"
+                    ,"server:whatsapp-signature:qa": "tsx server/scripts/runWhatsAppSignatureQa.ts"
+                    ,"server:whatsapp-inbound-normalization:qa": "tsx server/scripts/runWhatsAppInboundNormalizationQa.ts"
+                    ,"server:whatsapp-inbound-boundary:qa": "tsx server/scripts/runWhatsAppInboundBoundaryQa.ts"
+                    ,"server:whatsapp-inbound-integration:qa": "tsx server/scripts/runWhatsAppInboundIntegrationQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",

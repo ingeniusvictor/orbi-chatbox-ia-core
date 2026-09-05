@@ -52,7 +52,7 @@ export type ChannelCapabilities = Readonly<{
   voiceOutbound: boolean;
 }>;
 
-export type ChannelImplementationStatus = "implemented" | "planned" | "disabled";
+export type ChannelImplementationStatus = "implemented" | "foundation" | "inbound-foundation" | "planned" | "disabled";
 export type ChannelRuntimeAvailability = "available" | "unavailable" | "disabled";
 
 export type ChannelDescriptor = Readonly<{
@@ -65,7 +65,7 @@ export type ChannelDescriptor = Readonly<{
 export const CHANNEL_DESCRIPTORS: readonly ChannelDescriptor[] = Object.freeze([
   { channel: "web", capabilities: { textInbound: true, textOutbound: true, voiceInbound: true, voiceOutbound: true }, status: "implemented", availability: "available" },
   { channel: "widget", capabilities: { textInbound: true, textOutbound: true, voiceInbound: false, voiceOutbound: false }, status: "implemented", availability: "available" },
-  { channel: "whatsapp", capabilities: { textInbound: false, textOutbound: false, voiceInbound: false, voiceOutbound: false }, status: "planned", availability: "unavailable" },
+  { channel: "whatsapp", capabilities: { textInbound: true, textOutbound: false, voiceInbound: false, voiceOutbound: false }, status: "inbound-foundation", availability: "unavailable" },
   { channel: "internal", capabilities: { textInbound: true, textOutbound: true, voiceInbound: false, voiceOutbound: false }, status: "disabled", availability: "disabled" },
 ]);
 
