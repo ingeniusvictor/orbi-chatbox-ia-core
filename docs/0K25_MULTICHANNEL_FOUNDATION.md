@@ -71,6 +71,40 @@ Router integration proves repeat continuity, cross-channel isolation, exact rele
 
 The correlation store is process-local, non-production and reset on backend restart. No persistence is attempted. Next family: **0K-25C — Outbound Delivery Contract & Controlled Delivery Lifecycle**.
 
+## 0K-25C.1 — Outbound Delivery Foundation
+
+**Architectural invariant:** **LUMI generates responses; channel delivery remains outside Core.**
+
+`OutboundDeliveryRequest` reuses an existing `OutboundChannelResponse` and adds an opaque ORBI-local `deliveryId`, channel, conversation ID and creation timestamp. `OutboundDeliveryResult` is a bounded channel-boundary outcome: `pending`, `delivered` or `failed`. A delivery ID is neither a provider message ID nor an external conversation, user, phone or channel-message identifier; it may become a future retry/deduplication anchor without changing Core.
+
+`ChannelDeliveryAdapter` owns delivery after Core/LUMI has generated the neutral response. The web/widget reference adapter performs no network delivery: `delivered` means the validated, formatted response has been handed to the existing controlled HTTP response boundary. It does not claim provider acknowledgement, end-user receipt, read status or delivery to a device.
+
+Failures are controlled through bounded delivery codes. There are no provider payloads, provider receipts, Meta imports, retries, attempt counters, queues, workers, database or persistence. Future 0K-26 mapping is conceptual only: `OutboundDeliveryRequest → WhatsAppDeliveryAdapter → provider send boundary → OutboundDeliveryResult`; no WhatsApp adapter or API exists in this repository.
+
+## 0K-25C.2 — Controlled Delivery Lifecycle
+
+The local lifecycle is `NEW → pending → delivered` or `NEW → pending → failed`. `delivered` and `failed` are terminal: neither can transition backward or into the other. A future retry must use a separate controlled attempt rather than mutate a terminal delivery; retries, timers, workers and queues remain deferred.
+
+`InMemoryDeliveryLifecycleStore` holds at most 100 process-local, ephemeral records. A record contains only delivery ID, channel, state, timestamps and a bounded error code. It never stores response text, provider payloads, identifiers, media or Core conversation data. Capacity rejects a new record without eviction; existing records remain resolvable. Exact release removes only a terminal lifecycle record and never changes Core history or correlation.
+
+The delivery service uses a deterministic fingerprint of neutral channel, conversation and response identity to reject conflicting reuse of a `deliveryId`. An equivalent duplicate shares the original pending/terminal lifecycle and cannot execute the adapter twice. Repeated equivalent terminal completion is idempotent. Provider receipt/status integration remains a future adapter-side concern.
+
+## 0K-25C.3 — Delivery Lifecycle Integration Review
+
+The canonical web flow remains: compatible local HTTP route → `ControlledChannelRouter` → web adapter → normalized inbound message → correlation → Core/LUMI → `OutboundChannelResponse` → internal delivery request → lifecycle pending → web reference delivery adapter → terminal `delivered` → compatible HTTP response. The browser supplies neither a delivery ID nor lifecycle/correlation infrastructure fields; existing ORBI `conversationId` continuity remains unchanged.
+
+Correlation and delivery are separate process-local stores. Delivery failure is translated to the controlled routing boundary and does not remove correlation. Releasing a terminal delivery record affects no correlation, Core conversation or history; releasing correlation affects no delivery record. Delivery capacity is 100 records with explicit release and no eviction. A future `WhatsAppDeliveryAdapter` can replace the local reference adapter behind the same boundary without changing Core, LUMI, Knowledge or correlation contracts; its provider identifiers and receipts remain adapter-side.
+
+## 0K-25C — CLOSED
+
+- **C.1 — Delivery contracts + reference adapter:** neutral internal delivery request/result contracts and a local web/widget handoff proof.
+- **C.2 — Controlled lifecycle + idempotency:** bounded ephemeral state, terminal-transition protection, exact release and duplicate-send prevention.
+- **C.3 — Integration certification:** canonical route coverage, correlation/delivery separation, capacity verification and compatible HTTP smoke coverage.
+
+**Architectural invariant:** **LUMI generates responses; channel delivery remains outside Core.**
+
+0K-25C is complete and ready for the final 0K-25 closure certification. WhatsApp remains planned/unavailable; any future adapter preserves the neutral inbound, correlation and outbound delivery boundaries.
+
 ## A.3 live route integration
 
 The existing local HTTP receiver (`POST /api/public/widget/:publicKey/message`) now validates its compatible public payload, then invokes `ControlledChannelRouter` with the web adapter. Its single canonical path is HTTP route → controlled router → web adapter → normalized contract → bridge → existing Core/LUMI → normalized response → web adapter → compatible HTTP response.

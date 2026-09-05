@@ -72,7 +72,12 @@
                     "server:channel-identity-boundary:qa": "tsx server/scripts/runChannelIdentityBoundaryQa.ts",
                     "server:correlation-lifecycle:qa": "tsx server/scripts/runCorrelationLifecycleQa.ts",
                     "server:correlation-capacity:qa": "tsx server/scripts/runCorrelationCapacityQa.ts",
-                    "server:correlation-integration:qa": "tsx server/scripts/runCorrelationIntegrationQa.ts"
+                    "server:correlation-integration:qa": "tsx server/scripts/runCorrelationIntegrationQa.ts",
+                    "server:outbound-delivery-contract:qa": "tsx server/scripts/runOutboundDeliveryContractQa.ts",
+                    "server:delivery-state:qa": "tsx server/scripts/runDeliveryStateQa.ts",
+                    "server:delivery-lifecycle:qa": "tsx server/scripts/runDeliveryLifecycleQa.ts",
+                    "server:delivery-idempotency:qa": "tsx server/scripts/runDeliveryIdempotencyQa.ts",
+                    "server:delivery-integration:qa": "tsx server/scripts/runDeliveryIntegrationQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",
