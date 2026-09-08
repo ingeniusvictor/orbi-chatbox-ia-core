@@ -120,3 +120,61 @@ Native Graph transport is not called on startup, health checks, fixture QA, or n
 The family is closed with fake/injected transport only. No real Meta request, media, voice, queue, retry worker, persistent delivery storage, or production channel availability was introduced. The Graph version is config-driven; `WHATSAPP_BUSINESS_ACCOUNT_ID` is not required for the current message-send endpoint; public HTTPS and real development configuration remain operational prerequisites. A boundary-only test-recipient allowlist is recommended before the separately authorized live test.
 
 **0K-26B is CLOSED. Next: 0K-26C — Controlled WhatsApp Live Text Test Preparation.**
+
+## 0K-26C.1: controlled live-test safety foundation
+
+Native Graph transport is now fail-closed by default. It can execute only when `WHATSAPP_ENABLED=true`, `WHATSAPP_LIVE_SEND_ENABLED=true`, outbound configuration is ready, and the exact recipient is present in the bounded environment-only `WHATSAPP_TEST_RECIPIENT_ALLOWLIST`. A missing or empty allowlist, a malformed identifier, a partial match, incomplete configuration, or a disabled live flag denies execution before the native transport is invoked. The final execution gate is inside the WhatsApp Graph client; Core/LUMI, neutral responses, correlation, and knowledge remain unaware of live-test state and recipient policy.
+
+Recipients accept only their existing canonical decimal identifier form (6–30 digits). The guard trims outer whitespace only; it does not infer country codes, transform identifiers, support wildcards, regular expressions, or partial matching. Injected fake transports remain unrestricted so deterministic QA cannot accidentally depend on live configuration.
+
+Readiness diagnostics expose only status booleans: enabled, signature readiness, outbound-config readiness, allowlist presence, live-lock state, and live-test readiness. They never expose tokens, secrets, recipients, or phone-number identifiers. Runtime states are `disabled`, `config-incomplete`, `live-send-locked`, `live-test-ready`, or `invalid-config`. No startup, health check, webhook verification, fixture QA, lint, or build calls Graph.
+
+### C.1 configuration responsibility matrix
+
+| Variable | Purpose | Scope | Required for first live text loop | Secret | Diagnostics |
+| --- | --- | --- | --- | --- | --- |
+| `WHATSAPP_ENABLED` | Explicit integration enablement | inbound/outbound | Yes | No | Yes, boolean |
+| `WHATSAPP_VERIFY_TOKEN` | Webhook GET challenge validation | inbound | Yes | Yes | No |
+| `WHATSAPP_APP_SECRET` | Signed webhook POST validation | inbound | Yes | Yes | No |
+| `WHATSAPP_ACCESS_TOKEN` | Graph authorization | outbound | Yes | Yes | No |
+| `WHATSAPP_PHONE_NUMBER_ID` | Trusted messages endpoint component | outbound | Yes | No | No |
+| `WHATSAPP_BUSINESS_ACCOUNT_ID` | Future/admin or subscription metadata | admin | No | No | No |
+| `WHATSAPP_GRAPH_API_VERSION` | Trusted Graph endpoint version | outbound | Yes | No | No |
+| `WHATSAPP_TEST_RECIPIENT_ALLOWLIST` | Exact development-recipient guard | outbound | Yes | No | No |
+| `WHATSAPP_LIVE_SEND_ENABLED` | Explicit native-send opt-in | outbound | Yes | No | Yes, boolean |
+
+The public callback remains `GET/POST https://<PUBLIC_HOST>/api/channels/whatsapp/webhook`. A real test requires either an existing controlled staging HTTPS host or a temporary HTTPS development tunnel; neither is installed, selected, or deployed here. The operator must additionally prepare a Meta Developer account, Meta App, WhatsApp product, development/test sender number or configured business number, intended recipient authorization where required, access token, phone-number ID, app secret, local verify token, currently supported Graph version, callback URL, webhook fields/subscription, and any app-to-WABA subscription required by Meta. WABA ID is not required for the current `/messages` send itself.
+
+Development/user tokens may be temporary; token refresh, storage, and a longer-lived system-user credential strategy are deferred to staging/production readiness. No token is persisted.
+
+### Future authorized procedures (not executed)
+
+**Test 1 — outbound only:** with one explicitly allowlisted development recipient and harmless text such as “Hola, esta es una prueba de conexión de LUMI por WhatsApp.”, execute exactly one authorized send. Use no retries, bulk messaging, media, templates, or unsanitized logs.
+
+**Test 2 — complete loop:** the same approved recipient sends a text to the public HTTPS webhook; the signed inbound event traverses normalization, correlation, Core/LUMI, and the guarded outbound adapter back to that recipient. This proves the first real conversation only after Test 1 succeeds.
+
+`LIVE_META_SEND: NOT_RUN`. No live webhook, Graph request, deployment, tunnel, media, voice, or production activation occurred in C.1.
+
+## 0K-26C.2: first live outbound test preflight
+
+Test 1 is outbound only: ORBI → `WhatsAppDeliveryAdapter` → `WhatsAppGraphClient` → Meta → one approved development recipient. It needs `WHATSAPP_ENABLED=true`, `WHATSAPP_LIVE_SEND_ENABLED=true`, `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_GRAPH_API_VERSION`, and an exact single entry in `WHATSAPP_TEST_RECIPIENT_ALLOWLIST`. It does not require a verify token, app secret, public HTTPS callback, webhook subscription, or WABA ID for the current `/messages` endpoint.
+
+The future authorized command is `npm run server:whatsapp-live-test`. It sends one fixed harmless text to exactly one allowlisted recipient, has no retry, batch, timer, queue, or scheduler, and fails closed for incomplete configuration or any allowlist mismatch. Its output is restricted to sanitized state/result lines and never exposes credentials, recipient identifiers, authorization headers, or provider response bodies. The command is covered only with injected fake transport during preflight; **no live send is executed in C.2**.
+
+Test 2 remains separate: signed inbound text → LUMI → guarded outbound response. It will require a public HTTPS callback, webhook verification, app secret, signature validation, and Meta webhook subscription. Neither Test 2 configuration nor a tunnel is created by this preflight.
+
+## 0K-26C.3: controlled template-message live-test support
+
+The existing free-form outbound text path remains supported. A first-contact test can instead use a provider-only, parameter-free template message whose name and language code are environment-driven through `WHATSAPP_TEST_TEMPLATE_NAME` and `WHATSAPP_TEST_TEMPLATE_LANGUAGE_CODE`. The project does not hardcode a business template, infer a template from the Meta UI, or add generic component/parameter builders.
+
+The separate future command `npm run server:whatsapp-live-template-test` requires exactly one allowlisted recipient, the existing native-send lock, outbound readiness, a valid conservative template identifier, and a valid WhatsApp-style language code. It makes exactly one request with no retry, batch, worker, or queue; its sanitized result `SEND_ACCEPTED` means Graph API acceptance only, never confirmed handset delivery. The text test command remains separate and unchanged.
+
+Meta's own UI template test was reported as delivered to the device. The earlier ORBI free-form API request was accepted by Graph but device delivery was not confirmed. This is real-world operational evidence only; webhook status callbacks, provider receipt mapping, and confirmed delivery validation are future work. C.3 QA uses injected fake transport only: **no template send is executed by this repository during implementation or QA**.
+
+## 0K-26C: controlled live outbound validation — CLOSED
+
+`SEND_ACCEPTED` means that the Graph API accepted the request; it does **not** by itself mean that a WhatsApp device received or displayed it. The initial ORBI free-form text request was accepted by the API, while its device delivery was not confirmed. This free-form path remains supported but is not treated as device-delivery evidence.
+
+During controlled testing, the parameterized template `jaspers_market_order_confirmation_v1` was rejected by Meta with error `132000` because that template requires components/parameters. ORBI does not add generic parameter builders in this family. A parameter-free template, `hello_world` with `en_US`, was then selected through the environment-only template configuration. The controlled ORBI template test was accepted by Graph and confirmed by the authorized user as received on the device.
+
+Therefore the controlled first-contact path — ORBI → Meta Graph API → authorized WhatsApp device using a parameter-free template — is live-validated. Template components and parameters remain future work. Real signed inbound webhook testing and the full inbound LUMI conversational loop remain pending; status callbacks and provider receipt mapping are also deferred. Closure QA uses fake/injected transport only and makes no network request.

@@ -91,6 +91,13 @@
                     ,"server:whatsapp-outbound-integration:qa": "tsx server/scripts/runWhatsAppOutboundIntegrationQa.ts"
                     ,"server:whatsapp-text-loop:qa": "tsx server/scripts/runWhatsAppTextLoopQa.ts"
                     ,"server:whatsapp-text-pipeline-certification:qa": "tsx server/scripts/runWhatsAppTextPipelineCertificationQa.ts"
+                    ,"server:whatsapp-recipient-allowlist:qa": "tsx server/scripts/runWhatsAppRecipientAllowlistQa.ts"
+                    ,"server:whatsapp-live-guard:qa": "tsx server/scripts/runWhatsAppLiveGuardQa.ts"
+                    ,"server:whatsapp-live-readiness:qa": "tsx server/scripts/runWhatsAppLiveReadinessQa.ts"
+                    ,"server:whatsapp-live-test:qa": "tsx server/scripts/runWhatsAppLiveTestPreflightQa.ts"
+                    ,"server:whatsapp-live-test": "tsx server/scripts/runWhatsAppLiveTextTest.ts"
+                    ,"server:whatsapp-template-message:qa": "tsx server/scripts/runWhatsAppTemplateMessageQa.ts"
+                    ,"server:whatsapp-live-template-test": "tsx server/scripts/runWhatsAppLiveTemplateTest.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",

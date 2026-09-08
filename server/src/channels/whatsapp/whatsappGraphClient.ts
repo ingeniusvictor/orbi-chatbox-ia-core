@@ -1,5 +1,7 @@
 import type { WhatsAppRuntimeConfig } from "../../config/whatsappRuntimeConfig.js";
 import { createWhatsAppOutboundTextPayload, type WhatsAppOutboundDeliveryContext, type WhatsAppOutboundTextPayload } from "./whatsappOutboundText.js";
+import { createWhatsAppOutboundTemplatePayload, type WhatsAppOutboundTemplatePayload } from "./whatsappOutboundTemplate.js";
+import { canExecuteNativeWhatsAppSend, canExecuteNativeWhatsAppTemplateSend } from "./whatsappLiveTestSafety.js";
 
 export type WhatsAppGraphErrorCode =
   | "WHATSAPP_NOT_CONFIGURED"
@@ -8,7 +10,8 @@ export type WhatsAppGraphErrorCode =
   | "WHATSAPP_RATE_LIMITED"
   | "WHATSAPP_TIMEOUT"
   | "WHATSAPP_NETWORK_FAILED"
-  | "WHATSAPP_INVALID_RESPONSE";
+  | "WHATSAPP_INVALID_RESPONSE"
+  | "WHATSAPP_LIVE_SEND_LOCKED";
 
 export type WhatsAppGraphTransportRequest = Readonly<{
   endpoint: string;
@@ -18,7 +21,7 @@ export type WhatsAppGraphTransportRequest = Readonly<{
   timeoutMs: number;
 }>;
 export type WhatsAppGraphTransportResponse = Readonly<{ status: number; body: string }>;
-export type WhatsAppGraphTransport = (request: Readonly<WhatsAppGraphTransportRequest>) => Promise<Readonly<WhatsAppGraphTransportResponse>>;
+export type WhatsAppGraphTransport = ((request: Readonly<WhatsAppGraphTransportRequest>) => Promise<Readonly<WhatsAppGraphTransportResponse>>) & Readonly<{ kind?: "native" }>;
 export type WhatsAppGraphSendResult =
   | Readonly<{ ok: true; accepted: true; providerMessageId?: string }>
   | Readonly<{ ok: false; errorCode: WhatsAppGraphErrorCode }>;
@@ -47,14 +50,14 @@ const providerMessageIdFrom = (body: unknown): string | undefined => {
 };
 
 /** Native transport exists for a later authorized live test; B.1 QA injects a fake transport. */
-export const createNativeWhatsAppGraphTransport = (): WhatsAppGraphTransport => async (request) => {
+export const createNativeWhatsAppGraphTransport = (): WhatsAppGraphTransport => Object.assign(async (request: Readonly<WhatsAppGraphTransportRequest>) => {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), request.timeoutMs);
   try {
     const response = await fetch(request.endpoint, { method: request.method, headers: request.headers, body: request.body, redirect: "error", signal: controller.signal });
     return Object.freeze({ status: response.status, body: await response.text() });
   } finally { clearTimeout(timeout); }
-};
+}, Object.freeze({ kind: "native" as const }));
 
 export class WhatsAppGraphClient {
   constructor(
@@ -64,10 +67,28 @@ export class WhatsAppGraphClient {
   ) {}
 
   async sendText(context: Readonly<WhatsAppOutboundDeliveryContext>, text: string): Promise<WhatsAppGraphSendResult> {
-    const endpoint = buildWhatsAppGraphMessagesEndpoint(this.config);
-    if (!endpoint || !this.config.accessToken || !Number.isSafeInteger(this.timeoutMs) || this.timeoutMs < 100 || this.timeoutMs > 30_000) return Object.freeze({ ok: false, errorCode: "WHATSAPP_NOT_CONFIGURED" });
     let payload: Readonly<WhatsAppOutboundTextPayload>;
     try { payload = createWhatsAppOutboundTextPayload(context, text); } catch { return Object.freeze({ ok: false, errorCode: "WHATSAPP_REQUEST_REJECTED" }); }
+    return this.sendPayload(context, payload, canExecuteNativeWhatsAppSend);
+  }
+
+  async sendTemplate(context: Readonly<WhatsAppOutboundDeliveryContext>): Promise<WhatsAppGraphSendResult> {
+    let payload: Readonly<WhatsAppOutboundTemplatePayload>;
+    try {
+      if (!this.config.testTemplateName || !this.config.testTemplateLanguageCode) throw new Error("Missing template configuration.");
+      payload = createWhatsAppOutboundTemplatePayload(context, this.config.testTemplateName, this.config.testTemplateLanguageCode);
+    } catch { return Object.freeze({ ok: false, errorCode: "WHATSAPP_NOT_CONFIGURED" }); }
+    return this.sendPayload(context, payload, canExecuteNativeWhatsAppTemplateSend);
+  }
+
+  private async sendPayload(
+    context: Readonly<WhatsAppOutboundDeliveryContext>,
+    payload: Readonly<WhatsAppOutboundTextPayload | WhatsAppOutboundTemplatePayload>,
+    nativeGuard: (config: Readonly<WhatsAppRuntimeConfig>, recipient: string) => boolean,
+  ): Promise<WhatsAppGraphSendResult> {
+    const endpoint = buildWhatsAppGraphMessagesEndpoint(this.config);
+    if (!endpoint || !this.config.accessToken || !Number.isSafeInteger(this.timeoutMs) || this.timeoutMs < 100 || this.timeoutMs > 30_000) return Object.freeze({ ok: false, errorCode: "WHATSAPP_NOT_CONFIGURED" });
+    if (this.transport.kind === "native" && !nativeGuard(this.config, context.recipient)) return Object.freeze({ ok: false, errorCode: "WHATSAPP_LIVE_SEND_LOCKED" });
     try {
       const response = await this.transport(Object.freeze({ endpoint, method: "POST", headers: Object.freeze({ authorization: `Bearer ${this.config.accessToken}`, "content-type": "application/json" }), body: JSON.stringify(payload), timeoutMs: this.timeoutMs }));
       if (!Number.isInteger(response.status) || response.status < 200 || response.status > 299) return Object.freeze({ ok: false, errorCode: normalizeStatus(response.status) });
