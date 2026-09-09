@@ -3,8 +3,11 @@ import type { NormalizedWidgetMessageRequest } from "../types/widget.js";
 import { processCoreWidgetMessage } from "./coreWidgetMessageProcessor.js";
 import { ChannelConversationCorrelator } from "./channelConversationCorrelator.js";
 import { validateInboundChannelMessage, validateOutboundChannelResponse, type InboundChannelMessage, type OutboundChannelResponse } from "../types/channelMessage.js";
+import { defaultHumanHandoffService, type HumanHandoffService } from "../handoff/humanHandoffService.js";
 
-export type ChannelBridgeOptions = Readonly<{ activeProviderMode: AiProviderMode; providerOverride?: AiProvider; orbiConversationId?: string; correlator?: ChannelConversationCorrelator }>;
+export class HumanHandoffActiveError extends Error { constructor(){super("AI execution is suppressed by human handoff.");this.name="HumanHandoffActiveError";} }
+
+export type ChannelBridgeOptions = Readonly<{ activeProviderMode: AiProviderMode; providerOverride?: AiProvider; orbiConversationId?: string; correlator?: ChannelConversationCorrelator; handoffService?: HumanHandoffService }>;
 
 /**
  * Maps one already-normalized message into the existing local Core. External
@@ -17,6 +20,8 @@ export const processInboundChannelMessage = async (
 ): Promise<Readonly<OutboundChannelResponse>> => {
   const message = validateInboundChannelMessage(inbound);
   const correlation = (options.correlator ?? new ChannelConversationCorrelator()).correlate(message, options.orbiConversationId);
+  if (!options.handoffService?.canExecuteAi(correlation.internalRef!.conversationId) && options.handoffService) throw new HumanHandoffActiveError();
+  if (!options.handoffService && !defaultHumanHandoffService.canExecuteAi(correlation.internalRef!.conversationId)) throw new HumanHandoffActiveError();
   const legacyInput: NormalizedWidgetMessageRequest = {
     // The current Core ingress is the local sandbox receiver, not the source channel.
     channel: "web_demo",

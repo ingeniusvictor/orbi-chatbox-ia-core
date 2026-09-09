@@ -99,6 +99,7 @@
                     ,"server:whatsapp-template-message:qa": "tsx server/scripts/runWhatsAppTemplateMessageQa.ts"
                     ,"server:whatsapp-live-template-test": "tsx server/scripts/runWhatsAppLiveTemplateTest.ts"
                     ,"server:messaging-ux:qa": "tsx server/scripts/runMessagingUxQa.ts"
+                    ,"server:human-handoff:qa": "tsx server/scripts/runHumanHandoffQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",
