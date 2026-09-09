@@ -1,0 +1,2 @@
+# 0K-33 Business Tools Pack
+Local bounded tools provide knowledge lookup, lead capture, service requests, appointment requests and existing human handoff. Records use internal conversation IDs; contact values are not echoed in results. Appointment records are requests, never confirmed bookings. Tools are registered explicitly and remain denied until policy allows them. No CRM, calendar, network or provider identity is used.
