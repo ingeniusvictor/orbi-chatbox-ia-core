@@ -5,6 +5,16 @@ import type {
   RuntimeFailureReasonCode,
 } from "../types/runtimeFailureSemantics.js";
 
+export type RuntimeExecutionFailureCode = "PROVIDER_FAILURE" | "TOOL_EXECUTION_FAILURE" | "CORE_EXECUTION_FAILURE";
+
+/** Carries only a bounded neutral runtime reason; the original error stays private. */
+export class RuntimeExecutionFailure extends Error {
+  constructor(readonly reasonCode: RuntimeExecutionFailureCode) {
+    super("Runtime execution failed.");
+    this.name = "RuntimeExecutionFailure";
+  }
+}
+
 type RuntimeDispositionDefinition = Readonly<{
   category: RuntimeDispositionCategory;
   safeMessage: string;

@@ -3,7 +3,7 @@ import type { ChannelId } from "../types/channelMessage.js";
 import { ChannelMessageValidationError } from "../types/channelMessage.js";
 import { ConversationCorrelationError } from "../types/conversationCorrelation.js";
 import { processInboundChannelMessage } from "./channelMessageBridge.js";
-import { HumanHandoffActiveError } from "./channelMessageBridge.js";
+import { CommercialRuntimeDispositionError, HumanHandoffActiveError } from "./channelMessageBridge.js";
 import { ChannelAdapterRegistry, createChannelAdapterRegistry } from "./channelAdapterRegistry.js";
 import { ChannelConversationCorrelator } from "./channelConversationCorrelator.js";
 import { ChannelDeliveryService, createOutboundDeliveryRequest } from "./channelDeliveryService.js";
@@ -16,7 +16,7 @@ export type ControlledChannelRouteInput = Readonly<{ channel: string; rawInput: 
 export type ControlledInboundOnlyRouteInput = ControlledChannelRouteInput;
 export type ControlledChannelRouteResult<Formatted = unknown> =
   | Readonly<{ ok: true; channel: ChannelId; adapterChannel: ChannelId; outbound: import("../types/channelMessage.js").OutboundChannelResponse; output: Formatted; delivery: Readonly<OutboundDeliveryResult> }>
-  | Readonly<{ ok: false; channel?: string; errorCode: "CHANNEL_UNKNOWN" | "CHANNEL_NOT_IMPLEMENTED" | "CHANNEL_DISABLED" | "CHANNEL_ADAPTER_UNAVAILABLE" | "CHANNEL_NORMALIZATION_FAILED" | "CHANNEL_CORRELATION_FAILED" | "CHANNEL_FORMAT_FAILED" | "CHANNEL_DELIVERY_FAILED" | "CHANNEL_CORE_FAILED" | "HUMAN_HANDOFF_ACTIVE" }>;
+  | Readonly<{ ok: false; channel?: string; errorCode: "CHANNEL_UNKNOWN" | "CHANNEL_NOT_IMPLEMENTED" | "CHANNEL_DISABLED" | "CHANNEL_ADAPTER_UNAVAILABLE" | "CHANNEL_NORMALIZATION_FAILED" | "CHANNEL_CORRELATION_FAILED" | "CHANNEL_FORMAT_FAILED" | "CHANNEL_DELIVERY_FAILED" | "CHANNEL_CORE_FAILED" | "HUMAN_HANDOFF_ACTIVE" | "CHANNEL_RUNTIME_DENIED" | "CHANNEL_RUNTIME_ERROR"; disposition?: import("../types/runtimeFailureSemantics.js").RuntimeDisposition }>;
 export type ControlledInboundOnlyRouteResult =
   | Readonly<{ ok: true; channel: ChannelId; adapterChannel: ChannelId; outbound: import("../types/channelMessage.js").OutboundChannelResponse }>
   | Extract<ControlledChannelRouteResult, { ok: false }>;
@@ -52,7 +52,8 @@ export class ControlledChannelRouter {
         return Object.freeze({ ok: true, channel: resolution.channel, adapterChannel: resolution.adapterChannel, outbound, output, delivery });
       } catch { return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "CHANNEL_DELIVERY_FAILED" }); }
     } catch (error) {
-      if (error instanceof HumanHandoffActiveError) return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "HUMAN_HANDOFF_ACTIVE" });
+      if (error instanceof HumanHandoffActiveError) return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "HUMAN_HANDOFF_ACTIVE", disposition: error.disposition });
+      if (error instanceof CommercialRuntimeDispositionError) return Object.freeze({ ok: false, channel: resolution.channel, errorCode: error.disposition.category === "CONTROLLED_DENIAL" ? "CHANNEL_RUNTIME_DENIED" : "CHANNEL_RUNTIME_ERROR", disposition: error.disposition });
       if (error instanceof ChannelMessageValidationError) return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "CHANNEL_NORMALIZATION_FAILED" });
       if (error instanceof ConversationCorrelationError) return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "CHANNEL_CORRELATION_FAILED" });
       return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "CHANNEL_CORE_FAILED" });
@@ -72,6 +73,8 @@ export class ControlledChannelRouter {
       const outbound = await processInboundChannelMessage(inbound, { activeProviderMode: input.activeProviderMode, providerOverride: input.providerOverride, orbiConversationId: input.orbiConversationId, correlator: this.correlator, memoryStore: this.memoryStore });
       return Object.freeze({ ok: true, channel: resolution.channel, adapterChannel: resolution.adapterChannel, outbound });
     } catch (error) {
+      if (error instanceof HumanHandoffActiveError) return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "HUMAN_HANDOFF_ACTIVE", disposition: error.disposition });
+      if (error instanceof CommercialRuntimeDispositionError) return Object.freeze({ ok: false, channel: resolution.channel, errorCode: error.disposition.category === "CONTROLLED_DENIAL" ? "CHANNEL_RUNTIME_DENIED" : "CHANNEL_RUNTIME_ERROR", disposition: error.disposition });
       if (error instanceof ChannelMessageValidationError) return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "CHANNEL_NORMALIZATION_FAILED" });
       if (error instanceof ConversationCorrelationError) return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "CHANNEL_CORRELATION_FAILED" });
       return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "CHANNEL_CORE_FAILED" });
@@ -93,6 +96,8 @@ export class ControlledChannelRouter {
       if (delivery.status !== "delivered") return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "CHANNEL_DELIVERY_FAILED" });
       return Object.freeze({ ok: true, channel: resolution.channel, adapterChannel: resolution.adapterChannel, outbound, delivery });
     } catch (error) {
+      if (error instanceof HumanHandoffActiveError) return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "HUMAN_HANDOFF_ACTIVE", disposition: error.disposition });
+      if (error instanceof CommercialRuntimeDispositionError) return Object.freeze({ ok: false, channel: resolution.channel, errorCode: error.disposition.category === "CONTROLLED_DENIAL" ? "CHANNEL_RUNTIME_DENIED" : "CHANNEL_RUNTIME_ERROR", disposition: error.disposition });
       if (error instanceof ChannelMessageValidationError) return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "CHANNEL_NORMALIZATION_FAILED" });
       if (error instanceof ConversationCorrelationError) return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "CHANNEL_CORRELATION_FAILED" });
       return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "CHANNEL_CORE_FAILED" });

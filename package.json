@@ -109,6 +109,7 @@
                     ,"server:commercial-runtime-validator:qa": "tsx server/scripts/runCommercialRuntimeValidatorQa.ts"
                     ,"server:runtime-readiness-report:qa": "tsx server/scripts/runRuntimeReadinessReportQa.ts"
                     ,"server:runtime-failure-semantics:qa": "tsx server/scripts/runRuntimeFailureSemanticsQa.ts"
+                    ,"server:commercial-runtime-integration:qa": "tsx server/scripts/runCommercialRuntimeIntegrationQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",

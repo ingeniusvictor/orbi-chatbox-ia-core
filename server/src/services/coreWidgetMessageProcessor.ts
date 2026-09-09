@@ -17,6 +17,7 @@ import type { AiProvider, AiProviderMode, AiProviderRequest } from "../types/aiP
 import type { NormalizedWidgetMessageRequest, WidgetMessageResponse } from "../types/widget.js";
 import type { ConversationMemoryStore } from "../memory/conversationMemory.js";
 import { selectConversationContext } from "../memory/conversationMemory.js";
+import { RuntimeExecutionFailure } from "./runtimeFailureSemantics.js";
 
 const SANDBOX_GUARDRAILS = ["Sandbox local", "Sin WhatsApp real", "Sin datos reales", "Sin base de datos", "Sin IA externa"];
 
@@ -41,7 +42,12 @@ export const processCoreWidgetMessage = async (
   const conversationHistory = durableContext.length > 0 ? Object.freeze({ turns: Object.freeze(durableContext) }) : buildAssistantConversationHistory(previousHistory);
   const providerRequest: Readonly<AiProviderRequest> = Object.freeze({ requestId: envelope.requestId, conversationId: envelope.conversationId, message: envelope.message.text, conversationHistory, knowledgeContext: envelope.knowledgeContext, assistantInstruction, assistantRuntimeInstruction, assistantBehaviorInstruction, assistantCapabilityContext });
   const provider = providerOverride ?? resolveAiProvider(activeProviderMode);
-  const providerResponse = await provider.generate(providerRequest);
+  let providerResponse;
+  try {
+    providerResponse = await provider.generate(providerRequest);
+  } catch {
+    throw new RuntimeExecutionFailure("PROVIDER_FAILURE");
+  }
   const userTurn = createConversationTurn({ conversationId: envelope.conversationId, role: "user", content: envelope.message.text, sequence: previousHistory.turnCount === 0 ? 1 : previousHistory.turns[previousHistory.turnCount - 1]!.sequence + 1 });
   const assistantTurn = createConversationTurn({ conversationId: envelope.conversationId, role: "assistant", content: providerResponse.text, sequence: userTurn.sequence + 1 });
   appendConversationTurn(userTurn); appendConversationTurn(assistantTurn);

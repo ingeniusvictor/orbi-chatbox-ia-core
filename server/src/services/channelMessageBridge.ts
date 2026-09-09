@@ -5,10 +5,18 @@ import { ChannelConversationCorrelator } from "./channelConversationCorrelator.j
 import { validateInboundChannelMessage, validateOutboundChannelResponse, type InboundChannelMessage, type OutboundChannelResponse } from "../types/channelMessage.js";
 import { defaultHumanHandoffService, type HumanHandoffService } from "../handoff/humanHandoffService.js";
 import type { ConversationMemoryStore } from "../memory/conversationMemory.js";
+import { ORBI_DEFAULT_PROFILE } from "../config/clientProfile.js";
+import { DEFAULT_COMMERCIAL_RUNTIME_POLICY } from "./commercialRuntimeHardening.js";
+import { CommercialRuntimeExecution } from "./commercialRuntimeExecution.js";
+import { createRuntimeDisposition } from "./runtimeFailureSemantics.js";
+import type { RuntimeDisposition } from "../types/runtimeFailureSemantics.js";
 
-export class HumanHandoffActiveError extends Error { constructor(){super("AI execution is suppressed by human handoff.");this.name="HumanHandoffActiveError";} }
+export class CommercialRuntimeDispositionError extends Error { constructor(readonly disposition: RuntimeDisposition){super(disposition.safeMessage);this.name="CommercialRuntimeDispositionError";} }
+export class HumanHandoffActiveError extends CommercialRuntimeDispositionError { constructor(){super(createRuntimeDisposition("HANDOFF_ACTIVE"));this.name="HumanHandoffActiveError";} }
 
-export type ChannelBridgeOptions = Readonly<{ activeProviderMode: AiProviderMode; providerOverride?: AiProvider; orbiConversationId?: string; correlator?: ChannelConversationCorrelator; handoffService?: HumanHandoffService; memoryStore?: ConversationMemoryStore }>;
+export type ChannelBridgeOptions = Readonly<{ activeProviderMode: AiProviderMode; providerOverride?: AiProvider; orbiConversationId?: string; correlator?: ChannelConversationCorrelator; handoffService?: HumanHandoffService; memoryStore?: ConversationMemoryStore; commercialRuntime?: CommercialRuntimeExecution }>;
+
+const defaultCommercialRuntime = new CommercialRuntimeExecution({ activeClient: ORBI_DEFAULT_PROFILE, policy: DEFAULT_COMMERCIAL_RUNTIME_POLICY, handoff: defaultHumanHandoffService });
 
 /**
  * Maps one already-normalized message into the existing local Core. External
@@ -21,8 +29,10 @@ export const processInboundChannelMessage = async (
 ): Promise<Readonly<OutboundChannelResponse>> => {
   const message = validateInboundChannelMessage(inbound);
   const correlation = (options.correlator ?? new ChannelConversationCorrelator()).correlate(message, options.orbiConversationId);
-  if (!options.handoffService?.canExecuteAi(correlation.internalRef!.conversationId) && options.handoffService) throw new HumanHandoffActiveError();
-  if (!options.handoffService && !defaultHumanHandoffService.canExecuteAi(correlation.internalRef!.conversationId)) throw new HumanHandoffActiveError();
+  const internalConversationId = correlation.internalRef!.conversationId;
+  const runtime = options.commercialRuntime ?? (options.handoffService
+    ? new CommercialRuntimeExecution({ activeClient: ORBI_DEFAULT_PROFILE, policy: DEFAULT_COMMERCIAL_RUNTIME_POLICY, handoff: options.handoffService })
+    : defaultCommercialRuntime);
   const legacyInput: NormalizedWidgetMessageRequest = {
     // The current Core ingress is the local sandbox receiver, not the source channel.
     channel: "web_demo",
@@ -34,6 +44,13 @@ export const processInboundChannelMessage = async (
     consentAccepted: true,
     timestamp: message.receivedAt,
   };
-  const coreResponse = await processCoreWidgetMessage(legacyInput, options.activeProviderMode, options.providerOverride, options.memoryStore);
+  const execution = await runtime.execute({ channel: message.channel, internalConversationId, text: message.text }, () =>
+    processCoreWidgetMessage(legacyInput, options.activeProviderMode, options.providerOverride, options.memoryStore),
+  );
+  if (execution.ok === false) {
+    if (execution.disposition.reasonCode === "HANDOFF_ACTIVE") throw new HumanHandoffActiveError();
+    throw new CommercialRuntimeDispositionError(execution.disposition);
+  }
+  const coreResponse = execution.value;
   return validateOutboundChannelResponse({ channel: message.channel, conversationId: coreResponse.conversationId, responseType: "text", text: coreResponse.message, createdAt: coreResponse.processedAt, metadata: { grounded: coreResponse.grounded, sourceEntryIds: coreResponse.sourceEntryIds, provider: coreResponse.provider, requestId: coreResponse.requestId, normalizedMessage: coreResponse.normalizedMessage, messageLength: coreResponse.messageLength, processingMode: coreResponse.processingMode, intent: coreResponse.intent, knowledge: { source: coreResponse.knowledge.source, matchCount: coreResponse.knowledge.matchCount, truncated: coreResponse.knowledge.truncated } } });
 };
