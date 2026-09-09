@@ -17,7 +17,7 @@ const main = (): void => {
     getLumiRuntimeStateMessage("error").includes("LUMI") && !getLumiRuntimeStateMessage("error").includes("LOCAL_AI_"),
     source.includes('setRuntimeState("processing")') && source.includes('setRuntimeState("ready")'),
     source.includes("classifyLumiRuntimeState(result)") && source.includes("handleSendMessage(lastFailedMessage, true)"),
-    source.includes("getLumiRuntimeStateMessage(runtimeState)") && source.includes("getLumiRuntimeStateLabel(runtimeState)"),
+    source.includes("getLumiRuntimeStateMessage(runtimeState)") && source.includes("<LumiRuntimeStatus") && source.includes("runtimeState={runtimeState}"),
     !source.includes("backendError") && !source.includes("ollama") && !source.includes("localStorage") && !source.includes("setInterval") && !source.includes("fallback"),
   ];
   assert(checks.every(Boolean), "Frontend LUMI Runtime State QA: FAIL");
