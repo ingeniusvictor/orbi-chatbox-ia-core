@@ -101,6 +101,7 @@
                     ,"server:messaging-ux:qa": "tsx server/scripts/runMessagingUxQa.ts"
                     ,"server:human-handoff:qa": "tsx server/scripts/runHumanHandoffQa.ts"
                     ,"server:persistent-memory-context:qa": "tsx server/scripts/runPersistentMemoryContextQa.ts"
+                    ,"server:lumi-tool-engine:qa": "tsx server/scripts/runLumiToolEngineQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",
