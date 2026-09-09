@@ -1,0 +1,2 @@
+# 0K-34 Runtime Telemetry
+Telemetry is best-effort operational metadata, not memory, knowledge or business records. The bounded local sink stores safe event metadata only: no message content, prompts, PII, tool arguments or secrets. Provider usage remains optional. Pricing is injected, versioned and local; an unknown price or usage is UNKNOWN, never zero. Estimated API cost is not an invoice and excludes local infrastructure costs.
