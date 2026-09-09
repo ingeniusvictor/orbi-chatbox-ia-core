@@ -5,6 +5,7 @@ coverage/
 .DS_Store
 *.log
 .local-runtime/
+.orbi-data/
 server/runtime/kokoro/.venv/
 server/runtime/kokoro/models/
 server/runtime/kokoro/*.wav

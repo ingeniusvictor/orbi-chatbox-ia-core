@@ -4,10 +4,11 @@ import { processCoreWidgetMessage } from "./coreWidgetMessageProcessor.js";
 import { ChannelConversationCorrelator } from "./channelConversationCorrelator.js";
 import { validateInboundChannelMessage, validateOutboundChannelResponse, type InboundChannelMessage, type OutboundChannelResponse } from "../types/channelMessage.js";
 import { defaultHumanHandoffService, type HumanHandoffService } from "../handoff/humanHandoffService.js";
+import type { ConversationMemoryStore } from "../memory/conversationMemory.js";
 
 export class HumanHandoffActiveError extends Error { constructor(){super("AI execution is suppressed by human handoff.");this.name="HumanHandoffActiveError";} }
 
-export type ChannelBridgeOptions = Readonly<{ activeProviderMode: AiProviderMode; providerOverride?: AiProvider; orbiConversationId?: string; correlator?: ChannelConversationCorrelator; handoffService?: HumanHandoffService }>;
+export type ChannelBridgeOptions = Readonly<{ activeProviderMode: AiProviderMode; providerOverride?: AiProvider; orbiConversationId?: string; correlator?: ChannelConversationCorrelator; handoffService?: HumanHandoffService; memoryStore?: ConversationMemoryStore }>;
 
 /**
  * Maps one already-normalized message into the existing local Core. External
@@ -33,6 +34,6 @@ export const processInboundChannelMessage = async (
     consentAccepted: true,
     timestamp: message.receivedAt,
   };
-  const coreResponse = await processCoreWidgetMessage(legacyInput, options.activeProviderMode, options.providerOverride);
+  const coreResponse = await processCoreWidgetMessage(legacyInput, options.activeProviderMode, options.providerOverride, options.memoryStore);
   return validateOutboundChannelResponse({ channel: message.channel, conversationId: coreResponse.conversationId, responseType: "text", text: coreResponse.message, createdAt: coreResponse.processedAt, metadata: { grounded: coreResponse.grounded, sourceEntryIds: coreResponse.sourceEntryIds, provider: coreResponse.provider, requestId: coreResponse.requestId, normalizedMessage: coreResponse.normalizedMessage, messageLength: coreResponse.messageLength, processingMode: coreResponse.processingMode, intent: coreResponse.intent, knowledge: { source: coreResponse.knowledge.source, matchCount: coreResponse.knowledge.matchCount, truncated: coreResponse.knowledge.truncated } } });
 };

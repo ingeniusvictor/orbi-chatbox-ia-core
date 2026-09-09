@@ -10,6 +10,7 @@ import { ChannelDeliveryService, createOutboundDeliveryRequest } from "./channel
 import { webReferenceDeliveryAdapter } from "../adapters/webReferenceDeliveryAdapter.js";
 import type { ChannelDeliveryAdapter } from "../types/channelDeliveryAdapter.js";
 import type { OutboundDeliveryResult } from "../types/outboundDelivery.js";
+import type { ConversationMemoryStore } from "../memory/conversationMemory.js";
 
 export type ControlledChannelRouteInput = Readonly<{ channel: string; rawInput: unknown; activeProviderMode: AiProviderMode; providerOverride?: AiProvider; orbiConversationId?: string }>;
 export type ControlledInboundOnlyRouteInput = ControlledChannelRouteInput;
@@ -30,6 +31,7 @@ export class ControlledChannelRouter {
     private readonly correlator = new ChannelConversationCorrelator(),
     private readonly deliveryAdapter: ChannelDeliveryAdapter = webReferenceDeliveryAdapter,
     private readonly deliveryService = new ChannelDeliveryService(),
+    private readonly memoryStore?: ConversationMemoryStore,
   ) {}
 
   async route(input: Readonly<ControlledChannelRouteInput>): Promise<ControlledChannelRouteResult> {
@@ -38,7 +40,7 @@ export class ControlledChannelRouter {
     try {
       const normalized = resolution.adapter.normalizeInbound(input.rawInput);
       const inbound = normalized.channel === resolution.channel ? normalized : Object.freeze({ ...normalized, channel: resolution.channel });
-      const outbound = await processInboundChannelMessage(inbound, { activeProviderMode: input.activeProviderMode, providerOverride: input.providerOverride, orbiConversationId: input.orbiConversationId, correlator: this.correlator });
+      const outbound = await processInboundChannelMessage(inbound, { activeProviderMode: input.activeProviderMode, providerOverride: input.providerOverride, orbiConversationId: input.orbiConversationId, correlator: this.correlator, memoryStore: this.memoryStore });
       let output: unknown;
       try {
         // A reused transport formats its own representation while routing retains the requested channel.
@@ -67,7 +69,7 @@ export class ControlledChannelRouter {
     try {
       const normalized = resolution.adapter.normalizeInbound(input.rawInput);
       const inbound = normalized.channel === resolution.channel ? normalized : Object.freeze({ ...normalized, channel: resolution.channel });
-      const outbound = await processInboundChannelMessage(inbound, { activeProviderMode: input.activeProviderMode, providerOverride: input.providerOverride, orbiConversationId: input.orbiConversationId, correlator: this.correlator });
+      const outbound = await processInboundChannelMessage(inbound, { activeProviderMode: input.activeProviderMode, providerOverride: input.providerOverride, orbiConversationId: input.orbiConversationId, correlator: this.correlator, memoryStore: this.memoryStore });
       return Object.freeze({ ok: true, channel: resolution.channel, adapterChannel: resolution.adapterChannel, outbound });
     } catch (error) {
       if (error instanceof ChannelMessageValidationError) return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "CHANNEL_NORMALIZATION_FAILED" });
@@ -86,7 +88,7 @@ export class ControlledChannelRouter {
     try {
       const normalized = resolution.adapter.normalizeInbound(input.rawInput);
       const inbound = normalized.channel === resolution.channel ? normalized : Object.freeze({ ...normalized, channel: resolution.channel });
-      const outbound = await processInboundChannelMessage(inbound, { activeProviderMode: input.activeProviderMode, providerOverride: input.providerOverride, orbiConversationId: input.orbiConversationId, correlator: this.correlator });
+      const outbound = await processInboundChannelMessage(inbound, { activeProviderMode: input.activeProviderMode, providerOverride: input.providerOverride, orbiConversationId: input.orbiConversationId, correlator: this.correlator, memoryStore: this.memoryStore });
       const delivery = await this.deliveryService.deliver(createOutboundDeliveryRequest(outbound), deliveryAdapter);
       if (delivery.status !== "delivered") return Object.freeze({ ok: false, channel: resolution.channel, errorCode: "CHANNEL_DELIVERY_FAILED" });
       return Object.freeze({ ok: true, channel: resolution.channel, adapterChannel: resolution.adapterChannel, outbound, delivery });
