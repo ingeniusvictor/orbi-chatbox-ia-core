@@ -98,6 +98,7 @@
                     ,"server:whatsapp-live-test": "tsx server/scripts/runWhatsAppLiveTextTest.ts"
                     ,"server:whatsapp-template-message:qa": "tsx server/scripts/runWhatsAppTemplateMessageQa.ts"
                     ,"server:whatsapp-live-template-test": "tsx server/scripts/runWhatsAppLiveTemplateTest.ts"
+                    ,"server:messaging-ux:qa": "tsx server/scripts/runMessagingUxQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",

@@ -1,0 +1,1 @@
+export interface ChannelActivityAdapter{setTyping(conversationId:string,active:boolean):Promise<void>|void} export const withChannelActivity=async<T>(adapter:ChannelActivityAdapter|undefined,id:string,run:()=>Promise<T>):Promise<T>=>{try{await adapter?.setTyping(id,true)}catch{}try{return await run()}finally{try{await adapter?.setTyping(id,false)}catch{}}};
