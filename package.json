@@ -104,6 +104,7 @@
                     ,"server:lumi-tool-engine:qa": "tsx server/scripts/runLumiToolEngineQa.ts"
                     ,"server:business-tools:qa": "tsx server/scripts/runBusinessToolsQa.ts"
                     ,"server:runtime-telemetry:qa": "tsx server/scripts/runRuntimeTelemetryQa.ts"
+                    ,"server:client-profile:qa": "tsx server/scripts/runClientProfileQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",
