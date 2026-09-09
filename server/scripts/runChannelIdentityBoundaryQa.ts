@@ -1,4 +1,8 @@
 import { readFileSync } from "node:fs";
+import { validateClientProfile } from "../src/config/clientProfile.js";
+import { defaultHumanHandoffService } from "../src/handoff/humanHandoffService.js";
+import { CommercialRuntimeExecution } from "../src/services/commercialRuntimeExecution.js";
+import { DEFAULT_COMMERCIAL_RUNTIME_POLICY } from "../src/services/commercialRuntimeHardening.js";
 import { ChannelConversationCorrelator } from "../src/services/channelConversationCorrelator.js";
 import { InMemoryConversationCorrelationStore } from "../src/services/inMemoryConversationCorrelationStore.js";
 import { processInboundChannelMessage } from "../src/services/channelMessageBridge.js";
@@ -12,9 +16,25 @@ const provider: AiProvider = Object.freeze({ mode: "mock", async generate(reques
 
 try {
   const correlator = new ChannelConversationCorrelator(new InMemoryConversationCorrelationStore());
-  const first = await processInboundChannelMessage(inbound("web", "visitor-001"), { activeProviderMode: "mock", providerOverride: provider, correlator });
-  const repeated = await processInboundChannelMessage(inbound("web", "visitor-001"), { activeProviderMode: "mock", providerOverride: provider, correlator });
-  const crossChannel = await processInboundChannelMessage(inbound("whatsapp", "visitor-001"), { activeProviderMode: "mock", providerOverride: provider, correlator });
+
+  const qaProfile = validateClientProfile({
+    schemaVersion: 1,
+    profileId: "channel-identity-qa",
+    organization: { displayName: "ORBI QA" },
+    assistant: { displayName: "LUMI", locale: "es-CL" },
+    capabilities: { allowedTools: [] },
+    channels: { enabled: ["web", "whatsapp"] },
+    knowledge: { enabled: false },
+  });
+
+  const commercialRuntime = new CommercialRuntimeExecution({
+    activeClient: qaProfile,
+    policy: DEFAULT_COMMERCIAL_RUNTIME_POLICY,
+    handoff: defaultHumanHandoffService,
+  });
+  const first = await processInboundChannelMessage(inbound("web", "visitor-001"), { activeProviderMode: "mock", providerOverride: provider, correlator, commercialRuntime });
+  const repeated = await processInboundChannelMessage(inbound("web", "visitor-001"), { activeProviderMode: "mock", providerOverride: provider, correlator, commercialRuntime });
+  const crossChannel = await processInboundChannelMessage(inbound("whatsapp", "visitor-001"), { activeProviderMode: "mock", providerOverride: provider, correlator, commercialRuntime });
   const bridgeSource = readFileSync(new URL("../src/services/channelMessageBridge.ts", import.meta.url), "utf8");
   const coreSources = ["coreWidgetMessageProcessor.ts", "conversationEnvelope.ts", "conversationTurn.ts"].map((name) => readFileSync(new URL(`../src/services/${name}`, import.meta.url), "utf8")).join("\n");
   const bannedProviderSpecificIds = /waId|phoneNumber|metaUserId|whatsappConversationId|telegramId|slackUserId/;
