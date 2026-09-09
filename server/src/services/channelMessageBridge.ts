@@ -9,6 +9,7 @@ import { ORBI_DEFAULT_PROFILE } from "../config/clientProfile.js";
 import { DEFAULT_COMMERCIAL_RUNTIME_POLICY } from "./commercialRuntimeHardening.js";
 import { CommercialRuntimeExecution } from "./commercialRuntimeExecution.js";
 import { createRuntimeDisposition } from "./runtimeFailureSemantics.js";
+import { createInternalConversationRef } from "./internalConversationIdentity.js";
 import type { RuntimeDisposition } from "../types/runtimeFailureSemantics.js";
 
 export class CommercialRuntimeDispositionError extends Error { constructor(readonly disposition: RuntimeDisposition){super(disposition.safeMessage);this.name="CommercialRuntimeDispositionError";} }
@@ -29,7 +30,8 @@ export const processInboundChannelMessage = async (
 ): Promise<Readonly<OutboundChannelResponse>> => {
   const message = validateInboundChannelMessage(inbound);
   const correlation = (options.correlator ?? new ChannelConversationCorrelator()).correlate(message, options.orbiConversationId);
-  const internalConversationId = correlation.internalRef!.conversationId;
+  const internalRef = correlation.internalRef ?? createInternalConversationRef();
+  const internalConversationId = internalRef.conversationId;
   const runtime = options.commercialRuntime ?? (options.handoffService
     ? new CommercialRuntimeExecution({ activeClient: ORBI_DEFAULT_PROFILE, policy: DEFAULT_COMMERCIAL_RUNTIME_POLICY, handoff: options.handoffService })
     : defaultCommercialRuntime);
@@ -38,7 +40,7 @@ export const processInboundChannelMessage = async (
     channel: "web_demo",
     // External user IDs are correlation metadata, never Core visitor/user identity.
     visitorId: "channel-adapter-local",
-    conversationId: correlation.internalRef?.conversationId,
+    conversationId: internalConversationId,
     message: message.text,
     pageUrl: message.metadata?.pageUrl ?? "channel-adapter-local",
     consentAccepted: true,
