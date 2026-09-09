@@ -107,6 +107,7 @@
                     ,"server:client-profile:qa": "tsx server/scripts/runClientProfileQa.ts"
                     ,"server:commercial-readiness:qa": "tsx server/scripts/runCommercialReadinessQa.ts"
                     ,"server:commercial-runtime-validator:qa": "tsx server/scripts/runCommercialRuntimeValidatorQa.ts"
+                    ,"server:runtime-readiness-report:qa": "tsx server/scripts/runRuntimeReadinessReportQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",
