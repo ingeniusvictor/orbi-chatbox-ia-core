@@ -4,6 +4,7 @@ import { WhatsAppGraphClient, type WhatsAppGraphTransport } from "../src/channel
 import { loadWhatsAppRuntimeConfig } from "../src/config/whatsappRuntimeConfig.js";
 import { createChannelAdapterRegistry } from "../src/services/channelAdapterRegistry.js";
 import { ControlledChannelRouter } from "../src/services/controlledChannelRouter.js";
+import { createWhatsAppQaCommercialRuntime } from "./createWhatsAppQaCommercialRuntime.js";
 
 const assert = (value: unknown, message: string): void => { if (!value) throw new Error(message); };
 const config = loadWhatsAppRuntimeConfig({ WHATSAPP_ENABLED: "true", WHATSAPP_VERIFY_TOKEN: "qa-verify", WHATSAPP_APP_SECRET: "qa-app-secret", WHATSAPP_ACCESS_TOKEN: "qa-access-token", WHATSAPP_PHONE_NUMBER_ID: "0000000000", WHATSAPP_BUSINESS_ACCOUNT_ID: "business-qa", WHATSAPP_GRAPH_API_VERSION: "v99.0" });
@@ -15,7 +16,7 @@ try {
   let calls = 0;
   let capturedBody = "";
   const transport: WhatsAppGraphTransport = async (request) => { calls += 1; capturedBody = request.body; return Object.freeze({ status: 200, body: JSON.stringify({ messages: [{ id: "wamid.boundary-only" }] }) }); };
-  const router = new ControlledChannelRouter(createChannelAdapterRegistry(config));
+  const router = new ControlledChannelRouter(createChannelAdapterRegistry(config), undefined, undefined, undefined, undefined, createWhatsAppQaCommercialRuntime());
   const adapterFor = (sender: string) => new WhatsAppDeliveryAdapter(new WhatsAppGraphClient(config, transport, 1_000), () => Object.freeze({ recipient: sender }));
   const success = await router.routeInboundWithDelivery({ channel: "whatsapp", rawInput: inbound("wamid.success", "1111111111", "hola"), activeProviderMode: "mock", providerOverride: provider }, adapterFor("1111111111"));
   assert("delivery" in success && success.delivery.status === "delivered" && calls === 1, "Inbound response must use the injected WhatsApp delivery adapter once.");
@@ -25,7 +26,7 @@ try {
   const unavailable = loadWhatsAppRuntimeConfig({ WHATSAPP_ENABLED: "true", WHATSAPP_VERIFY_TOKEN: "qa-verify", WHATSAPP_APP_SECRET: "qa-app-secret" });
   let missingCalls = 0;
   const missingAdapter = new WhatsAppDeliveryAdapter(new WhatsAppGraphClient(unavailable, async () => { missingCalls += 1; return Object.freeze({ status: 200, body: "{}" }); }, 1_000), () => Object.freeze({ recipient: "2222222222" }));
-  const missing = await new ControlledChannelRouter(createChannelAdapterRegistry(unavailable)).routeInboundWithDelivery({ channel: "whatsapp", rawInput: inbound("wamid.missing", "2222222222", "sin config"), activeProviderMode: "mock", providerOverride: provider }, missingAdapter);
+  const missing = await new ControlledChannelRouter(createChannelAdapterRegistry(unavailable), undefined, undefined, undefined, undefined, createWhatsAppQaCommercialRuntime()).routeInboundWithDelivery({ channel: "whatsapp", rawInput: inbound("wamid.missing", "2222222222", "sin config"), activeProviderMode: "mock", providerOverride: provider }, missingAdapter);
   assert("errorCode" in missing && missing.errorCode === "CHANNEL_DELIVERY_FAILED" && missingCalls === 0, "Missing config must fail closed without transport execution.");
   let failureCalls = 0;
   const rejectedAdapter = new WhatsAppDeliveryAdapter(new WhatsAppGraphClient(config, async () => { failureCalls += 1; return Object.freeze({ status: 429, body: "provider-body-must-not-leak" }); }, 1_000), () => Object.freeze({ recipient: "3333333333" }));

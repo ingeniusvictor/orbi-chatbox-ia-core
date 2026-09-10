@@ -9,6 +9,7 @@ import { createWhatsAppWebhookRawBodyMiddleware } from "../src/middleware/whatsA
 import { createWhatsAppWebhookRouter } from "../src/routes/whatsappWebhook.js";
 import { createChannelAdapterRegistry } from "../src/services/channelAdapterRegistry.js";
 import { ControlledChannelRouter } from "../src/services/controlledChannelRouter.js";
+import { createWhatsAppQaCommercialRuntime } from "./createWhatsAppQaCommercialRuntime.js";
 
 const assert = (value: unknown, message: string): void => { if (!value) throw new Error(message); };
 const secret = "qa-app-secret";
@@ -30,7 +31,7 @@ try {
   app.use(createWhatsAppWebhookRouter(config, "mock", provider, Object.freeze({ createDeliveryAdapter: (inbound): ChannelDeliveryAdapter => {
     const delegate = new WhatsAppDeliveryAdapter(new WhatsAppGraphClient(config, transport, 1_000), () => Object.freeze({ recipient: inbound.externalUserId }));
     return Object.freeze({ deliver: async (request) => { deliveryIds.push(request.deliveryId); return delegate.deliver(request); } });
-  } })));
+  } }), createWhatsAppQaCommercialRuntime()));
   const server = await new Promise<import("node:http").Server>((resolve) => { const value = app.listen(0, "127.0.0.1", () => resolve(value)); });
   try {
     const address = server.address(); if (!address || typeof address === "string") throw new Error("Webhook listener unavailable.");
@@ -47,7 +48,7 @@ try {
     assert(!JSON.stringify(first.body).includes("respuesta:") && !JSON.stringify(first.body).includes("wamid.fake"), "Webhook acknowledgement must not expose Core text or provider result.");
   } finally { await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve())); }
   let failureCalls = 0;
-  const failureRouter = new ControlledChannelRouter(createChannelAdapterRegistry(config));
+  const failureRouter = new ControlledChannelRouter(createChannelAdapterRegistry(config), undefined, undefined, undefined, undefined, createWhatsAppQaCommercialRuntime());
   const failedAdapter = new WhatsAppDeliveryAdapter(new WhatsAppGraphClient(config, async () => { failureCalls += 1; return Object.freeze({ status: 500, body: "private-provider-error" }); }, 1_000), () => Object.freeze({ recipient: "3333333333" }));
   const beforeFailure = coreCalls.length;
   const failed = await failureRouter.routeInboundWithDelivery({ channel: "whatsapp", rawInput: event("wamid.failure", "3333333333", "fallo"), activeProviderMode: "mock", providerOverride: provider }, failedAdapter);

@@ -6,18 +6,27 @@ import { loadWhatsAppRuntimeConfig } from "../src/config/whatsappRuntimeConfig.j
 import { ControlledChannelRouter } from "../src/services/controlledChannelRouter.js";
 import { createChannelAdapterRegistry } from "../src/services/channelAdapterRegistry.js";
 import { InMemoryWhatsAppInboundDeduplicationStore } from "../src/channels/whatsapp/inMemoryWhatsAppInboundDeduplicationStore.js";
+import { createWhatsAppQaCommercialRuntime } from "./createWhatsAppQaCommercialRuntime.js";
 
 const assert = (value: unknown, message: string): void => { if (!value) throw new Error(message); };
 const config = loadWhatsAppRuntimeConfig({ WHATSAPP_ENABLED: "true", WHATSAPP_VERIFY_TOKEN: "qa", WHATSAPP_APP_SECRET: "qa-app-secret" });
+const commercialRuntime = createWhatsAppQaCommercialRuntime();
 const inbound = Object.freeze({ providerMessageId: "wamid.boundary.1", externalUserId: "56912345678", externalConversationId: "whatsapp:56912345678", text: "Hola LUMI", receivedAt: "2026-09-05T00:00:00.000Z" });
 const start = async (): Promise<{ baseUrl: string; close: () => Promise<void> }> => {
-  const app = express(); app.use("/api/channels/whatsapp/webhook", createWhatsAppWebhookRawBodyMiddleware()); app.use(express.json()); app.use(createWhatsAppWebhookRouter(config));
+  const app = express(); app.use("/api/channels/whatsapp/webhook", createWhatsAppWebhookRawBodyMiddleware()); app.use(express.json()); app.use(createWhatsAppWebhookRouter(config, "mock", undefined, undefined, commercialRuntime));
   const server = await new Promise<import("node:http").Server>((resolve) => { const value = app.listen(0, "127.0.0.1", () => resolve(value)); });
   const address = server.address(); if (!address || typeof address === "string") throw new Error("Listener unavailable.");
   return { baseUrl: `http://127.0.0.1:${address.port}`, close: async () => new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve())) };
 };
 try {
-  const router = new ControlledChannelRouter(createChannelAdapterRegistry(config));
+  const router = new ControlledChannelRouter(
+    createChannelAdapterRegistry(config),
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    commercialRuntime,
+  );
   const result = await router.routeInboundOnly({ channel: "whatsapp", rawInput: inbound, activeProviderMode: "mock" });
   assert(result.ok && result.outbound.channel === "whatsapp" && result.outbound.conversationId !== inbound.externalConversationId, "Router must correlate external identity before Core and return only neutral output.");
   const dedup = new InMemoryWhatsAppInboundDeduplicationStore(1);

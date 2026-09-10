@@ -6,6 +6,7 @@ import { WhatsAppGraphClient, type WhatsAppGraphTransport } from "../src/channel
 import { loadWhatsAppRuntimeConfig } from "../src/config/whatsappRuntimeConfig.js";
 import { createWhatsAppWebhookRawBodyMiddleware } from "../src/middleware/whatsAppWebhookRawBody.js";
 import { createWhatsAppWebhookRouter } from "../src/routes/whatsappWebhook.js";
+import { createWhatsAppQaCommercialRuntime } from "./createWhatsAppQaCommercialRuntime.js";
 
 const assert = (value: unknown, message: string): void => { if (!value) throw new Error(message); };
 const secret = "qa-app-secret";
@@ -21,7 +22,7 @@ try {
   const app = express();
   app.use("/api/channels/whatsapp/webhook", createWhatsAppWebhookRawBodyMiddleware());
   app.use(express.json());
-  app.use(createWhatsAppWebhookRouter(config, "mock", provider, Object.freeze({ createDeliveryAdapter: (event) => new WhatsAppDeliveryAdapter(new WhatsAppGraphClient(config, transport, 1_000), () => Object.freeze({ recipient: event.externalUserId })) })));
+  app.use(createWhatsAppWebhookRouter(config, "mock", provider, Object.freeze({ createDeliveryAdapter: (event) => new WhatsAppDeliveryAdapter(new WhatsAppGraphClient(config, transport, 1_000), () => Object.freeze({ recipient: event.externalUserId })) }), createWhatsAppQaCommercialRuntime()));
   const server = await new Promise<import("node:http").Server>((resolve) => { const value = app.listen(0, "127.0.0.1", () => resolve(value)); });
   try {
     const address = server.address(); if (!address || typeof address === "string") throw new Error("Listener unavailable.");

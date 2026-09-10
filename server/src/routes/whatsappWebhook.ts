@@ -10,6 +10,7 @@ import { createSandboxError } from "../security/errorResponses.js";
 import type { AiProvider, AiProviderMode } from "../types/aiProvider.js";
 import type { ChannelDeliveryAdapter } from "../types/channelDeliveryAdapter.js";
 import type { WhatsAppInboundTextEvent } from "../channels/whatsapp/whatsappInboundText.js";
+import type { CommercialRuntimeExecution } from "../services/commercialRuntimeExecution.js";
 
 const verifyMode = "subscribe";
 const webhookReady = (config: WhatsAppRuntimeConfig): boolean => config.readiness === "ready-for-webhook" || config.readiness === "ready-for-api";
@@ -26,9 +27,17 @@ export const createWhatsAppWebhookRouter = (
   activeProviderMode: AiProviderMode = "mock",
   providerOverride?: AiProvider,
   outboundIntegration?: Readonly<WhatsAppOutboundDeliveryIntegration>,
+  commercialRuntime?: CommercialRuntimeExecution,
 ): Router => {
   const router = Router();
-  const routerService = new ControlledChannelRouter(createChannelAdapterRegistry(config));
+  const routerService = new ControlledChannelRouter(
+    createChannelAdapterRegistry(config),
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    commercialRuntime,
+  );
   const deduplication = new InMemoryWhatsAppInboundDeduplicationStore();
 
   router.get("/api/channels/whatsapp/webhook", (request, response) => {

@@ -4,6 +4,7 @@ import type { AiProvider, AiProviderRequest } from "../src/types/aiProvider.js";
 import { createWhatsAppWebhookRawBodyMiddleware } from "../src/middleware/whatsAppWebhookRawBody.js";
 import { createWhatsAppWebhookRouter } from "../src/routes/whatsappWebhook.js";
 import { loadWhatsAppRuntimeConfig } from "../src/config/whatsappRuntimeConfig.js";
+import { createWhatsAppQaCommercialRuntime } from "./createWhatsAppQaCommercialRuntime.js";
 
 const assert = (value: unknown, message: string): void => { if (!value) throw new Error(message); };
 const secret = "qa-app-secret";
@@ -29,7 +30,7 @@ const start = async (): Promise<{ baseUrl: string; close: () => Promise<void> }>
   const app = express();
   app.use("/api/channels/whatsapp/webhook", createWhatsAppWebhookRawBodyMiddleware());
   app.use(express.json());
-  app.use(createWhatsAppWebhookRouter(config, "mock", provider));
+  app.use(createWhatsAppWebhookRouter(config, "mock", provider, undefined, createWhatsAppQaCommercialRuntime()));
   const server = await new Promise<import("node:http").Server>((resolve) => { const value = app.listen(0, "127.0.0.1", () => resolve(value)); });
   const address = server.address(); if (!address || typeof address === "string") throw new Error("Webhook listener unavailable.");
   return Object.freeze({ baseUrl: `http://127.0.0.1:${address.port}`, close: async () => new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve())) });
