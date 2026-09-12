@@ -19,6 +19,13 @@ export type WhatsAppProductionComposition = Readonly<{
   outboundIntegration: WhatsAppProductionOutboundIntegration;
 }>;
 
+
+export const isWhatsAppOutboundCompositionReady = (
+  config: Readonly<WhatsAppRuntimeConfig>,
+): boolean =>
+  config.outboundDeliveryEnabled &&
+  config.outboundReadiness === "ready-for-outbound";
+
 export type WhatsAppProductionCompositionInput = Readonly<{
   config: Readonly<WhatsAppRuntimeConfig>;
   commercialRuntime: CommercialRuntimeExecution;
