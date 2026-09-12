@@ -10,9 +10,31 @@ import { createWhatsAppWebhookRouter } from "./routes/whatsappWebhook.js";
 import { createWhatsAppWebhookRawBodyMiddleware } from "./middleware/whatsAppWebhookRawBody.js";
 import { createSandboxError } from "./security/errorResponses.js";
 import { createWhatsAppCommercialRuntime } from "./services/whatsAppCommercialRuntime.js";
+import {
+  createWhatsAppProductionComposition,
+  isWhatsAppOutboundCompositionReady,
+} from "./services/whatsAppProductionComposition.js";
+import type { WhatsAppGraphTransport } from "./channels/whatsapp/whatsappGraphClient.js";
 
-export const createApp = (runtimeEnv: ServerRuntimeEnv): express.Express => {
+export type AppCompositionOverrides = Readonly<{
+  whatsappGraphTransport?: WhatsAppGraphTransport;
+}>;
+
+export const createApp = (
+  runtimeEnv: ServerRuntimeEnv,
+  overrides: AppCompositionOverrides = {},
+): express.Express => {
   const app = express();
+  const whatsappCommercialRuntime = createWhatsAppCommercialRuntime();
+  const whatsappProduction = isWhatsAppOutboundCompositionReady(runtimeEnv.whatsapp)
+    ? createWhatsAppProductionComposition({
+        config: runtimeEnv.whatsapp,
+        commercialRuntime: whatsappCommercialRuntime,
+        ...(overrides.whatsappGraphTransport
+          ? { transport: overrides.whatsappGraphTransport }
+          : {}),
+      })
+    : undefined;
 
   // Must precede global JSON parsing so the webhook HMAC sees its exact bytes.
   app.use("/api/channels/whatsapp/webhook", createWhatsAppWebhookRawBodyMiddleware());
@@ -30,8 +52,8 @@ export const createApp = (runtimeEnv: ServerRuntimeEnv): express.Express => {
       runtimeEnv.whatsapp,
       runtimeEnv.activeAiProvider,
       undefined,
-      undefined,
-      createWhatsAppCommercialRuntime(),
+      whatsappProduction?.outboundIntegration,
+      whatsappProduction?.commercialRuntime ?? whatsappCommercialRuntime,
     ),
   );
   app.use(createWidgetMessageRouter(runtimeEnv.demoWidgetPublicKey, runtimeEnv.activeAiProvider));
