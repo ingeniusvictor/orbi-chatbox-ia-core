@@ -111,6 +111,7 @@
                     ,"server:runtime-failure-semantics:qa": "tsx server/scripts/runRuntimeFailureSemanticsQa.ts"
                     ,"server:commercial-runtime-integration:qa": "tsx server/scripts/runCommercialRuntimeIntegrationQa.ts"
                     ,"server:whatsapp-commercial-profile:qa": "tsx server/scripts/runWhatsAppCommercialProfileQa.ts"
+                    ,"server:whatsapp-production-webhook:qa": "tsx server/scripts/runWhatsAppProductionWebhookCompositionQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",
