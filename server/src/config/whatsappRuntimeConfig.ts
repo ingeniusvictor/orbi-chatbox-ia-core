@@ -6,6 +6,7 @@ export type WhatsAppTemplateLiveTestReadiness = "disabled" | "config-incomplete"
 export type WhatsAppRuntimeConfig = Readonly<{
   enabled: boolean;
   liveSendEnabled: boolean;
+  outboundDeliveryEnabled: boolean;
   readiness: WhatsAppRuntimeReadiness;
   outboundReadiness: WhatsAppOutboundReadiness;
   liveTestReadiness: WhatsAppLiveTestReadiness;
@@ -47,6 +48,7 @@ export const loadWhatsAppRuntimeConfig = (
 ): WhatsAppRuntimeConfig => {
   const enabled = parseEnabled(env.WHATSAPP_ENABLED);
   const liveSendEnabled = parseEnabled(env.WHATSAPP_LIVE_SEND_ENABLED);
+  const outboundDeliveryEnabled = parseEnabled(env.WHATSAPP_OUTBOUND_DELIVERY_ENABLED);
   const verifyToken = trim(env.WHATSAPP_VERIFY_TOKEN);
   const appSecret = trim(env.WHATSAPP_APP_SECRET);
   const accessToken = trim(env.WHATSAPP_ACCESS_TOKEN);
@@ -59,7 +61,7 @@ export const loadWhatsAppRuntimeConfig = (
   const outboundValues = [accessToken, phoneNumberId, graphApiVersion];
   const hasAnyOutboundValue = outboundValues.some(Boolean);
   const hasCompleteOutboundConfig = outboundValues.every(Boolean) && validGraphVersion(graphApiVersion);
-  const invalid = enabled === "invalid" || !validGraphVersion(graphApiVersion) || !validBoundaryId(phoneNumberId) || !validBoundaryId(businessAccountId) || !validTemplateName(testTemplateName) || !validTemplateLanguageCode(testTemplateLanguageCode) || (hasAnyOutboundValue && !hasCompleteOutboundConfig);
+  const invalid = enabled === "invalid" || outboundDeliveryEnabled === "invalid" || !validGraphVersion(graphApiVersion) || !validBoundaryId(phoneNumberId) || !validBoundaryId(businessAccountId) || !validTemplateName(testTemplateName) || !validTemplateLanguageCode(testTemplateLanguageCode) || (hasAnyOutboundValue && !hasCompleteOutboundConfig);
   const readiness: WhatsAppRuntimeReadiness = invalid
     ? "invalid-config"
     : enabled === false
@@ -100,6 +102,7 @@ export const loadWhatsAppRuntimeConfig = (
   return Object.freeze({
     enabled: enabled === true,
     liveSendEnabled: liveSendEnabled === true,
+    outboundDeliveryEnabled: outboundDeliveryEnabled === true,
     readiness,
     outboundReadiness,
     liveTestReadiness,
