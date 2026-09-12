@@ -112,6 +112,7 @@
                     ,"server:commercial-runtime-integration:qa": "tsx server/scripts/runCommercialRuntimeIntegrationQa.ts"
                     ,"server:whatsapp-commercial-profile:qa": "tsx server/scripts/runWhatsAppCommercialProfileQa.ts"
                     ,"server:whatsapp-production-webhook:qa": "tsx server/scripts/runWhatsAppProductionWebhookCompositionQa.ts"
+                    ,"server:whatsapp-production-outbound:qa": "tsx server/scripts/runWhatsAppProductionOutboundDeliveryQa.ts"
                 },
     "dependencies":  {
                          "@google/genai":  "^2.4.0",
