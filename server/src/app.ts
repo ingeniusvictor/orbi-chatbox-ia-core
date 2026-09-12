@@ -9,6 +9,7 @@ import { createVoiceRouter } from "./routes/voice.js";
 import { createWhatsAppWebhookRouter } from "./routes/whatsappWebhook.js";
 import { createWhatsAppWebhookRawBodyMiddleware } from "./middleware/whatsAppWebhookRawBody.js";
 import { createSandboxError } from "./security/errorResponses.js";
+import { createWhatsAppCommercialRuntime } from "./services/whatsAppCommercialRuntime.js";
 
 export const createApp = (runtimeEnv: ServerRuntimeEnv): express.Express => {
   const app = express();
@@ -24,7 +25,15 @@ export const createApp = (runtimeEnv: ServerRuntimeEnv): express.Express => {
   app.use(createAuditLog(runtimeEnv.auditLogEnabled));
   app.use(healthRouter);
   app.use(createVoiceRouter());
-  app.use(createWhatsAppWebhookRouter(runtimeEnv.whatsapp, runtimeEnv.activeAiProvider));
+  app.use(
+    createWhatsAppWebhookRouter(
+      runtimeEnv.whatsapp,
+      runtimeEnv.activeAiProvider,
+      undefined,
+      undefined,
+      createWhatsAppCommercialRuntime(),
+    ),
+  );
   app.use(createWidgetMessageRouter(runtimeEnv.demoWidgetPublicKey, runtimeEnv.activeAiProvider));
 
   const notFoundHandler: RequestHandler = (_request, response) => {
